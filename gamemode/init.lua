@@ -3,6 +3,10 @@ include( 'shared.lua' )
 include( 'player.lua' )
 include( 'config.lua' )
 
+AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "player_sdh.lua" )
+
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
    Desc: Called immediately after starting the gamemode 
