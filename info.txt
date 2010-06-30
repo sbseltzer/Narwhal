@@ -1,0 +1,13 @@
+"Gamemode"
+{
+	"name"		"Narwhal Base"
+	"version"	"1.0"
+
+	"author_name"	"TEAM GMODCENTRAL"
+	"author_email"	"team@gmodcentral.com"
+	"author_url"	"http://www.gmodcentral.com/"
+	
+	"icon"		""
+	"info"		""
+	"hide"		"1"
+}
