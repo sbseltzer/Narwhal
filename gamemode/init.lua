@@ -2,7 +2,6 @@
 include( 'shared.lua' )
 include( 'player.lua' )
 include( 'config.lua' )
-include( 'achievements.lua' )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
