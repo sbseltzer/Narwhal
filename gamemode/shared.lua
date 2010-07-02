@@ -3,8 +3,6 @@
 
 	Developer's Notes:
 	
-	
-	
 	Narwhals are like fucking sea-unicorns.
 
 ---------------------------------------------------------*/

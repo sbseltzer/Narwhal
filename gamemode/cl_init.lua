@@ -1,7 +1,6 @@
 
 
 include( 'shared.lua' )
-include( 'cl_pickteam.lua' )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
@@ -21,7 +20,8 @@ end
    Name: gamemode:InitPostEntity( )
    Desc: Called as soon as all map entities have been spawned
 ---------------------------------------------------------*/
-function GM:InitPostEntity( )	
+function GM:InitPostEntity( )
+	
 end
 
 
@@ -127,85 +127,6 @@ end
 
 
 /*---------------------------------------------------------
-   Name: gamemode:OnChatTab( str )
-   Desc: Tab is pressed when typing (Auto-complete names, IRC style)
----------------------------------------------------------*/
-function GM:OnChatTab( str )
-
-	local LastWord
-	for word in string.gmatch( str, "%a+" ) do
-	     LastWord = word;
-	end
-	
-	if (LastWord == nil) then return str end
-	
-	playerlist = player.GetAll()
-	
-	for k, v in pairs( playerlist ) do
-		
-		local nickname = v:Nick()
-		
-		if ( string.len(LastWord) < string.len(nickname) &&
-			 string.find( string.lower(nickname), string.lower(LastWord) ) == 1 ) then
-				
-			str = string.sub( str, 1, (string.len(LastWord) * -1) - 1)
-			str = str .. nickname
-			return str
-			
-		end		
-		
-	end
-		
-	return str;
-
-end
-
-/*---------------------------------------------------------
-   Name: gamemode:StartChat( teamsay )
-   Desc: Start Chat.
-   
-		 If you want to display your chat shit different here's what you'd do:
-			In StartChat show your text box and return true to hide the default
-			Update the text in your box with the text passed to ChatTextChanged
-			Close and clear your text box when FinishChat is called.
-			Return true in ChatText to not show the default chat text
-			
----------------------------------------------------------*/
-function GM:StartChat( teamsay )
-	return false
-end
-
-/*---------------------------------------------------------
-   Name: gamemode:FinishChat()
----------------------------------------------------------*/
-function GM:FinishChat()
-end
-
-/*---------------------------------------------------------
-   Name: gamemode:ChatTextChanged( text)
----------------------------------------------------------*/
-function GM:ChatTextChanged( text )
-end
-
-
-/*---------------------------------------------------------
-   Name: ChatText
-   Allows override of the chat text
----------------------------------------------------------*/
-function GM:ChatText( playerindex, playername, text, filter )
-
-	if ( filter == "chat" ) then
-		Msg( playername, ": ", text, "\n" )
-	else
-		Msg( text, "\n" )
-	end
-	
-	return false
-
-end
-
-
-/*---------------------------------------------------------
    Name: gamemode:PostProcessPermitted( str )
    Desc: return true/false depending on whether this post process should be allowed
 ---------------------------------------------------------*/
@@ -229,51 +150,6 @@ end
    Desc: Render the scene
 ---------------------------------------------------------*/
 function GM:RenderScene()
-end
-
-/*---------------------------------------------------------
-   Name: CalcVehicleThirdPersonView
----------------------------------------------------------*/
-function GM:CalcVehicleThirdPersonView( Vehicle, ply, origin, angles, fov )
-
-	local view = {}
-	view.angles		= angles
-	view.fov 		= fov
-	
-	if ( !Vehicle.CalcView ) then
-	
-		Vehicle.CalcView = {}
-		
-		// Try to work out the size
-		local min, max = Vehicle:WorldSpaceAABB()
-		local size = max - min
-		
-		Vehicle.CalcView.OffsetUp = size.z
-		Vehicle.CalcView.OffsetOut = (size.x + size.y + size.z) * 0.33
-	
-	end
-	
-	// Offset the origin
-	local Up = view.angles:Up() * Vehicle.CalcView.OffsetUp * 0.66
-	local Offset = view.angles:Forward() * -Vehicle.CalcView.OffsetOut
-	
-	// Trace back from the original eye position, so we don't clip through walls/objects
-	local TargetOrigin = Vehicle:GetPos() + Up + Offset
-	local distance = origin - TargetOrigin
-	
-	local trace = {
-					start = origin,
-					endpos = TargetOrigin,
-					filter = Vehicle
-				  }
-				  
-				  
-	local tr = util.TraceLine( trace ) 
-	
-	view.origin = origin + tr.Normal * (distance:Length() - 10) * tr.Fraction
-		
-	return view
-
 end
 
 

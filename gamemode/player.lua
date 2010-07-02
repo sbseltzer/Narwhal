@@ -1,50 +1,5 @@
 
 /*---------------------------------------------------------
-   Name: gamemode:OnPhysgunFreeze( weapon, phys, ent, player )
-   Desc: The physgun wants to freeze a prop
----------------------------------------------------------*/
-function GM:OnPhysgunFreeze( weapon, phys, ent, ply )
-	
-	// Object is already frozen (!?)
-	if ( !phys:IsMoveable() ) then return false end
-	if ( ent:GetUnFreezable() ) then return false end
-	
-	phys:EnableMotion( false )
-	
-	// With the jeep we need to pause all of its physics objects
-	// to stop it spazzing out and killing the server.
-	if (ent:GetClass() == "prop_vehicle_jeep") then
-	
-		local objects = ent:GetPhysicsObjectCount()
-		
-		for i=0, objects-1 do
-		
-			local physobject = ent:GetPhysicsObjectNum( i )
-			physobject:EnableMotion( false )
-			
-		end
-	
-	end
-	
-	// Add it to the player's frozen props
-	ply:AddFrozenPhysicsObject( ent, phys )
-	
-	return true
-	
-end
-
-
-/*---------------------------------------------------------
-   Name: gamemode:OnPhysgunReload( weapon, player )
-   Desc: The physgun wants to freeze a prop
----------------------------------------------------------*/
-function GM:OnPhysgunReload( weapon, ply )
-
-	ply:PhysgunUnfreeze( weapon )
-
-end
-
-/*---------------------------------------------------------
    Name: gamemode:PlayerCanPickupWeapon( )
    Desc: Called when a player tries to pickup a weapon.
 		  return true to allow the pickup.
@@ -55,21 +10,12 @@ end
 
 
 /*---------------------------------------------------------
-   Name: gamemode:CanPlayerUnfreeze( )
-   Desc: Can the player unfreeze this entity & physobject
----------------------------------------------------------*/
-function GM:CanPlayerUnfreeze( ply, entity, physobject )
-	return true
-end
-
-
-
-/*---------------------------------------------------------
    Name: gamemode:PlayerDisconnected( )
    Desc: Player has disconnected from the server.
 ---------------------------------------------------------*/
 function GM:PlayerDisconnected( player )
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerSay( )
@@ -98,6 +44,7 @@ function GM:PlayerDeathThink( pl )
 	
 end
 
+
 /*---------------------------------------------------------
 	Name: gamemode:PlayerUse( player, entity )
 	Desc: A player has attempted to use a specific entity
@@ -106,6 +53,7 @@ end
 function GM:PlayerUse( pl, entity )
 	return true
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerSilentDeath( )
@@ -117,6 +65,7 @@ function GM:PlayerSilentDeath( Victim )
 	Victim.DeathTime = CurTime()
 
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerDeath( )
@@ -174,6 +123,7 @@ function GM:PlayerDeath( Victim, Inflictor, Attacker )
 	
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerInitialSpawn( )
    Desc: Called just before the player's first spawn
@@ -187,6 +137,7 @@ function GM:PlayerInitialSpawn( pl )
 	end
 
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerSpawnAsSpectator( )
@@ -207,6 +158,7 @@ function GM:PlayerSpawnAsSpectator( pl )
 	pl:Spectate( OBS_MODE_ROAMING )
 
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerSpawn( )
@@ -236,18 +188,6 @@ function GM:PlayerSpawn( pl )
 	
 end
 
-/*---------------------------------------------------------
-   Name: gamemode:PlayerSetModel( )
-   Desc: Set the player's model
----------------------------------------------------------*/
-function GM:PlayerSetModel( pl )
-
-	local cl_playermodel = pl:GetInfo( "cl_playermodel" )
-	local modelname = player_manager.TranslatePlayerModel( cl_playermodel )
-	util.PrecacheModel( modelname )
-	pl:SetModel( modelname )
-	
-end
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerLoadout( )
@@ -277,6 +217,7 @@ function GM:PlayerLoadout( pl )
 	end
 	
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerSelectTeamSpawn( player )
@@ -337,6 +278,7 @@ function GM:IsSpawnpointSuitable( pl, spawnpointent, bMakeSuitable )
 	return true
 
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerSelectSpawn( player )
@@ -425,12 +367,6 @@ function GM:PlayerSelectSpawn( pl )
 	
 end
 
-/*---------------------------------------------------------
-   Name: gamemode:WeaponEquip( weapon )
-   Desc: Player just picked up (or was given) weapon
----------------------------------------------------------*/
-function GM:WeaponEquip( weapon )
-end
 
 /*---------------------------------------------------------
    Name: gamemode:ScalePlayerDamage( ply, hitgroup, dmginfo )
@@ -459,6 +395,7 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerDeathSound()
    Desc: Return true to not play the default sounds
@@ -466,6 +403,7 @@ end
 function GM:PlayerDeathSound()
 	return true
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:SetupPlayerVisibility()
@@ -484,11 +422,13 @@ function GM:CanPlayerSuicide( ply )
 	return true
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerLeaveVehicle()
 ---------------------------------------------------------*/
 function GM:PlayerLeaveVehicle( ply, veichle )
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:CanExitVehicle()
@@ -498,6 +438,7 @@ function GM:CanExitVehicle( veichle, passenger )
 	return true
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerSwitchFlashlight()
 		Return true to allow action
@@ -505,6 +446,7 @@ end
 function GM:PlayerSwitchFlashlight( ply, SwitchOn )
 	return true
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerCanJoinTeam( ply, teamid )
@@ -530,6 +472,7 @@ function GM:PlayerCanJoinTeam( ply, teamid )
 	
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerRequestTeam()
 		Player wants to change team
@@ -553,28 +496,6 @@ function GM:PlayerRequestTeam( ply, teamid )
 	
 end
 
-/*---------------------------------------------------------
-   Name: gamemode:PlayerJoinTeam()
-		Make player join this team
----------------------------------------------------------*/
-function GM:PlayerJoinTeam( ply, teamid )
-	
-	local iOldTeam = ply:Team()
-	
-	if ( ply:Alive() ) then
-		if (iOldTeam == TEAM_SPECTATOR || iOldTeam == TEAM_UNASSIGNED) then
-			ply:KillSilent()
-		else
-			ply:Kill()
-		end
-	end
-
-	ply:SetTeam( teamid )
-	ply.LastTeamSwitch = RealTime()
-	
-	GAMEMODE:OnPlayerChangedTeam( ply, iOldTeam, teamid )
-	
-end
 
 /*---------------------------------------------------------
    Name: gamemode:OnPlayerChangedTeam( ply, oldteam, newteam )
@@ -608,15 +529,17 @@ function GM:OnPlayerChangedTeam( ply, oldteam, newteam )
 	
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerSpray()
 		Return true to prevent player spraying
 ---------------------------------------------------------*/
 function GM:PlayerSpray( ply )
 	
-	return false
+	return GAMEMODE.Config.AllowSprays
 	
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:OnPlayerHitGround()
@@ -630,6 +553,7 @@ function GM:OnPlayerHitGround( ply, bInWater, bOnFloater, flFallSpeed )
 	//return true
 	
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:GetFallDamage()
@@ -645,6 +569,7 @@ function GM:GetFallDamage( ply, flFallSpeed )
 	
 end
 
+
 /*---------------------------------------------------------
    Name: gamemode:PlayerCanSeePlayersChat()
 		Can this player see the other player's chat?
@@ -659,6 +584,7 @@ function GM:PlayerCanSeePlayersChat( strText, bTeamOnly, pListener, pSpeaker )
 	return true
 	
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerCanHearPlayersVoice()

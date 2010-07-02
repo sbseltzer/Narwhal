@@ -2,6 +2,8 @@
 include( 'shared.lua' )
 include( 'player.lua' )
 include( 'config.lua' )
+include( 'money.lua' )
+include( 'achievements.lua' )
 
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
@@ -12,7 +14,7 @@ AddCSLuaFile( "player_sdh.lua" )
    Desc: Called immediately after starting the gamemode 
 ---------------------------------------------------------*/
 function GM:Initialize( )
-	
+	GAMEMODE:LoadAchievements()
 end
 
 
