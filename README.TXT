@@ -7,5 +7,5 @@ Doug52392
 Ryaga
 Kamataima
 UberMensch
-And JetBoom since we edited his Lua Animations API.
+And JetBoom for his Lua Animations API.
 

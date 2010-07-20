@@ -56,7 +56,7 @@ function ENT:AcceptInput( name, activator, caller, data )
 		if self.Vals[string.sub( name, 7 )] then
 			self.Vals[string.sub( name, 7 )] = data
 		end
-	elseif name = "createval" then
+	elseif name == "createval" then
 		local rawData = string.Explode(",", data)
 		if !self.Vals[rawData[1]] then
 			self.Vals[rawData[1]] = rawData[2]

@@ -3,11 +3,15 @@
 
 	Developer's Notes:
 	
-	Narwhals are like fucking sea-unicorns.
+	Keep your including to init.lua, cl_init.lua, and
+	shared.lua. Try not to do much more editing than
+	include and AddCSLuaFile in these files unless
+	absolutely neccessary.
 
 ---------------------------------------------------------*/
 
 include( 'player_shd.lua' )
+include( 'networking/network_shd.lua' )
 include( 'animations.lua' )
 
 DeriveGamemode( "base" )
@@ -67,10 +71,27 @@ function GM:Move( ply, move )
 end
 
 /*---------------------------------------------------------
+   Name: EntityRemoved
+   Desc: Called right before an entity is removed. Note that this
+   isn't going to be totally reliable on the client since the client
+   only knows about entities that it has had in its PVS.
+---------------------------------------------------------*/
+function GM:EntityRemoved( ent )
+	//GAMEMODE:RemoveEntityIndex( ent ) -- Remove all the NWVars from the cache for this entity
+end
+
+/*---------------------------------------------------------
    Name: Tick
    Desc: Like Think except called every tick on both client and server
 ---------------------------------------------------------*/
 function GM:Tick()
+end
+
+/*---------------------------------------------------------
+   Name: OnEntityCreated
+   Desc: Called right after the Entity has been made visible to Lua
+---------------------------------------------------------*/
+function GM:OnEntityCreated( Ent )
 end
 
 /*---------------------------------------------------------

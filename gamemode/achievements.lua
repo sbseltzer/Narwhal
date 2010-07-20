@@ -20,8 +20,12 @@ function GM:AddAchievement( uniquename, name, desc, icon, detect )
 	}
 end
 
-// Example achievement.
-GAMEMODE:AddAchievement( "IsAdmin", "The Adminator", "Get switched to the admin usergroup on the server.", "achievements/isadmin", function( ply ) if ply:IsAdmin() then return true end end )
+function GM:AddAchievements()
+
+	// Example achievement.
+	GAMEMODE:AddAchievement( "IsAdmin", "The Adminator", "Get switched to the admin usergroup on the server.", "achievements/isadmin", function( ply ) if ply:IsAdmin() then return true end end )
+
+end
 
 // Loads achievements.
 function GM:LoadAchievements()

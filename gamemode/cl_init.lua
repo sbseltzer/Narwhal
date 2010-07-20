@@ -1,6 +1,18 @@
 
+/*---------------------------------------------------------
+
+	Developer's Notes:
+	
+	Keep your including to init.lua, cl_init.lua, and
+	shared.lua. Try not to do much more editing than
+	include and AddCSLuaFile in these files unless
+	absolutely neccessary.
+
+---------------------------------------------------------*/
 
 include( 'shared.lua' )
+include( 'networking/network_cl.lua' )
+include( 'cl_testhooks.lua' )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
@@ -8,11 +20,7 @@ include( 'shared.lua' )
 ---------------------------------------------------------*/
 function GM:Initialize( )
 
-	GAMEMODE.ShowScoreboard = false
-	
-	surface.CreateFont( "coolvetica", 48, 500, true, false, "ScoreboardHead" )
-	surface.CreateFont( "coolvetica", 24, 500, true, false, "ScoreboardSub" )
-	surface.CreateFont( "Tahoma", 16, 1000, true, false, "ScoreboardText" )
+	GAMEMODE:LoadNetworkConfigurations_Internal()
 	
 end
 
