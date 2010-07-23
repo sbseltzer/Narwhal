@@ -441,14 +441,14 @@ GM.__NetworkData = {
 
 // This can be used to add custom datatypes. This could be useful on a per-gamemode basis. It would allow developers to design their own ways of sending data.
 // Every time we send data, it follows a general pattern: Check to see if the data is valid within the context of the variable, Encode it somehow, Send that encoded data via usermessages, and then Retrieving that data on the client.
-function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcEncode, funcSend, funcRetrieve )
+function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcEncode, funcSend, funcRead )
 	local tData = {}
 	tData["Ref"] = sRef
 	tData["Storage"] = sStore
 	tData["Func_Check"] = funcCheck
 	tData["Func_Encode"] = funcEncode
 	tData["Func_Send"] = funcSend
-	tData["Func_Retrieve"] = funcRetrieve
+	tData["Func_Read"] = funcRead
 	GAMEMODE.__NetworkData[sType] = tData
 end
 

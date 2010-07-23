@@ -11,21 +11,11 @@
 ---------------------------------------------------------*/
 
 
-include( 'shared.lua' )
-include( 'player.lua' )
-include( 'config.lua' )
-include( 'money.lua' )
-include( 'achievements.lua' )
-include( 'networking/network.lua' )
+include( 'includes.lua' )
+include( 'includes_shd.lua' )
 
-AddCSLuaFile( "shared.lua" )
-AddCSLuaFile( "cl_init.lua" )
-AddCSLuaFile( "player_sdh.lua" )
-AddCSLuaFile( "networking/network_cl.lua" )
-AddCSLuaFile( "networking/network_shd.lua" )
-
-include( 'sv_testhooks.lua' )
-AddCSLuaFile( "cl_testhooks.lua" )
+AddCSLuaFile( "includes_cl.lua" )
+AddCSLuaFile( "includes_shd.lua" )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )

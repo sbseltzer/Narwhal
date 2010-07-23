@@ -64,7 +64,7 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	GAMEMODE.__NetworkCache[storageDest][ID][Name].Filter = Filter -- Update the filter settings.
 	GAMEMODE.__NetworkCache[storageDest][ID][Name].Value = Var
 	
-	SendData.Func_Check( Var )
+	if SendData.Func_Check( Var ) == false then return end
 	Var = SendData.Func_Encode( Var )
 	
 	umsg.Start( "NETWORK_SendVariable", RF )

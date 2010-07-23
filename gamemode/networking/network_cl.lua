@@ -66,7 +66,7 @@ local function UMSG_RecieveVariable( um )
 	local Name = StorageData[3]
 	local RecieveData = GAMEMODE:GetNetworkConfigurations()[storageType]
 	local storageDest = RecieveData.Storage
-	local Var = RecieveData.Func_Recieve( um )
+	local Var = RecieveData.Func_Read( um )
 	
 	if !GAMEMODE.__NetworkCache[storageDest] then
 		GAMEMODE.__NetworkCache[storageDest] = {}

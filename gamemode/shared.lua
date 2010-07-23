@@ -10,9 +10,8 @@
 
 ---------------------------------------------------------*/
 
-include( 'player_shd.lua' )
-include( 'networking/network_shd.lua' )
-include( 'animations.lua' )
+
+include( 'includes_shd.lua' )
 
 DeriveGamemode( "base" )
 

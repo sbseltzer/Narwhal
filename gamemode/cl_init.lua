@@ -10,9 +10,9 @@
 
 ---------------------------------------------------------*/
 
-include( 'shared.lua' )
-include( 'networking/network_cl.lua' )
-include( 'cl_testhooks.lua' )
+
+include( 'includes_cl.lua' )
+include( 'includes_shd.lua' )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
