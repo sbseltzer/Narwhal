@@ -36,7 +36,6 @@ local function ResetModuleTable()
 	MODULE.Author = ""
 	MODULE.Contact = ""
 	MODULE.Purpose = ""
-	MODULE.CreateObject = false
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
@@ -47,9 +46,20 @@ local function ResetModuleTable()
 	end
 	
 	// Adds a hook for the specified module.
-	function MODULE.Hook( hookName, uniqueName, func )
+	function MODULE:Hook( hookName, uniqueName, func )
 		local self = self or MODULE
-		hook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
+		local isMember = false
+		for k, v in pairs( self ) do
+			if v == func then
+				isMember = true
+				break
+			end
+		end
+		if isMember then
+			hook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
+		else
+			hook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
+		end
 	end
 	
 	// Gets a key value, or sets one if it's nil
@@ -93,24 +103,6 @@ local function RegisterModule( path, state )
 	if path:find(".") and !path:find(".lua") then return end -- Don't include the "." or ".." folders.
 	
 	ResetModuleTable() -- Reset the Module table
-	
-	// Autogenerates a metatable
-	local function GenerateObjectRef()
-		if MODULE.CreateObject then
-			local ModuleObject = {}
-			MODULE.Object.__index = ModuleObject
-			function MODULE:Constructor()
-				if !self.Object then
-					ErrorNoHalt( "Module '"..self.Name.."' has no Object table!\n" )
-					return
-				end
-				local obj = {}
-				obj = self:SetupObject( obj )
-				setmetatable( obj, self.Object )
-				return obj
-			end
-		end
-	end
 	
 	// Does the actuall including
 	local function FinalInclude()
@@ -236,7 +228,7 @@ local function PreloadModuleData( path, state )
 	
 end
 
-local function IncludeGamemodeModules()
+local function LoadGamemodeModules()
 	
 	local Folder = string.Replace( GM.Folder, "gamemodes/", "" );
 	local path, state
@@ -283,7 +275,7 @@ local function recur( name )
 	table.insert( IncludedModules, inc )
 end
 
-IncludeGamemodeModules() -- Preload them
+LoadGamemodeModules() -- Preload them
 
 PrintTable(ModuleFiles)
 
