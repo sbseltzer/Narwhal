@@ -24,14 +24,14 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType )
 	
 	local storageDest = GAMEMODE.__NetworkData[storageType].Storage
 	
-	if !GAMEMODE.__NetworkCache[storageDest] then
-		GAMEMODE.__NetworkCache[storageDest] = {}
+	if !NARWHAL.__NetworkCache[storageDest] then
+		NARWHAL.__NetworkCache[storageDest] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID] then
-		GAMEMODE.__NetworkCache[storageDest][ID] = {}
+	if !NARWHAL.__NetworkCache[storageDest][ID] then
+		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
 	
-	GAMEMODE.__NetworkCache[storageDest][ID][Name] = Var
+	NARWHAL.__NetworkCache[storageDest][ID][Name] = Var
 	
 end
 
@@ -43,18 +43,18 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType )
 	local ID = Ent:GetNetworkID()
 	local storageDest = GAMEMODE.__NetworkData[storageType].Storage
 	
-	if !GAMEMODE.__NetworkCache[storageDest] then
-		GAMEMODE.__NetworkCache[storageDest] = {}
+	if !NARWHAL.__NetworkCache[storageDest] then
+		NARWHAL.__NetworkCache[storageDest] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID] then
-		GAMEMODE.__NetworkCache[storageDest][ID] = {}
+	if !NARWHAL.__NetworkCache[storageDest][ID] then
+		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID][Name] then
+	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
 		GAMEMODE:SendNetworkedVariable( Ent, Name, Var, storageType )
 		return Var
 	end
 	
-	return GAMEMODE.__NetworkCache[storageDest][ID][Name]
+	return NARWHAL.__NetworkCache[storageDest][ID][Name]
 	
 end
 
@@ -68,14 +68,14 @@ local function UMSG_RecieveVariable( um )
 	local storageDest = RecieveData.Storage
 	local Var = RecieveData.Func_Read( um )
 	
-	if !GAMEMODE.__NetworkCache[storageDest] then
-		GAMEMODE.__NetworkCache[storageDest] = {}
+	if !NARWHAL.__NetworkCache[storageDest] then
+		NARWHAL.__NetworkCache[storageDest] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID] then
-		GAMEMODE.__NetworkCache[storageDest][ID] = {}
+	if !NARWHAL.__NetworkCache[storageDest][ID] then
+		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
 	
-	GAMEMODE.__NetworkCache[storageDest][ID][Name] = Var
+	NARWHAL.__NetworkCache[storageDest][ID][Name] = Var
 	
 end
 usermessage.Hook( "NETWORK_SendVariable", UMSG_RecieveVariable )
@@ -88,7 +88,7 @@ local function UMSG_RemoveVariable( um )
 	local Name = StorageData[3]
 	
 	local storageDest = GAMEMODE.__NetworkTypeTranslateTable[storageType]
-	GAMEMODE.__NetworkCache[storageDest][ID][Name] = nil
+	NARWHAL.__NetworkCache[storageDest][ID][Name] = nil
 	
 end
 usermessage.Hook( "NETWORK_RemoveVariable", UMSG_RemoveVariable )
@@ -98,8 +98,8 @@ local function UMSG_RemoveIndex( um )
 	local ID = um:ReadString()
 	
 	for k, v in pairs( GAMEMODE.__NetworkData ) do
-		if GAMEMODE.__NetworkCache[v.Storage][ID] then
-			GAMEMODE.__NetworkCache[v.Storage][ID] = nil
+		if NARWHAL.__NetworkCache[v.Storage][ID] then
+			NARWHAL.__NetworkCache[v.Storage][ID] = nil
 		end
 	end
 	

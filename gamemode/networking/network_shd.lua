@@ -22,18 +22,18 @@ local tonumber = tonumber
 local tostring = tostring
 local FindMetaTable = FindMetaTable
 
-GM.__NetworkCache = {} -- Set up the shared Network Cache table
-GM.__NetworkCache.Booleans = {} -- Stores NWBools
-GM.__NetworkCache.Strings = {} -- Stores NWStrings
-GM.__NetworkCache.Integers = {} -- Stores NWInts
-GM.__NetworkCache.Floats = {} -- Stores NWFloats
-GM.__NetworkCache.Entities = {} -- Stores NWEntities
-GM.__NetworkCache.Colors = {} -- Stores NWColors
-GM.__NetworkCache.Vectors = {} -- Stores NWVectors
-GM.__NetworkCache.Angles = {} -- Stores NWAngles
-GM.__NetworkCache.Effects = {} -- Stores NWEffects
-GM.__NetworkCache.Tables = {} -- Stores NWTables
-GM.__NetworkCache.Vars = {} -- Stores NWVars
+NARWHAL.__NetworkCache = {} -- Set up the shared Network Cache table
+NARWHAL.__NetworkCache.Booleans = {} -- Stores NWBools
+NARWHAL.__NetworkCache.Strings = {} -- Stores NWStrings
+NARWHAL.__NetworkCache.Integers = {} -- Stores NWInts
+NARWHAL.__NetworkCache.Floats = {} -- Stores NWFloats
+NARWHAL.__NetworkCache.Entities = {} -- Stores NWEntities
+NARWHAL.__NetworkCache.Colors = {} -- Stores NWColors
+NARWHAL.__NetworkCache.Vectors = {} -- Stores NWVectors
+NARWHAL.__NetworkCache.Angles = {} -- Stores NWAngles
+NARWHAL.__NetworkCache.Effects = {} -- Stores NWEffects
+NARWHAL.__NetworkCache.Tables = {} -- Stores NWTables
+NARWHAL.__NetworkCache.Vars = {} -- Stores NWVars
 
 function ents.GetByNetworkID( id )
 	local eType, eID = id:sub( 1, 3 ), id:sub( 3 )
@@ -769,26 +769,28 @@ function GM:LoadNetworkConfigurations_Internal()
 	for k, v in pairs( GAMEMODE.__NetworkData ) do
 		ENTITY["SendNetworked"..v.Ref] = function( self, Name, Var, Filter )
 			if !self or !ValidEntity( self ) or ( type( self ):lower() != "entity" and type( self ):lower() != "player" ) then
-				error( "Bad argument #1 (Entity or Player expected, got "..type( self )..")\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..type( self ).."\n", 2 )
 			elseif !Name then
-				error( "Bad argument #2 (String or Number expected, got "..type( Name )..")\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "Bad argument #2 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
 			elseif !Var then
-				error( "Bad argument #3 (Attempted to use nil variable!)\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
+			elseif Filter and type( Filter ) != "player" and type( Filter ) != "entity" and type( Filter ) != "CRecipientFilter" and !IsTableOfEntitiesValid( Filter ) then
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
 			end
 			print( self, Name, Var, k, Filter )
 			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
 		end
 		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter )
 			if !self or !ValidEntity( self ) or ( type( self ):lower() != "entity" and type( self ):lower() != "player" ) then
-				error( "Bad argument #1 (Entity or Player expected, got "..type( self )..")\n", 2 )
+				error( "FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..type( self ).."\n", 2 )
 			elseif !Name then
-				error( "Bad argument #2 (String or Number expected, got "..type( Name )..")\n", 2 )
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "Bad argument #2 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
-			elseif !Var then
-				error( "Bad argument #3 (Attempted to use nil variable!)\n", 2 )
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+			elseif Filter and type( Filter ) != "player" and type( Filter ) != "entity" and type( Filter ) != "CRecipientFilter" and !IsTableOfEntitiesValid( Filter ) then
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
 			end
 			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
 		end

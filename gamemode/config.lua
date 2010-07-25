@@ -8,6 +8,7 @@
 ---------------------------------------------------------*/
 
 GM.Config = {}
+GM.Config["UseModules"]				= true -- Toggle Module Loading.
 GM.Config["UseMySQL"]				= true -- Toggle MySQL Interfaces.
 GM.Config["UseLuaAnims"]			= true -- Toggle the Lua based animations. This includes NPC animations merged to the player.
 GM.Config["UseMoney"]				= true -- Toggle the money system.

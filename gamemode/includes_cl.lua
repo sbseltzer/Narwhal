@@ -12,8 +12,8 @@
 	
 ---------------------------------------------------------*/
 
-
-include( 'shared.lua' )
-include( 'modules.lua' )
+// Include client files
 include( 'networking/network_cl.lua' )
+
+// Temp files for testing
 include( 'cl_testhooks.lua' )

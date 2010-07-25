@@ -11,19 +11,27 @@
 ---------------------------------------------------------*/
 
 
-include( 'includes.lua' )
-include( 'includes_shd.lua' )
+NARWHAL = {}
 
-AddCSLuaFile( "includes_cl.lua" )
+// Include shared files
+include( 'shared.lua' )
+
+// Include server files
+include( 'includes.lua' )
+
+// Add shared files
+AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "includes_shd.lua" )
+
+// Add client files
+AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "includes_cl.lua" )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
    Desc: Called immediately after starting the gamemode 
 ---------------------------------------------------------*/
 function GM:Initialize( )
-	--GAMEMODE:AddAchievements()
-	--GAMEMODE:LoadAchievements()
 	GAMEMODE:SetupConfigCommands()
 	GAMEMODE:LoadNetworkConfigurations_Internal()
 end

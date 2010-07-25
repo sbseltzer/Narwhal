@@ -11,8 +11,13 @@
 ---------------------------------------------------------*/
 
 
+NARWHAL = {}
+
+// Include shared files
+include( 'shared.lua' )
+
+// Include client files
 include( 'includes_cl.lua' )
-include( 'includes_shd.lua' )
 
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
@@ -29,7 +34,6 @@ end
    Desc: Called as soon as all map entities have been spawned
 ---------------------------------------------------------*/
 function GM:InitPostEntity( )
-	
 end
 
 
@@ -89,7 +93,7 @@ function GM:HUDShouldDraw( name )
 		
 	end
 
-	return true;
+	return true
 	
 end
 
@@ -139,9 +143,7 @@ end
    Desc: return true/false depending on whether this post process should be allowed
 ---------------------------------------------------------*/
 function GM:PostProcessPermitted( str )
-
 	return true
-
 end
 
 
@@ -169,7 +171,6 @@ function GM:CalcView( ply, origin, angles, fov )
 	
 	local Vehicle = ply:GetVehicle()
 	local wep = ply:GetActiveWeapon()
-
 	
 	if ( ValidEntity( Vehicle ) && 
 		 gmod_vehicle_viewmode:GetInt() == 1 
@@ -241,7 +242,6 @@ end
    Desc: The player has just been drawn.
 ---------------------------------------------------------*/
 function GM:PostPlayerDraw( ply )
-
 	
 end
 
@@ -250,7 +250,6 @@ end
    Desc: The player is just about to be drawn.
 ---------------------------------------------------------*/
 function GM:PrePlayerDraw( ply )
-
 	
 end
 

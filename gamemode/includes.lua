@@ -14,21 +14,22 @@
 ---------------------------------------------------------*/
 
 
-include( 'shared.lua' )
-include( 'modules.lua' )
-include( 'player.lua' )
+// Include server files
 include( 'config.lua' )
+include( 'player.lua' )
 include( 'money.lua' )
 include( 'achievements.lua' )
 include( 'networking/network.lua' )
 
-AddCSLuaFile( "shared.lua" )
+// Add shared files
 AddCSLuaFile( "modules.lua" )
-AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "animations.lua" )
 AddCSLuaFile( "player_shd.lua" )
+
+// Add client files
 AddCSLuaFile( "networking/network_cl.lua" )
 AddCSLuaFile( "networking/network_shd.lua" )
 
+// Temp files for testing
 include( 'sv_testhooks.lua' )
 AddCSLuaFile( "cl_testhooks.lua" )
-

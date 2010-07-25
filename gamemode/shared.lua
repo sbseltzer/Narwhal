@@ -10,7 +10,7 @@
 
 ---------------------------------------------------------*/
 
-
+// Include shared files
 include( 'includes_shd.lua' )
 
 DeriveGamemode( "base" )

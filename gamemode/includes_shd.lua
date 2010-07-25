@@ -12,7 +12,8 @@
 	
 ---------------------------------------------------------*/
 
-
+// Include shared files
+include( 'modules.lua' )
+include( 'animations.lua' )
 include( 'player_shd.lua' )
 include( 'networking/network_shd.lua' )
-include( 'animations.lua' )

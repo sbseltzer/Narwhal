@@ -33,9 +33,6 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	print( Ent, Name, Var, storageType, Filter )
 	
-	
-	print("no errors... yet")
-	
 	storageType = storageType or "var"
 	
 	local realType = type( Var )
@@ -43,17 +40,17 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	local storageDest = SendData.Storage
 	local ID = Ent:GetNetworkID()
 	
-	if !GAMEMODE.__NetworkCache[storageDest] then
-		GAMEMODE.__NetworkCache[storageDest] = {}
+	if !NARWHAL.__NetworkCache[storageDest] then
+		NARWHAL.__NetworkCache[storageDest] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID] then
-		GAMEMODE.__NetworkCache[storageDest][ID] = {}
+	if !NARWHAL.__NetworkCache[storageDest][ID] then
+		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID][Name] then
-		GAMEMODE.__NetworkCache[storageDest][ID][Name] = {}
+	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
+		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
 	end
 	
-	Filter = Filter or GAMEMODE.__NetworkCache[storageDest][ID][Name].Filter
+	Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter
 	
 	if !Filter then
 		RF = RecipientFilter()
@@ -61,8 +58,8 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 		Filter = RF
 	end
 	
-	GAMEMODE.__NetworkCache[storageDest][ID][Name].Filter = Filter -- Update the filter settings.
-	GAMEMODE.__NetworkCache[storageDest][ID][Name].Value = Var
+	NARWHAL.__NetworkCache[storageDest][ID][Name].Filter = Filter -- Update the filter settings.
+	NARWHAL.__NetworkCache[storageDest][ID][Name].Value = Var
 	
 	if SendData.Func_Check( Var ) == false then return end
 	Var = SendData.Func_Encode( Var )
@@ -79,11 +76,9 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	// We don't want to go any further if some of our args are invalid
 	if !Ent or !ValidEntity( Ent ) or ( string.lower( type( Ent ) ) != "entity" and string.lower( type( Ent ) ) != "player" ) then
-		error( "Bad argument #1 (Entity or Player expected, got "..type( Ent )..")\n", 4 )
+		error( "GAMEMODE.FetchNetworkedVariable Failed: Bad argument #1 (Entity or Player expected, got "..type( Ent )..")\n", 4 )
 	elseif !Name then
-		error( "Bad argument #2 (String or Number expected, got "..type( Name )..")\n", 4 )
-	elseif !Var then
-		error( "Bad argument #3 (Attempted to use nil variable!)\n", 4 )
+		error( "GAMEMODE.FetchNetworkedVariable Failed: Bad argument #2 (String or Number expected, got "..type( Name )..")\n", 4 )
 	end
 	
 	storageType = storageType or "var"
@@ -92,15 +87,15 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	local storageDest = GAMEMODE:GetNetworkConfigurations()[storageType].Storage
 	
-	if !GAMEMODE.__NetworkCache[storageDest] then
-		GAMEMODE.__NetworkCache[storageDest] = {}
+	if !NARWHAL.__NetworkCache[storageDest] then
+		NARWHAL.__NetworkCache[storageDest] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID] then
-		GAMEMODE.__NetworkCache[storageDest][ID] = {}
+	if !NARWHAL.__NetworkCache[storageDest][ID] then
+		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
-	if !GAMEMODE.__NetworkCache[storageDest][ID][Name] then
-		GAMEMODE.__NetworkCache[storageDest][ID][Name] = {}
-		Filter = Filter or GAMEMODE.__NetworkCache[storageDest][ID][Name].Filter
+	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
+		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
+		Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter
 		if !Filter then
 			local RF = RecipientFilter()
 			RF:AddAllPlayers()
@@ -110,7 +105,7 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 		return Var
 	end
 	
-	return GAMEMODE.__NetworkCache[storageDest][ID][Name].Value
+	return NARWHAL.__NetworkCache[storageDest][ID][Name].Value
 	
 end
 
@@ -120,7 +115,7 @@ function GM:DeleteNetworkedVariable( Ent, Name, storageType )
 	
 	local ID = Ent:GetNetworkID()
 	local storageDest = GAMEMODE.__NetworkTypeTranslateTable[storageType]
-	GAMEMODE.__NetworkCache[storageDest][ID][Name] = nil
+	NARWHAL.__NetworkCache[storageDest][ID][Name] = nil
 	
 	umsg.Start( "NETWORK_RemoveVariable" )
 		umsg.String( ID .. " " .. storageType .. " " .. Name )
