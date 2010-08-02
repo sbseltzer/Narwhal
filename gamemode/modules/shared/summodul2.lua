@@ -11,6 +11,8 @@ MODULE.Author = "Grea$eMonkey" -- The author
 MODULE.Contact = "ssjgamemaker@charter.net" -- The author's contact
 MODULE.Purpose = "Just an example module to figure out the framework design from." -- The purpose
 
+print("lol"..somenilvalue)
+
 // Called one time after the module has loaded.
 function MODULE:Initialize()
 	print(self.Name.." has initialized!")
@@ -30,5 +32,5 @@ function MODULE:Think()
 	--print(self.Name.." is thinking!")
 end
 
-
+--NARWHAL.RegisterModule( MODULE )
 

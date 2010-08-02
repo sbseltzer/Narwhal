@@ -10,6 +10,7 @@
 
 ---------------------------------------------------------*/
 
+
 // Include shared files
 include( 'includes_shd.lua' )
 
@@ -29,8 +30,14 @@ GM.Teams		= {}
   'Color' is the team color.
   'SpawnPoints' is a table list of spawn points (or just a string for one spawn point).
 ---------------------------------------------------------*/
-GM.Teams[1] = { Global = "ONE", Name = "Team 1 Name", Color = Color(100,200,100), SpawnPoints = { "info_player_start" } }
-GM.Teams[2] = { Global = "TWO", Name = "Team 2 Name", Color = Color(200,100,200), SpawnPoints = { "info_player_start" } }
+
+function Add_Team( iTeamNum, strGlobal, strName, tblColor, tblSpawnPoints )
+	local GM = GM or GAMEMODE
+	GM.Teams[iTeamNum] = { Global = strGlobal, Name = strName, Color = tblColor, SpawnPoints = tblSpawnPoints }
+end
+
+Add_Team( 1, "ONE", "Team 1 Name", Color(100,200,100), { "info_player_start" } )
+Add_Team( 2, "TWO", "Team 2 Name", Color(200,100,200), { "info_player_start" } )
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerConnect( )

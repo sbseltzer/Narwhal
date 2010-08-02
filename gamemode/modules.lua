@@ -1,17 +1,22 @@
 
-// A
+/*
+	Module files are read to find their dependencies before being included.
+	Their name, path, state, and dependencies are written to a table. 
+	Global Module table is set up.
+	Each module is loaded and any dependencies are loaded first in a recursive function.
+*/
 
 NARWHAL.__Modules = {}
 
---local WHITELIST = {}
 local ModuleFiles = {}
 local IncludedModules = {}
+local FailedModules = {}
+local moduleHook = hook
 
 // Gets the module data from the global table
 local function GetModule( moduleName )
 	if !NARWHAL.__Modules[moduleName] then
-		--ErrorNoHalt( "Module '"..moduleName.."' is not a registered module.\n" )
-		return
+		return false
 	end
 	return NARWHAL.__Modules[moduleName]
 end
@@ -20,16 +25,16 @@ end
 function IncludeModule( Module )
 	local t = GetModule( Module ) -- Gets the module's table
 	if !t then
-		error( "The inclusion of Module '"..Module.."' failed!\n" )
+		error( "Inclusion of Module '"..Module.."' Failed: Not registered!\n", 2 )
 	end
 	return table.Copy( t ) -- Return a copy of the table.
 end
 
 // Resets the Module table
+// Here we define a set of members and functions that are available in all modules.
 local function ResetModuleTable()
 	
 	MODULE = {}
-	MODULE.Object = {}
 	
 	MODULE.Name = nil
 	MODULE.Title = ""
@@ -39,10 +44,10 @@ local function ResetModuleTable()
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
-		if !GetModule( moduleName ) then
-			error( "The inclusion of Module '"..moduleName.."' failed! Halting dependency tree.\n" )
+		local b, e = pcall( IncludeModule( moduleName ) )
+		if !b then
+			error( "MODULE.Require on Module '"..moduleName.."' Failed: Not registered!\n", 2 )
 		end
-		return IncludeModule(moduleName)
 	end
 	
 	// Adds a hook for the specified module.
@@ -56,13 +61,13 @@ local function ResetModuleTable()
 			end
 		end
 		if isMember then
-			hook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
+			moduleHook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
 		else
-			hook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
+			moduleHook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
 		end
 	end
 	
-	// Gets a key value, or sets one if it's nil
+	// Gets a module key value, or sets one if it's nil
 	function MODULE:GetKeyValue( key, value )
 		if !self.KeyValues and !value then
 			ErrorNoHalt( "Module '"..self.Name.."' has no key values.\n" )
@@ -78,7 +83,7 @@ local function ResetModuleTable()
 		return self.KeyValues[key]
 	end
 	
-	// Sets a key value
+	// Sets a module key value
 	function MODULE:SetKeyValue( key, value )
 		if !self.KeyValues then
 			self.KeyValues = {}
@@ -86,11 +91,12 @@ local function ResetModuleTable()
 		self.KeyValues[key] = value
 	end
 	
+	// Generates autohooks.
 	function MODULE:GenerateHooks()
-		local hooks = hook.GetTable()
+		local hooks = moduleHook.GetTable()
 		for k, v in pairs( self ) do
 			if type(v) == "function" and hooks[k] then
-				hook.Add( k, "MODULES."..self.Name..".HOOK.".."BaseFunction_"..k, function( ... ) return v( self, ... ) end )
+				moduleHook.Add( k, "MODULES."..self.Name..".HOOK.".."BaseFunction_"..k, function( ... ) return v( self, ... ) end )
 			end
 		end
 	end
@@ -98,117 +104,110 @@ local function ResetModuleTable()
 end
 
 // Registers a specific module file
-local function RegisterModule( path, state )
+local function RegisterModule( name, path, state )
 	
-	if path:find(".") and !path:find(".lua") then return end -- Don't include the "." or ".." folders.
+	if !path:find(".lua") then return end -- Don't try to include the "." or ".." folders. -- path:find(".") and 
 	
-	ResetModuleTable() -- Reset the Module table
+	if GetModule( name ) then
+		ErrorNoHalt( "Registration of Module '"..name.."' Failed: A module by this name already exists (Author "..MODULE.Author..")!\n" )
+		return
+	end
 	
 	// Does the actuall including
 	local function FinalInclude()
 	
-		include( path )
+		/*local pos = path:find( "/" )
+		local lastpos
+		repeat
+			print(pos)
+			lastpos = pos
+			pos = path:find( "/", pos )
+		until ( !pos )*/
 		
-		if !MODULE then return end
+		local bLoaded, strError = pcall( CompileString( ModuleFiles[name].Code, path ) )
 		
-		if GetModule( MODULE.Name ) then
-			--MsgN( "Module '",MODULE.Name,"' already exists!" )
+		--print( "PCall Module "..name..":", bLoaded, strError )
+		
+		if !bLoaded then
+			ErrorNoHalt( "Registration of Module '",name,"' Failed: "..strError.."\n" )
+			table.insert( FailedModules, path )
 			return
 		end
 		
-		GenerateObjectRef()
-		NARWHAL.__Modules[MODULE.Name] = MODULE
+		if !MODULE then
+			ErrorNoHalt( "Registration of Module '",name,"' Failed: MODULE table is nil! Conflicting scripts?\n" )
+			table.insert( FailedModules, path )
+			return
+		end
 		
-		--MsgN( MODULE.Name, "\t", path, "\t", state )
-		MsgN("Successfully registered Module '",MODULE.Name,"'!")
+		if !MODULE.Name then
+			table.insert( FailedModules, ModuleFiles[name].Path )
+			ErrorNoHalt( "Registration of module file '"..ModuleFiles[name].Path.."' Failed: MODULE.Name is invalid! Parsing error?\n" )
+			return
+		end
 		
-	end
-	
-	// Include a clientside module
-	local function IncludeOnClient()
-		if SERVER then
-			AddCSLuaFile( path )
-		end
-		if CLIENT then
-			FinalInclude()
-		end
-	end
-	
-	// Include a serverside module
-	local function IncludeOnServer()
-		if SERVER then
-			FinalInclude()
-		end
-	end
-	
-	// Include a shared module
-	local function IncludeShared()
-		if SERVER then
-			AddCSLuaFile( path )
-		end
-		FinalInclude()
+		NARWHAL.__Modules[name] = MODULE
+		
+		MsgN( "Successfully registered Module '",name,"'!\n" )
+		
 	end
 	
 	if state == "client" then
-		IncludeOnClient()
-	elseif state == "server" then
-		IncludeOnServer()
-	elseif state == "shared" then
-		IncludeShared()
-	end
-	
-	/*
-	for k, v in pairs( MODULE ) do
-		if type(v) == "function" then
-			if !GetModule( MODULE.Name ).Enabled then
-				MODULE.Cached[k] = v
-				MODULE[k] = function()
-					return false
-				end
-			else
-				MODULE[k] = MODULE.Cached[k]
-			end
+		if CLIENT then
+			FinalInclude()
 		end
+	elseif state == "server" then
+		if SERVER then
+			FinalInclude()
+		end
+	elseif state == "shared" then
+		FinalInclude()
 	end
-	*/
 	
 end
 
+// Reads the module's raw text and gathers information about it before including
 local function PreloadModuleData( path, state )
 	
-	if path:find(".") and !path:find(".lua") then return end
+	if path:find(".") and !path:find(".lua") then return end -- Don't read the "." or ".." folders
 	
+	// Read/Gather info
 	local function ReadText()
-		
 		local RawText = file.Read( "../gamemodes/"..path )
-		--print("Path = ",path)
+		
+		local commentPattern1 = "/%*(.*)%*/"
+		local commentPattern2 = "%-%-%[%[(.*)%]%]"
+		local commentPattern3 = "%-%-(.*)[\n]-"
+		local commentPattern4 = "//(.*)[\n]-"
+		
+		RawText:gsub( commentPattern1, "" )
+		RawText:gsub( commentPattern2, "" )
+		RawText:gsub( commentPattern3, "" )
+		RawText:gsub( commentPattern4, "" )
 		
 		local Name
-		local namePattern = "MODULE%.Name%s*=%s*\"([%w_]+)\""
-		
+		local namePattern = "MODULE%.Name%s*=%s*[\"']*([%w_]+)[\"']*"
 		for modName in RawText:gmatch( namePattern ) do
-			--print("Name = ",modName)
 			Name = modName
+		end
+		if !Name then -- Either the user did something that failed before adding members, or there was a parsing error.
+			ErrorNoHalt( "Registration of module file '"..path.."' Failed: Name is invalid! Parsing error?\n" )
+			return
 		end
 		
 		local mIncludes = {}
-		local includesPattern, ipat2 = "MODULE%.Require%s*%b()", "MODULE%.Require%s*%(%s*\"([%w_]+)\"%s*%)"
-		local rFunc = "MODULE.Require(\"\""
-		local final
-		
-		for reqModule in RawText:gmatch( ipat2 ) do
-			--print("Include = ",reqModule)
+		local includesPattern = "MODULE%.Require%s*%(%s*%p*([%w_]+)%p*%s*%)"
+		for reqModule in RawText:gmatch( includesPattern ) do
 			table.insert( mIncludes, reqModule )
 		end
-		
-		ModuleFiles[Name] = { Path = path, State = state, Dependencies = mIncludes }
-		
+		ModuleFiles[Name] = { Path = path, State = state, Dependencies = mIncludes, Code = RawText }
+		MsgN( "Loaded Module '"..Name.."'." )
 	end
-	
+
+	// Make sure it loads in the correct state
 	if state == "server" then
 		if SERVER then
 			ReadText()
-			--MsgN("Preloading module data for file '"..path.."' in the "..state.." lua state.")
 		end
 	elseif state == "client" then
 		if SERVER then
@@ -216,23 +215,20 @@ local function PreloadModuleData( path, state )
 		end
 		if CLIENT then
 			ReadText()
-			--MsgN("Preloading module data for file '"..path.."' in the "..state.." lua state.")
 		end
 	elseif state == "shared" then
 		if SERVER then
 			AddCSLuaFile( path )
 		end
 		ReadText()
-		--MsgN("Preloading module data for file '"..path.."' in the "..state.." lua state.")
 	end
 	
 end
 
-local function LoadGamemodeModules()
-	
+// Preload Module Data
+local function PreLoadGamemodeModules()
 	local Folder = string.Replace( GM.Folder, "gamemodes/", "" );
 	local path, state
-	
 	for c, d in pairs( file.FindInLua( Folder.."/gamemode/modules/*") ) do
 		path = Folder.."/gamemode/modules/"..d
 		if d:find( ".lua" ) then
@@ -251,54 +247,129 @@ local function LoadGamemodeModules()
 			end
 		end
 	end
-	
-	MODULE = nil
-	
 end
 
 // Recursive function for including modules in the correct order.
-local function recur( name )
-	if !ModuleFiles[name] then
-		ErrorNoHalt("Attempting to include an invalid module\n")
+local function LoadDependencyTree( name )
+	print("Loading Dependency Tree for "..name)
+	if !ModuleFiles[name] then -- This module doesnt exist.
+		ErrorNoHalt( "Registration of module '"..name.."' Failed: Module is invalid!\n" )
 		return
 	end
-	for _, inc in pairs( ModuleFiles[name].Dependencies ) do -- loop through the module's dependencies
+	for _, inc in pairs( ModuleFiles[name].Dependencies ) do -- Loop through the module's dependencies
+		print("\tChecking validity for include "..inc)
 		if ModuleFiles[inc] then -- If the include exists
-			if !GetModule( inc ) then -- If the include is registered
-				recur( inc ) -- Perform these actions on the include's dependencies
+			if table.HasValue( FailedModules, ModuleFiles[inc].Path ) then -- Looks like this module has been deemed as failed. Fail any modules that depended on it.
+				ErrorNoHalt( "Registration of Module '"..name.."' Failed: Module is dependent on failed module '"..inc.."'!\n" )
+				return
+			elseif !GetModule( inc ) then -- If the include is registered
+				print("\t\tInclude "..inc.." has not been loaded yet...")
+				LoadDependencyTree( inc ) -- Perform these actions on the module's dependencies
 			end
-		else
-			ErrorNoHalt("Attempting to include an invalid module\n")
+		else -- Our dependency appears to be invalid. Fail the module.
+			ErrorNoHalt( "Registration of Module '"..name.."' Failed: Module is dependent on invalid module '"..inc.."'!\n" )
+			return
 		end
 	end
-	RegisterModule( ModuleFiles[name].Path, ModuleFiles[name].State ) -- Include the module
-	table.insert( IncludedModules, inc )
+	ResetModuleTable() -- Reset the Module table
+	RegisterModule( name, ModuleFiles[name].Path, ModuleFiles[name].State ) -- Include the module
+	table.insert( IncludedModules, name ) -- This module has been successfully included.
 end
 
-LoadGamemodeModules() -- Preload them
+MsgN("\nLoading Narwhal Modules...")
 
-PrintTable(ModuleFiles)
+PreLoadGamemodeModules() -- Preload modules
 
-// Loop through the module files and include their dependencies first
+--PrintTable(ModuleFiles)
+
+MsgN("\nRegistering Narwhal Modules...")
+
+hook = nil -- We don't want your nasty hooks
+
+// Loop through the module data and include their dependencies first
 for k, v in pairs( ModuleFiles ) do
-	if !table.HasValue( IncludedModules, k ) then
-		recur( k )
+	if !table.HasValue( IncludedModules, k ) and !table.HasValue( FailedModules, v.Path ) then
+		LoadDependencyTree( k )
 	end
 end
+
+hook = moduleHook -- Okay you can come out now. :)
+
+MODULE = nil -- Remove the MODULE table.
+
+MsgN("\nInitializing Narwhal Modules...")
 
 // Run all module Initialize functions if they have one.
 for k, v in pairs( NARWHAL.__Modules ) do
 	if v.Initialize then
 		v:Initialize()
+		MsgN("Module '"..v.Name.."' Successfully Initialized!")
 	end
 	v:GenerateHooks()
 end
 
+MsgN("\nInitializing Narwhal Loaded, Registered, and Initialized!")
 
 
 
 
+--[[
+	for k, v in pairs( MODULE ) do
+		if type(v) == "function" then
+			if !GetModule( MODULE.Name ).Enabled then
+				MODULE.Cached[k] = v
+				MODULE[k] = function()
+					return false
+				end
+			else
+				MODULE[k] = MODULE.Cached[k]
+			end
+		end
+	end
+]]--
+/*local regPattern = "NARWHAL%.RegisterModule%s*%("..SpaceCharSpace.."MODULE"..SpaceCharSpace.."%)"
+if !RawText:find( regPattern ) then
+	ErrorNoHalt( "Registration of Module '"..Name.."' Failed: NARWHAL.RegisterModule is missing!\n" )
+	return
+end*/
+/*local function RegisterModule( MODULE )
+	
+	local name = MODULE.Name
+	local path, state = ModuleFiles[name].Path, ModuleFiles[name].State
+	
+	local function FinalInclude()
+		
+		local b, e = pcall( function() CompileString( ModuleFiles[name].Code, ModuleFiles[name].Path ) end ) --RunStringEx( ModuleFiles[name].Code, ModuleFiles[name].Path )
+		
+		print( "CompileString:", b, e)
+		--print( MODULE.Name, MODULE.__CompletedInclude )
+		
+		if !MODULE then return end
+		if GetModule( name ) then
+			return
+		end
+		NARWHAL.__Modules[name] = MODULE
+		MsgN("Successfully registered Module '",name,"'!\n")
+	end
+	
+	if state == "client" then
+		if CLIENT then
+			FinalInclude()
+		end
+	elseif state == "server" then
+		if SERVER then
+			FinalInclude()
+		end
+	elseif state == "shared" then
+		FinalInclude()
+	end
+	
+end*/
 
-
-
-
+--function NARWHAL.RegisterModule( MODULE )
+	--RegisterModule( MODULE )
+	--MODULE.__CompletedInclude = true
+	--if ModuleFiles[MODULE.Name] then
+		--LoadDependencyTree( MODULE.Name )
+	--end
+--end

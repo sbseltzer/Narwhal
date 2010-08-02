@@ -68,6 +68,8 @@ local function UMSG_RecieveVariable( um )
 	local storageDest = RecieveData.Storage
 	local Var = RecieveData.Func_Read( um )
 	
+	MsgN("Recieved "..storageType.." "..Var)
+	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
 	end

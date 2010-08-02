@@ -5,9 +5,7 @@
 	
 	This file has our shared tables and entity methods.
 	
-	BUG: For some reason using the Entity metatable for
-	methods isn't automatically adding it to the Player
-	metatable. Wtf?
+	Note: This may need some cleaning up.
 
 ---------------------------------------------------------*/
 
@@ -768,29 +766,31 @@ function GM:LoadNetworkConfigurations_Internal()
 
 	for k, v in pairs( GAMEMODE.__NetworkData ) do
 		ENTITY["SendNetworked"..v.Ref] = function( self, Name, Var, Filter )
-			if !self or !ValidEntity( self ) or ( type( self ):lower() != "entity" and type( self ):lower() != "player" ) then
-				error( "SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..type( self ).."\n", 2 )
+			local entType = type( self )
+			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
+				error( "Entity.SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
 			elseif !Name then
-				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
+				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
 			elseif !Var then
-				error( "SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
+				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
 			elseif Filter and type( Filter ) != "player" and type( Filter ) != "entity" and type( Filter ) != "CRecipientFilter" and !IsTableOfEntitiesValid( Filter ) then
-				error( "SendNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
+				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
 			end
 			print( self, Name, Var, k, Filter )
 			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
 		end
 		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter )
-			if !self or !ValidEntity( self ) or ( type( self ):lower() != "entity" and type( self ):lower() != "player" ) then
-				error( "FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..type( self ).."\n", 2 )
+			local entType = type( self )
+			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
+				error( "Entity.FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
 			elseif !Name then
-				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
+				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
 			elseif Filter and type( Filter ) != "player" and type( Filter ) != "entity" and type( Filter ) != "CRecipientFilter" and !IsTableOfEntitiesValid( Filter ) then
-				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
+				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
 			end
 			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
 		end
