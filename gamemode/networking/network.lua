@@ -31,7 +31,7 @@ local ValidEntity = ValidEntity
 // SERVER version of SendNetworkedVariable.
 function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
-	print( Ent, Name, Var, storageType, Filter )
+	--print( Ent, Name, Var, storageType, Filter )
 	
 	storageType = storageType or "var"
 	

@@ -5,7 +5,9 @@
 		  return true to allow the pickup.
 ---------------------------------------------------------*/
 function GM:PlayerCanPickupWeapon( player, entity )
+
 	return true
+	
 end
 
 
@@ -14,6 +16,7 @@ end
    Desc: Player has disconnected from the server.
 ---------------------------------------------------------*/
 function GM:PlayerDisconnected( player )
+
 end
 
 
@@ -22,7 +25,9 @@ end
    Desc: Return true to not play the default sounds
 ---------------------------------------------------------*/
 function GM:PlayerDeathSound()
+	
 	return true
+	
 end
 
 
@@ -31,7 +36,9 @@ end
    Desc: Player typed KILL in the console. Can they kill themselves?
 ---------------------------------------------------------*/
 function GM:CanPlayerSuicide( ply )
-	return GAMEMODE.Config.CanPlayerSuicide
+	
+	return GAMEMODE.Config.PlayerCanSuicide
+	
 end
 
 
@@ -40,31 +47,8 @@ end
 		Return true to allow action
 ---------------------------------------------------------*/
 function GM:PlayerSwitchFlashlight( ply, SwitchOn )
-	return true
-end
-
-
-/*---------------------------------------------------------
-   Name: gamemode:PlayerCanJoinTeam( ply, teamid )
-		Allow mods/addons to easily determine whether a player 
-			can join a team or not
----------------------------------------------------------*/
-function GM:PlayerCanJoinTeam( ply, teamid )
 	
-	local TimeBetweenSwitches = GAMEMODE.SecondsBetweenTeamSwitches or 10
-	if ( ply.LastTeamSwitch && RealTime()-ply.LastTeamSwitch < TimeBetweenSwitches ) then
-		ply.LastTeamSwitch = ply.LastTeamSwitch + 1;
-		ply:ChatPrint( Format( "Please wait %i more seconds before trying to change team again", (TimeBetweenSwitches - (RealTime()-ply.LastTeamSwitch)) + 1 ) )
-		return false
-	end
-	
-	// Already on this team!
-	if ( ply:Team() == teamid ) then 
-		ply:ChatPrint( "You're already on that team" )
-		return false
-	end
-	
-	return true
+	return GAMEMODE.Config["PlayerCanSwitchFlashlight"]
 	
 end
 

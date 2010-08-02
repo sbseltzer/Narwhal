@@ -6,6 +6,19 @@
 	Each module is loaded and any dependencies are loaded first in a recursive function.
 */
 
+local hook = hook
+local file = file
+local table = table
+local string = string
+local type = type
+local error = error
+local pcall = pcall
+local pairs = pairs
+local ErrorNoHalt = ErrorNoHalt
+local AddCSLuaFile = AddCSLuaFile
+local SERVER = SERVER
+local CLIENT = CLIENT
+
 NARWHAL.__Modules = {}
 
 local ModuleFiles = {}
