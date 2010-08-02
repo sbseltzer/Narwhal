@@ -14,6 +14,7 @@
 
 
 // Include shared files
+include( 'themes.lua' )
 include( 'modules.lua' )
 include( 'animations.lua' )
 include( 'player_shd.lua' )

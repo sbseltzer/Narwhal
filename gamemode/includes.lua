@@ -22,6 +22,7 @@ include( 'achievements.lua' )
 include( 'networking/network.lua' )
 
 // Add shared files
+AddCSLuaFile( "themes.lua" )
 AddCSLuaFile( "modules.lua" )
 AddCSLuaFile( "animations.lua" )
 AddCSLuaFile( "player_shd.lua" )
