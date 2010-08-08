@@ -123,9 +123,9 @@ Anims.Male[ "models" ] = {
 	"models/barney.mdl",
 	"models/eli.mdl",
 	"models/breen.mdl",
-	"models/Gustavio/maleanimtree.mdl",
-	"models/Gustavio/combineanimtree.mdl",
-	"models/Gustavio/metroanimtree.mdl",
+	"models/Skeleton/maleanimtree.mdl",
+	"models/Skeleton/combineanimtree.mdl",
+	"models/Skeleton/metroanimtree.mdl",
 	"models/kleiner.mdl"
 }
 Anims.Male[ "default" ] = { 
@@ -153,19 +153,19 @@ Anims.Male[ "default" ] = {
         }
 }
 Anims.Male[ "pistol" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE_PISTOL",
-        [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_PISTOL",
-        [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN_PISTOL",
+        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_PISTOL",
+        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_PISTOL",
+        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_PISTOL",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_AIM_PISTOL",
-                [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN_AIM_PISTOL"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_AIM_PISTOL",
+                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_AIM_PISTOL"
         },
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_PISTOL",
         [ "reload" ] = "ACT_GESTURE_RELOAD_PISTOL"
@@ -189,56 +189,56 @@ Anims.Male[ "ar2" ] = {
 }
 
 Anims.Male[ "smg" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE_SMG1",
-        [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN_RIFLE",
+        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_SMG1",
+        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_RIFLE",
+        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_RIFLE",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_RIFLE",
-                [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_RIFLE",
+                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_RIFLE"
         },
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_SMG1",
         [ "reload" ] = "ACT_GESTURE_RELOAD_SMG1"
 }
 
 Anims.Male[ "shotgun" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_RUN_RIFLE",
+        [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_RIFLE",
+        [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_RIFLE",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+                [ "aimidle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_IDLE_ANGRY_SHOTGUN",
-                [ "walk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_AIM_SHOTGUN",
-                [ "run" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_RUN_AIM_SHOTGUN"
+                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE_ANGRY_SHOTGUN",
+                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_AIM_SHOTGUN",
+                [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_AIM_SHOTGUN"
         },
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SHOTGUN"
 }
 
 Anims.Male[ "crossbow" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_RUN_RIFLE",
+        [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_RIFLE",
+        [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_RIFLE",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+                [ "aimidle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_IDLE_ANGRY",
-                [ "walk" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_WALK_AIM_RIFLE",
-                [ "run" ] = "&switch:models/Gustavio/combineanimtree.mdl;ACT_RUN_AIM_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE_ANGRY",
+                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_AIM_RIFLE",
+                [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_AIM_RIFLE"
         },
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_AR2"
 }
@@ -262,39 +262,39 @@ Anims.Male[ "rpg" ] = {
 }
 
 Anims.Male[ "melee" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN",
+        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK",
+        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_ANGRY",
-                [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_ANGRY",
+                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN"
         },
 		["fire"] = "ACT_MELEE_ATTACK_SWING_GESTURE"
 }
 
 Anims.Male[ "grenade" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN",
+        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK",
+        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
-                [ "walk" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_WALK_ANGRY",
-                [ "run" ] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_RUN"
+                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
+                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_ANGRY",
+                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN"
         },
-		["fire"] = "&switch:models/Gustavio/metroanimtree.mdl;ACT_COMBINE_THROW_GRENADE"
+		["fire"] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COMBINE_THROW_GRENADE"
 }
 
 Anims.Male[ "slam" ] = {
@@ -319,8 +319,8 @@ Anims.Male[ "slam" ] = {
 Anims.Female = {}
 Anims.Female[ "models" ] = {
 	"models/alyx.mdl",
-	"models/Gustavio/femaleanimtree.mdl",
-	"models/Gustavio/alyxanimtree.mdl"
+	"models/Skeleton/femaleanimtree.mdl",
+	"models/Skeleton/alyxanimtree.mdl"
  
 }
 Anims.Female[ "default" ] = { 
@@ -348,19 +348,19 @@ Anims.Female[ "default" ] = {
         }
 }
 Anims.Female[ "pistol" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_PISTOL",
-        [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN",
+        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_PISTOL",
+        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_AIM_PISTOL",
-                [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN_AIM_PISTOL"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_PISTOL",
+                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_PISTOL"
         },
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_PISTOL",
 }
@@ -383,37 +383,37 @@ Anims.Female[ "ar2" ] = {
 }
 
 Anims.Female[ "smg" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_SMG1",
-        [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN_RIFLE",
+        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_SMG1",
+        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_RIFLE",
+        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_RIFLE",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
-                [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
+                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
         },
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_SMG1",
 }
 
 Anims.Female[ "shotgun" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_SHOTGUN_STIMULATED",
-        [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_RIFLE_RELAXED",
-        [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN_RIFLE_RELAXED",
+        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_SHOTGUN_STIMULATED",
+        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_RIFLE_RELAXED",
+        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_RIFLE_RELAXED",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_ANGRY_RPG",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
-                [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_RPG",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
+                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
         },
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SHOTGUN"
 }
@@ -455,57 +455,57 @@ Anims.Female[ "rpg" ] = {
 }
 
 Anims.Female[ "melee" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN",
+        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_MANNEDGUN",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_PACKAGE",
-                [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_MANNEDGUN",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_PACKAGE",
+                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
         },
 		["fire"] = "ACT_MELEE_ATTACK_SWING"
 }
 
 Anims.Female[ "grenade" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN",
+        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_PACKAGE",
-                [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_PACKAGE",
+                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
         },
 		["fire"] = "ACT_MELEE_ATTACK_SWING"
 }
 
 Anims.Female[ "grenade" ] = {
-        [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN",
+        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
+        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
         [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_CROUCH"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
                 },
         [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
-                [ "walk" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_WALK_ANGRY",
-                [ "run" ] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_RUN"
+                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
+                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_ANGRY",
+                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
         },
-		["fire"] = "&switch:models/Gustavio/alyxanimtree.mdl;ACT_COMBINE_THROW_GRENADE"
+		["fire"] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COMBINE_THROW_GRENADE"
 }
 
 Anims.Female[ "slam" ] = {
@@ -576,19 +576,19 @@ local function HandleSequence( ply, seq )
 		end
 	else
 		
-		if ply:GetModel() != "models/Gustavio/femaleanimtree.mdl" or ply:GetModel() != "models/Gustavio/maleanimtree.mdl" then
+		if ply:GetModel() != "models/Skeleton/femaleanimtree.mdl" or ply:GetModel() != "models/Skeleton/maleanimtree.mdl" then
 			if ply:GetNWBool( "charloaded", false ) then
 				if( ply:GetNWString( "gender", "Male" ) == "Female" ) then
-					ply:SetModel( "models/Gustavio/femaleanimtree.mdl" )
+					ply:SetModel( "models/Skeleton/femaleanimtree.mdl" )
 					--ply:SetMaterial( "null" )
 					--ply:SetModel( "models/alyx.mdl" )
 				else
 					--ply:SetModel( "models/barney.mdl" )
-					ply:SetModel( "models/Gustavio/maleanimtree.mdl" )
+					ply:SetModel( "models/Skeleton/maleanimtree.mdl" )
 					--ply:SetMaterial( "null" )
 				end
 			else
-				ply:SetModel( "models/Gustavio/maleanimtree.mdl" );
+				ply:SetModel( "models/Skeleton/maleanimtree.mdl" );
 				--ply:SetMaterial( "null" )
 				--ply:SetModel( "models/barney.mdl" )
 			end

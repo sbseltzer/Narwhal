@@ -1,5 +1,6 @@
 
 /*
+	UNFINISHED
 	Themes are essentially the same as modules, except they are basically like whole gamemodes.
 */
 
@@ -16,13 +17,15 @@ local AddCSLuaFile = AddCSLuaFile
 local SERVER = SERVER
 local CLIENT = CLIENT
 
+local ThemeFiles = {}
+
 NARWHAL.__Themes = {}
 NARWHAL.__CurrentTheme = "Default"
 
 local themeHook = hook
 
 // Gets the current gamemode theme
-function GM:GetTheme()
+function GM:GetCurrentTheme()
 	return NARWHAL.__CurrentTheme
 end
 
@@ -34,27 +37,24 @@ function GM:GetThemeData( themeName )
 	return NARWHAL.__Themes[themeName]
 end
 
-// Gets the current gamemode theme
+// Sets the gamemode theme
 function GM:SetTheme( themeName )
-	local current = NARWHAL.__CurrentTheme
-	local theme = GAMEMODE:GetThemeData( current )
-	for k, v in pairs( theme.Hooks ) do
+	local oldtheme, newtheme = GAMEMODE:GetThemeData( NARWHAL.__CurrentTheme ), GAMEMODE:GetThemeData( themeName )
+	if oldtheme.OnThemeChanged then
+		oldtheme:OnThemeChanged( themeName )
+	end
+	for k, v in pairs( oldtheme.Hooks ) do
 		hook.Remove( v[1], v[2] )
 	end
-	theme = GAMEMODE:GetThemeData( themeName )
-	for k, v in pairs( theme.Hooks ) do
+	for k, v in pairs( newtheme.Hooks ) do
 		hook.Add( unpack( v ) )
 	end
 	NARWHAL.__CurrentTheme = themeName
 end
 
-// Global function to include a child theme for an optional given parent
-function GM:ForceTheme( Theme )
-	local t = GetTheme( Theme ) -- Gets the theme's table
-	if !t then
-		error( "Inclusion of Theme '"..Theme.."' Failed: Not registered!\n", 2 )
-	end
-	return table.Copy( t ) -- Return a copy of the table.
+// Called when deciding which theme to use
+function GM:ForceTheme()
+	return "Default"
 end
 
 // Resets the Theme table
@@ -69,6 +69,8 @@ local function ResetThemeTable()
 	THEME.Author = ""
 	THEME.Contact = ""
 	THEME.Purpose = ""
+	
+	THEME.Derive = "" -- I'm thinking of making it so modules can derive from one another.
 	
 	// Adds a hook for the specified theme.
 	function THEME:Hook( hookName, uniqueName, func )
@@ -161,16 +163,7 @@ local function PreloadThemeData( name, path, state )
 	
 	// Read/Gather info
 	local function ReadText()
-		local RawText = file.Read( "../gamemodes/"..path )
-		--[[local commentPattern1 = "/%*(.*)%*/"
-		local commentPattern2 = "%-%-%[%[(.*)%]%]"
-		local commentPattern3 = "%-%-(.*)[\n]-"
-		local commentPattern4 = "//(.*)[\n]-"
-		RawText:gsub( commentPattern1, "" )
-		RawText:gsub( commentPattern2, "" )
-		RawText:gsub( commentPattern3, "" )
-		RawText:gsub( commentPattern4, "" )]]
-		ThemeFiles[name] = { Path = path, State = state, Code = RawText }
+		ThemeFiles[name] = { Path = path, State = state, Code = file.Read( "../gamemodes/"..path ) }
 	end
 
 	// Make sure it loads in the correct state
@@ -197,12 +190,10 @@ end
 // Preload Theme Data
 local function PreLoadGamemodeThemes()
 	local Folder = string.Replace( GM.Folder, "gamemodes/", "" );
-	local path, state
 	for c, d in pairs( file.FindInLua( Folder.."/gamemode/themes/*") ) do
-		path = Folder.."/gamemode/themes/"..d
 		if !d:find( ".lua" ) then
 			for e, f in pairs( file.FindInLua( Folder.."/gamemode/themes/"..d.."/*" ) ) do
-				path = Folder.."/gamemode/themes/"..d.."/"..f
+				local state
 				if f == "init.lua" then
 					state = "server"
 				elseif f == "cl_init.lua" then
@@ -210,7 +201,7 @@ local function PreLoadGamemodeThemes()
 				elseif f == "shared.lua" then
 					state = "shared"
 				end
-				PreloadThemeData( d, path, state )
+				PreloadThemeData( d, Folder.."/gamemode/themes/"..d.."/"..f, state )
 			end
 		end
 	end

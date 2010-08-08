@@ -14,6 +14,14 @@
 ---------------------------------------------------------*/
 
 
+// Add Resources
+resource.AddFile( "models/Skeleton/alyxanimtree.mdl" )
+resource.AddFile( "models/Skeleton/combineanimtree.mdl" )
+resource.AddFile( "models/Skeleton/maleanimtree.mdl" )
+resource.AddFile( "models/Skeleton/femaleanimtree.mdl" )
+resource.AddFile( "models/Skeleton/metroanimtree.mdl" )
+//resource.AddFile( "models/Skeleton/playeranimtree.mdl" ) -- TODO
+
 // Include server files
 include( 'config.lua' )
 include( 'player.lua' )

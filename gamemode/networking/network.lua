@@ -20,54 +20,104 @@
 ---------------------------------------------------------*/
 
 // Declare frequently used globals as locals to enhance performance
+local concommand = concommand
 local string = string
+local player = player
+local table = table
+local timer = timer
 local umsg = umsg
 local type = type
 local pairs = pairs
 local error = error
-local RecipientFilter = RecipientFilter
+local unpack = unpack
+local tostring = tostring
+local ErrorNoHalt = ErrorNoHalt
 local ValidEntity = ValidEntity
+local RecipientFilter = RecipientFilter
+
+local function CheckForConfirmation( ply, ID, Name, storageType, storageDest, retries, tSendData )
+
+	if !ply then
+		local msg
+		if retries > 0 then
+			msg = "Retried "..retries.." time(s) before failure. Connection lost?"
+		else
+			msg = "The player was never valid."
+		end
+		ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(UTIL_GetByNetworkID( ID )).." failed for "..tostring(ply).." because they are invalid. "..msg.."\n" )
+		return
+	end
+	
+	if !NARWHAL.__NetworkCache[storageDest] or !NARWHAL.__NetworkCache[storageDest][ID] or !NARWHAL.__NetworkCache[storageDest][ID][Name] or !NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting or !table.HasValue( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, ply ) then
+		return
+	end
+	
+	local maxRetries, retryDelay, retryAgain = 50, 0.1, 30
+	if retries < maxRetries then
+		ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(UTIL_GetByNetworkID( ID )).." failed for "..tostring(ply).." after "..retries.." retries.\n" )
+		timer.Simple( retryDelay, CheckForConfirmation, ply, ID, Name, storageType, storageDest, retries + 1, tSendData )
+	elseif retries == maxRetries then
+		ErrorNoHalt( tostring(ply).." may be having connection problems. Will reattempt in "..retryAgain.." seconds.\n" )
+		timer.Simple( retryAgain, CheckForConfirmation, ID, Name, storageType, storageDest, retries + 1, tSendData )
+	else
+		ErrorNoHalt( "Reattempting network syncronization for "..tostring(ply).."...\n" )
+		GAMEMODE:SendNetworkedVariable( unpack( tSendData ) )
+	end
+	
+end
 
 // SERVER version of SendNetworkedVariable.
 function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
-	--print( Ent, Name, Var, storageType, Filter )
-	
 	storageType = storageType or "var"
 	
-	local realType = type( Var )
-	local SendData = GAMEMODE.__NetworkData[storageType]
-	local storageDest = SendData.Storage
+	local Config = NARWHAL.__NetworkData[storageType]
+	local storageDest = Config.Storage
 	local ID = Ent:GetNetworkID()
 	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
 	end
+	
 	if !NARWHAL.__NetworkCache[storageDest][ID] then
 		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
+	
 	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
 		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
 	end
 	
-	Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter
+	Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter or player.GetAll()
 	
-	if !Filter then
-		RF = RecipientFilter()
-		RF:AddAllPlayers()
-		Filter = RF
+	if type(Filter) != "table" then
+		Filter = {Filter}
 	end
 	
 	NARWHAL.__NetworkCache[storageDest][ID][Name].Filter = Filter -- Update the filter settings.
-	NARWHAL.__NetworkCache[storageDest][ID][Name].Value = Var
+	NARWHAL.__NetworkCache[storageDest][ID][Name].Value = Var -- Set the var
 	
-	if SendData.Func_Check( Var ) == false then return end
-	Var = SendData.Func_Encode( Var )
+	Var = Config.Func_Check( Var )
+	if !Var then return end
 	
-	umsg.Start( "NETWORK_SendVariable", RF )
-		umsg.String( ID .. " " .. storageType .. --[[" " .. realType ..]] " " .. Name ) -- Is realtype even needed?
-		SendData.Func_Send( Var )
+	if NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting then
+		for k, v in pairs( Filter ) do
+			if table.HasValue( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, v ) then
+				table.remove( Filter, k )
+			end
+		end
+	end
+	
+	umsg.Start( "NETWORK_SendVariable", Filter )
+		umsg.String( ID .. " " .. storageType .. " " .. Name )
+		Config.Func_Send( Var )
 	umsg.End()
+	
+	NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting = {}
+	
+	for k, v in pairs( Filter ) do
+		table.insert( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, v )
+		CheckForConfirmation( v, ID, Name, storageType, storageDest, 0, {Ent, Name, Var, storageType, Filter} )
+	end
 	
 end
 
@@ -85,22 +135,19 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	local ID = Ent:GetNetworkID()
 	
-	local storageDest = GAMEMODE:GetNetworkConfigurations()[storageType].Storage
+	local storageDest = NARWHAL.__NetworkData[storageType].Storage
 	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
 	end
+	
 	if !NARWHAL.__NetworkCache[storageDest][ID] then
 		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
+	
 	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
 		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
-		Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter
-		if !Filter then
-			local RF = RecipientFilter()
-			RF:AddAllPlayers()
-			Filter = RF
-		end
+		Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter or player.GetAll()
 		GAMEMODE:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 		return Var
 	end
@@ -109,28 +156,39 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 end
 
-/*
-// Deletes a networked variable from the cache
-function GM:DeleteNetworkedVariable( Ent, Name, storageType )
+local function ConfirmRecievedVar( ply, cmd, args )
+
+	local ID, Name, storageType, storageDest, Key = unpack( args )
+	if !NARWHAL.__NetworkCache[storageDest] or !NARWHAL.__NetworkCache[storageDest][ID] or !NARWHAL.__NetworkCache[storageDest][ID][Name] or !NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting or !table.HasValue( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, ply ) then
+		return
+	end
 	
-	local ID = Ent:GetNetworkID()
-	local storageDest = GAMEMODE.__NetworkTypeTranslateTable[storageType]
-	NARWHAL.__NetworkCache[storageDest][ID][Name] = nil
+	for k, v in pairs( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting ) do
+		if v == ply then
+			table.remove( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, k )
+			break
+		end
+	end
 	
-	umsg.Start( "NETWORK_RemoveVariable" )
-		umsg.String( ID .. " " .. storageType .. " " .. Name )
-	umsg.End()
-	
-end
-// Deletes all networked variables for an entity (entity is removed from cache)
-function GM:RemoveEntityIndex( Ent )
-	
-	umsg.Start( "NETWORK_RemoveIndex" )
-		umsg.String( Ent:GetNetworkID() )
-	umsg.End()
+	MsgN( "Player has confirmed the recieved variable!" )
 	
 end
-*/
+concommand.Add( "narwhal_nw_confirmrecievedvar", ConfirmRecievedVar )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

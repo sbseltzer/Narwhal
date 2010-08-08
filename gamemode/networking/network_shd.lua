@@ -20,6 +20,7 @@ local tonumber = tonumber
 local tostring = tostring
 local FindMetaTable = FindMetaTable
 
+NARWHAL.__NetworkData = {}
 NARWHAL.__NetworkCache = {} -- Set up the shared Network Cache table
 NARWHAL.__NetworkCache.Booleans = {} -- Stores NWBools
 NARWHAL.__NetworkCache.Strings = {} -- Stores NWStrings
@@ -33,615 +34,151 @@ NARWHAL.__NetworkCache.Effects = {} -- Stores NWEffects
 NARWHAL.__NetworkCache.Tables = {} -- Stores NWTables
 NARWHAL.__NetworkCache.Vars = {} -- Stores NWVars
 
-function ents.GetByNetworkID( id )
-	local eType, eID = id:sub( 1, 3 ), id:sub( 3 )
-	if eType == "ent" then
-		return ents.GetByIndex( eID )
-	elseif eType == "ply" then
-		return player.GetByUniqueID( eID )
+local function GetByIndexEx( stype, id )
+	local t, i
+	if stype == "ent" then
+		for _, ent in pairs( ents.GetAll() ) do
+			if ValidEntity( ent ) then
+				if ent:EntIndex() == id then
+					return ent
+				end
+			end
+		end
+	elseif stype == "ply" then
+		for _, ply in pairs( player.GetAll() ) do
+			if ValidEntity( ply ) then
+				if ply:UniqueID() == id then
+					return ply
+				end
+			end
+		end
+	else
+		return
 	end
 end
 
-// Convenience function for strings that exceed the string character limit on umsg.String.
-local function DivideString( str )
-	local strList = {}
-	local function Recur( str )
-		local add, new
-		if string.len( str ) > 127 then
-			add = str:sub( 1, 127 )
-			strList[strList+1] = add
-			new = Recur( str:sub( 128 ) )
-		else
-			return str
-		end
-	end
-	Recur( str )
-	return strList
+// Utility function for getting entities by network ID.
+function UTIL_GetByNetworkID( id )
+	return GetByIndexEx( id:sub( 1, 3 ), id:sub( 4 ) )
 end
 
-local function IsFloat( num )
-	return tostring( num ):find( "." )
+// This is a function for getting the network configurations.
+function GM:GetNWData()
+	return NARWHAL.__NetworkData
 end
-
-local function IsShort( num )
-	num = tonumber( num )
-	return ( num >= -32768 and num <= 32767 )
-end
-
-local function IsLong( num )
-	num = tonumber( num )
-	return ( num >= -2147483648 and num <= 2147483647 )
-end
-
-local function IsNormal( v )
-	return ( ( v.x >= -1 and v.x <= 1 ) and ( v.y >= -1 and v.y <= 1 ) and ( v.z >= -1 and v.z <= 1 ) )
-end
-
-local function DivideNumber( num )
-	num = tonumber( num )
-	local numList = {}
-	local function Recur( num )
-		local add, new
-		if !IsLong( num ) then
-			if num < 0 then
-				numList[numList+1] = tostring( num ):sub( 1, 11 )
-				Recur( num:sub( 12 ) )
-			else
-				numList[numList+1] = tostring( num ):sub( 1, 10 )
-				Recur( num:sub( 11 ) )
-			end
-		else
-			return num
-		end
-	end
-	Recur( num )
-	return numList
-end
-
-GM.__NetworkData = {
-	--[[ ["bool"] = {
-		["Ref"] = "Bool",
-		["Storage"] = "Booleans",
-		["Func_Check"] = function( var )
-			return
-		end,
-		["Func_Encode"] = function( var )
-			var = tobool( var )
-			return var
-		end,
-		["Func_Send"] = function( var )
-			umsg.Bool( var )
-		end,
-		["Func_Recieve"] = function( um )
-			return um:ReadBool()
-		end
-	},
-	["string"] = {
-		["Ref"] = "String",
-		["Storage"] = "Strings",
-		["Func_Check"] = function( var )
-			if type( var ) != "string" and type( var ) != "number" then
-				error( "Bad argument #2 (String expected, got "..type( var )..")\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			var = tostring( var )
-			return DivideString( var )
-		end,
-		["Func_Send"] = function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				umsg.String( var )
-			end
-		end,
-		["Func_Recieve"] = function( um )
-			local s = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					s = s..um:ReadString()
-				end
-			else
-				s = um:ReadString()
-			end
-			return s
-		end
-	},
-	["integer"] = {
-		["Ref"] = "Int",
-		["Storage"] = "Integers",
-		["Func_Check"] = function( var )
-			if type( var ) != "string" and type( var ) != "number" then
-				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
-			elseif type( var ) == "string" and !tonumber( var ) then
-				error( "Bad argument #2 (String '"..var.."' could not be converted to Number)\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			if IsFloat( var ) then
-				var = tonumber( tostring( var ):sub( 1, IsFloat( var ) ) )
-			end
-			return DivideNumber( var )
-		end,
-		["Func_Send"] = function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.Long( v )
-				end
-			else
-				umsg.Bool( false )
-				if type(var) == "string" then
-					umsg.Short( 1 )
-					umsg.String( var )
-				elseif type(var) == "number" then
-					if IsShort( var ) then
-						umsg.Short( 2 )
-						umsg.Short( var )
-					elseif IsLong( var ) then
-						umsg.Short( 3 )
-						umsg.Long( var )
-					end
-				end
-			end
-		end,
-		["Func_Recieve"] = function( um )
-			local n = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					n = n..um:ReadString()
-				end
-				n = tonumber( n )
-			else
-				local i = um:ReadShort()
-				if i == 1 then
-					n = tonumber( um:ReadString() )
-				elseif i == 2 then
-					n = um:ReadShort()
-				else
-					n = um:ReadLong()
-				end
-			end
-			return n
-		end
-	},
-	["float"] = {
-		["Ref"] = "Float",
-		["Storage"] = "Floats",
-		["Func_Check"] = function( var )
-			if type( var ) != "string" and type( var ) != "number" then
-				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
-			elseif type( var ) == "string" and !tonumber( var ) then
-				error( "Bad argument #2 (String '"..var.."' could not be converted to Number)\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			if !IsLong( var ) then
-				var = tostring( var )
-			end
-			var = tostring( var )
-			return DivideString( var )
-		end,
-		["Func_Send"] = function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				if type( var ) == "string" then
-					umsg.Short( 1 )
-					umsg.String( var )
-				elseif type(var) == "number" then
-					umsg.Short( 2 )
-					umsg.Float( var )
-				end
-			end
-		end,
-		["Func_Recieve"] = function( um )
-			local n = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					n = n..um:ReadString()
-				end
-				n = tonumber( n )
-			else
-				local i = um:ReadShort()
-				if i == 1 then
-					n = tonumber( um:ReadString() )
-				else
-					n = um:ReadFloat()
-				end
-			end
-			return n
-		end
-	},
-	["entity"] = {
-		["Ref"] = "Entity",
-		["Storage"] = "Entities",
-		["Func_Check"] = function( var )
-			if type( var ) != "entity" and type( var ) != "player" then
-				error( "Bad argument #2 (Player or Entity expected, got "..type( var )..")\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			return GAMEMODE:GetEntityNWID( var )
-		end,
-		["Func_Send"] = function( var )
-			umsg.String( var )
-		end,
-		["Func_Recieve"] = function( um )
-			local id = um:ReadString()
-			local entType, entID, Ent = id:sub( 1, 3 ), id:sub( 3 )
-			if entType == "ply" then
-				Ent = player.GetByUniqueID( entID )
-			elseif entType == "ent" then
-				Ent = ents.GetByIndex( entID )
-			end
-			return Ent
-		end
-	},
-	["color"] = {
-		["Ref"] = "Color",
-		["Storage"] = "Colors",
-		["Func_Check"] = function( var )
-			if type( var ) != "table" then
-				error( "Bad argument #2 (Color expected, got "..type( var )..")\n", 2 )
-			end
-			local s = ""
-			for k, v in pairs( Var ) do
-				s = s..k
-			end
-			if s:sub( 1, 3 ) != "rgb" then
-				error( "Bad argument #2 (Table '"..tostring(var).."' is not a valid Color)\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			var.r = math.Clamp( var.r, 0, 255 )
-			var.g = math.Clamp( var.g, 0, 255 )
-			var.b = math.Clamp( var.b, 0, 255 )
-			var.a = var.a or 255
-			var.a = math.Clamp( var.a, 0, 255 )
-			return var
-		end,
-		["Func_Send"] = function( var )
-			umsg.Short( var.r )
-			umsg.Short( var.g )
-			umsg.Short( var.b )
-			umsg.Short( var.a )
-		end,
-		["Func_Recieve"] = function( um )
-			local col = color_white
-			col.r = um:ReadShort()
-			col.g = um:ReadShort()
-			col.b = um:ReadShort()
-			col.a = um:ReadShort()
-			return col
-		end
-	},
-	["vector"] = {
-		["Ref"] = "Vector",
-		["Storage"] = "Vectors",
-		["Func_Check"] = function( var )
-			if type( var ) != "vector" then
-				error( "Bad argument #2 (Vector expected, got "..type( var )..")\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			return var
-		end,
-		["Func_Send"] = function( var )
-			umsg.Vector( var )
-		end,
-		["Func_Recieve"] = function( um )
-			return um:ReadVector()
-		end
-	},
-	["angle"] = {
-		["Ref"] = "Angle",
-		["Storage"] = "Angles",
-		["Func_Check"] = function( var )
-			if type( var ) != "angle" then
-				error( "Bad argument #2 (Angle expected, got "..type( var )..")\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			return var
-		end,
-		["Func_Send"] = function( var )
-			umsg.Angle( var )
-		end,
-		["Func_Recieve"] = function( um )
-			return um:ReadAngle()
-		end
-	},
-	["table"] = {
-		["Ref"] = "Table",
-		["Storage"] = "Tables",
-		["Func_Check"] = function( var )
-			if type( var ) != "table" then
-				error( "Bad argument #2 (Table expected, got "..type( var )..")\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			var = glon.encode( var )
-			return DivideString( var )
-		end,
-		["Func_Send"] = function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				umsg.String( var )
-			end
-		end,
-		["Func_Recieve"] = function( um )
-			local t = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					t = t..um:ReadString()
-				end
-			else
-				t = um:ReadString()
-			end
-			return glon.decode(t)
-		end
-	},
-	["ceffectdata"] = {
-		["Ref"] = "Effect",
-		["Storage"] = "Effects",
-		["Func_Check"] = function( var )
-			if type( var ) != "CEffectData" then
-				error( "Bad argument #2 (CEffectData expected, got "..type( var )..")\n", 2 )
-			end
-		end,
-		["Func_Encode"] = function( var )
-			var = glon.encode( var )
-			return DivideString( var )
-		end,
-		["Func_Send"] = function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				umsg.String( var )
-			end
-		end,
-		["Func_Recieve"] = function( um )
-			local t = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					t = t..um:ReadString()
-				end
-			else
-				t = um:ReadString()
-			end
-			return glon.decode(t)
-		end
-	} ]]--
-}
 
 // This can be used to add custom datatypes. This could be useful on a per-gamemode basis. It would allow developers to design their own ways of sending data.
 // Every time we send data, it follows a general pattern: Check to see if the data is valid within the context of the variable, Encode it somehow, Send that encoded data via usermessages, and then Retrieving that data on the client.
-function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcEncode, funcSend, funcRead )
+function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
 	local tData = {}
 	tData["Ref"] = sRef
 	tData["Storage"] = sStore
-	tData["Func_Check"] = funcCheck
-	tData["Func_Encode"] = funcEncode
-	tData["Func_Send"] = funcSend
-	tData["Func_Read"] = funcRead
-	GAMEMODE.__NetworkData[sType] = tData
-end
-
-function GM:GetNetworkConfigurations()
-	return GAMEMODE.__NetworkData
+	if SERVER then
+		tData["Func_Check"] = funcCheck
+		tData["Func_Send"] = funcSend
+	elseif CLIENT then
+		tData["Func_Read"] = funcRead
+	end
+	NARWHAL.__NetworkData[sType] = tData
+	if !NARWHAL.__NetworkCache[sStore] then
+		NARWHAL.__NetworkCache[sStore] = {}
+	end
 end
 
 function GM:LoadNetworkConfigurations()
 	
 end
-function GM:LoadNetworkConfigurations_Internal()
+
+// Here's our internal configuration loading. Devs can load their own in the other function.
+function GM:LoadInternalNetworkConfigurations()
 	
 	// BOOLEANS
 	GAMEMODE:AddValidNetworkType( "boolean", "Bool", "Booleans",
-		function( var ) return end,
 		function( var ) return tobool( var ) end,
 		function( var ) umsg.Bool( var ) end,
-		function( um ) return um:ReadBool() end )
+		function( um ) return um:ReadBool() end
+	)
 
 	// STRINGS
 	GAMEMODE:AddValidNetworkType( "string", "String", "Strings",
 		function( var )
-			if type( var ) != "string" and type( var ) != "number" then
-				error( "Bad argument #2 (String expected, got "..type( var )..")\n", 2 )
+			local vType = type( var )
+			if vType != "string" and vType != "number" then
+				error( "Bad argument #2 (String expected, got "..vType..")\n", 2 )
 			end
+			return tostring( var )
 		end,
-		function( var ) return DivideString( tostring( var ) ) end,
-		function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				umsg.String( var )
-			end
-		end,
-		function( um )
-			local s = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					s = s..um:ReadString()
-				end
-			else
-				s = um:ReadString()
-			end
-			return s
-		end )
+		function( var ) umsg.String( var ) end,
+		function( um ) return um:ReadString() end
+	)
 
 	// INTEGERS
 	GAMEMODE:AddValidNetworkType( "integer", "Int", "Integers",
 		function( var )
-			if type( var ) != "string" and type( var ) != "number" then
+			if !tonumber( var ) then
 				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
-			elseif type( var ) == "string" and !tonumber( var ) then
-				error( "Bad argument #2 (String '"..var.."' could not be converted to Number)\n", 2 )
 			end
+			return tonumber( math.floor( var ) )
 		end,
 		function( var )
-			if IsFloat( var ) then
-				var = tonumber( tostring( var ):sub( 1, IsFloat( var ) ) )
-			end
-			return DivideNumber( var )
-		end,
-		function( var )
-			if type(var) == "table" then
+			if ( var >= -32768 and var <= 32767 ) then
 				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.Long( v )
-				end
-			else
+				umsg.Short( var )
+			elseif ( var >= -2147483648 and var <= 2147483647 ) then
 				umsg.Bool( false )
-				if type(var) == "string" then
-					umsg.Short( 1 )
-					umsg.String( var )
-				elseif type(var) == "number" then
-					if IsShort( var ) then
-						umsg.Short( 2 )
-						umsg.Short( var )
-					elseif IsLong( var ) then
-						umsg.Short( 3 )
-						umsg.Long( var )
-					end
-				end
+				umsg.Long( var )
+			else
+				ErrorNoHalt( "Attempted to send a number that exceeds usermessage Long limits!\n" )
 			end
 		end,
 		function( um )
-			local n = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					n = n..um:ReadString()
-				end
-				n = tonumber( n )
+			local short = um:ReadBool()
+			if short then
+				return um:ReadShort()
 			else
-				local i = um:ReadShort()
-				if i == 1 then
-					n = tonumber( um:ReadString() )
-				elseif i == 2 then
-					n = um:ReadShort()
-				else
-					n = um:ReadLong()
-				end
+				return um:ReadLong()
 			end
-			return n
-		end )
+		end
+	)
 
 	// FLOATS
 	GAMEMODE:AddValidNetworkType( "float", "Float", "Floats",
 		function( var )
-			if type( var ) != "string" and type( var ) != "number" then
+			if !tonumber( var ) then
 				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
-			elseif type( var ) == "string" and !tonumber( var ) then
-				error( "Bad argument #2 (String '"..var.."' could not be converted to Number)\n", 2 )
 			end
+			return tonumber( var )
 		end,
-		function( var )
-			if !IsLong( var ) then
-				var = tostring( var )
-			end
-			return DivideString( var )
-		end,
-		function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				if type( var ) == "string" then
-					umsg.Short( 1 )
-					umsg.String( var )
-				elseif type(var) == "number" then
-					umsg.Short( 2 )
-					umsg.Float( var )
-				end
-			end
-		end,
-		function( um )
-			local n = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					n = n..um:ReadString()
-				end
-				n = tonumber( n )
-			else
-				local i = um:ReadShort()
-				if i == 1 then
-					n = tonumber( um:ReadString() )
-				else
-					n = um:ReadFloat()
-				end
-			end
-			return n
-		end )
+		function( var ) umsg.Float( var ) end,
+		function( um ) return um:ReadFloat() end
+	)
 
 	// ENTITIES	
 	GAMEMODE:AddValidNetworkType( "entity", "Entity", "Entities",
 		function( var )
-			if type( var ) != "entity" and type( var ) != "player" then
-				error( "Bad argument #2 (Player or Entity expected, got "..type( var )..")\n", 2 )
+			local vType = type( var )
+			if vType != "entity" and vType != "player" then
+				error( "Bad argument #2 (Player or Entity expected, got "..vType..")\n", 2 )
 			end
+			return var:GetNetworkID()
 		end,
-		function( var ) return GAMEMODE:GetEntityNWID( var ) end,
 		function( var ) umsg.String( var ) end,
 		function( um )
 			local id = um:ReadString()
-			local entType, entID, Ent = id:sub( 1, 3 ), id:sub( 3 )
-			if entType == "ply" then
-				Ent = player.GetByUniqueID( entID )
-			elseif entType == "ent" then
-				Ent = ents.GetByIndex( entID )
-			end
-			return Ent
-		end )
+			local entType, entID = id:sub( 1, 3 ), id:sub( 3 )
+			return UTIL_GetByNetworkID( entType, entID )
+		end
+	)
 
 	// COLORS
 	GAMEMODE:AddValidNetworkType( "color", "Color", "Colors",
 		function( var )
 			if type( var ) != "table" then
-				error( "Bad argument #2 (Color expected, got "..type( var )..")\n", 2 )
+				error( "Bad argument #2 (Color table expected, got "..type( var )..")\n", 2 )
 			end
-			local s = ""
-			for k, v in pairs( Var ) do
-				s = s..k
+			if type( var.r + var.g + var.b ) != "number" then
+				error( "Bad argument #2 (Table '"..tostring( var ).."' is not a valid Color)\n", 2 )
 			end
-			if s:sub( 1, 3 ) != "rgb" then
-				error( "Bad argument #2 (Table '"..tostring(var).."' is not a valid Color)\n", 2 )
-			end
-		end,
-		function( var )
 			var.r = math.Clamp( var.r, 0, 255 )
 			var.g = math.Clamp( var.g, 0, 255 )
 			var.b = math.Clamp( var.b, 0, 255 )
@@ -650,19 +187,15 @@ function GM:LoadNetworkConfigurations_Internal()
 			return var
 		end,
 		function( var )
-			umsg.Short( var.r )
-			umsg.Short( var.g )
-			umsg.Short( var.b )
-			umsg.Short( var.a )
+			umsg.Char( color.r - 128 )
+			umsg.Char( color.g - 128 )
+			umsg.Char( color.b - 128 )
+			umsg.Char( color.a - 128 )
 		end,
 		function( um )
-			local col = color_white
-			col.r = um:ReadShort()
-			col.g = um:ReadShort()
-			col.b = um:ReadShort()
-			col.a = um:ReadShort()
-			return col
-		end )
+			return { r = um:ReadChar() + 128, g = um:ReadChar() + 128, b = um:ReadChar() + 128, a = um:ReadChar() + 128 }
+		end
+	)
 
 	// VECTORS
 	GAMEMODE:AddValidNetworkType( "vector", "Vector", "Vectors",
@@ -670,10 +203,11 @@ function GM:LoadNetworkConfigurations_Internal()
 			if type( var ) != "vector" then
 				error( "Bad argument #2 (Vector expected, got "..type( var )..")\n", 2 )
 			end
+			return var
 		end,
-		function( var ) return var end,
 		function( var ) umsg.Vector( var ) end,
-		function( um ) return um:ReadVector() end )
+		function( um ) return um:ReadVector() end
+	)
 
 	// ANGLES
 	GAMEMODE:AddValidNetworkType( "angle", "Angle", "Angles",
@@ -681,10 +215,11 @@ function GM:LoadNetworkConfigurations_Internal()
 			if type( var ) != "angle" then
 				error( "Bad argument #2 (Angle expected, got "..type( var )..")\n", 2 )
 			end
+			return var
 		end,
-		function( var ) return var end,
 		function( var ) umsg.Angle( var ) end,
-		function( um ) return um:ReadAngle() end )
+		function( um ) return um:ReadAngle() end
+	)
 
 	// TABLES
 	GAMEMODE:AddValidNetworkType( "table", "Table", "Tables",
@@ -692,31 +227,11 @@ function GM:LoadNetworkConfigurations_Internal()
 			if type( var ) != "table" then
 				error( "Bad argument #2 (Table expected, got "..type( var )..")\n", 2 )
 			end
+			return glon.encode( var )
 		end,
-		function( var ) return DivideString( glon.encode( var ) ) end,
-		function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				umsg.String( var )
-			end
-		end,
-		function( um )
-			local t = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					t = t..um:ReadString()
-				end
-			else
-				t = um:ReadString()
-			end
-			return glon.decode(t)
-		end )
+		function( var ) umsg.String( var ) end,
+		function( um ) return glon.decode( um:ReadString() ) end
+	)
 
 	// EFFECTS
 	GAMEMODE:AddValidNetworkType( "ceffectdata", "Effect", "Effects",
@@ -724,38 +239,20 @@ function GM:LoadNetworkConfigurations_Internal()
 			if type( var ) != "CEffectData" then
 				error( "Bad argument #2 (CEffectData expected, got "..type( var )..")\n", 2 )
 			end
+			return glon.encode( var )
 		end,
-		function( var ) return DivideString( glon.encode( var ) ) end,
-		function( var )
-			if type(var) == "table" then
-				umsg.Bool( true )
-				umsg.Short( #var )
-				for k, v in pairs( var ) do
-					umsg.String( v )
-				end
-			else
-				umsg.Bool( false )
-				umsg.String( var )
-			end
-		end,
-		function( um )
-			local t = ""
-			if um:ReadBool() then
-				for i = 1, um:ReadShort() do
-					t = t..um:ReadString()
-				end
-			else
-				t = um:ReadString()
-			end
-			return glon.decode(t)
-		end )
+		function( var ) umsg.String( var ) end,
+		function( um ) return glon.decode( um:ReadString() ) end
+	)
 	
-	GAMEMODE:LoadNetworkConfigurations() -- Call the one for developers.
+	if GAMEMODE.LoadNetworkConfigurations then
+		GAMEMODE:LoadNetworkConfigurations() -- Call the one for developers.
+	end
 	
 	local ENTITY = FindMetaTable( "Entity" ) -- Here is the entity metatable. This lets us add methods to all entities.
-
 	if !ENTITY then return end
 	
+	// A handy function for getting network ID's.
 	function ENTITY:GetNetworkID()
 		if self:IsPlayer() then
 			return "ply"..self:UniqueID()
@@ -763,10 +260,12 @@ function GM:LoadNetworkConfigurations_Internal()
 			return "ent"..self:EntIndex()
 		end
 	end
-
-	for k, v in pairs( GAMEMODE.__NetworkData ) do
+	
+	// Now we loop through our network data and generate our player/entity methods for networking.
+	for k, v in pairs( NARWHAL.__NetworkData ) do
 		ENTITY["SendNetworked"..v.Ref] = function( self, Name, Var, Filter )
 			local entType = type( self )
+			if !SERVER then Filter = nil end
 			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
 				error( "Entity.SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
 			elseif !Name then
@@ -775,22 +274,42 @@ function GM:LoadNetworkConfigurations_Internal()
 				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
 			elseif !Var then
 				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
-			elseif Filter and type( Filter ) != "player" and type( Filter ) != "entity" and type( Filter ) != "CRecipientFilter" and !IsTableOfEntitiesValid( Filter ) then
-				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
+			elseif Filter and type( Filter ) != "player" and type( Filter ) != "table" then
+				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Player or Table of Players expected, got "..type( Filter )..")\n", 2 )
+			elseif Filter and type( Filter ) == "table" then
+				for k, v in pairs( Filter ) do
+					if !ValidEntity( v ) or type( v ) != "player" then
+						table.remove( Filter, k )
+						ErrorNoHalt( entType..".FetchNetworked"..v.Ref..": Problem with argument #3 (Filter Table contains invalid member "..tostring( v )..")\n" )
+					end
+				end
+				if !IsTableOfEntitiesValid( Filter ) then
+					error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
+				end
 			end
-			print( self, Name, Var, k, Filter )
-			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
+			GAMEMODE:SendNetworkedVariable( self, Name, Var, k, Filter )
 		end
 		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter )
 			local entType = type( self )
+			if !SERVER then Filter = nil end
 			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
 				error( "Entity.FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
 			elseif !Name then
 				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
 				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
-			elseif Filter and type( Filter ) != "player" and type( Filter ) != "entity" and type( Filter ) != "CRecipientFilter" and !IsTableOfEntitiesValid( Filter ) then
-				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Entity, Player, RecipientFilter, or Table of Entities expected, got "..type( Filter )..")\n", 2 )
+			elseif Filter and type( Filter ) != "player" and type( Filter ) != "table" then
+				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Player or Table of Players expected, got "..type( Filter )..")\n", 2 )
+			elseif Filter and type( Filter ) == "table" then
+				for k, v in pairs( Filter ) do
+					if !ValidEntity( v ) or type( v ) != "player" then
+						table.remove( Filter, k )
+						ErrorNoHalt( entType..".FetchNetworked"..v.Ref..": Problem with argument #3 (Filter Table contains invalid member "..tostring( v )..")\n" )
+					end
+				end
+				if !IsTableOfEntitiesValid( Filter ) then
+					error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
+				end
 			end
 			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
 		end
@@ -799,7 +318,7 @@ function GM:LoadNetworkConfigurations_Internal()
 	end
 	
 end
-
+hook.Add( "Initialize", "NARWHAL_LoadNWConfig", GM.LoadInternalNetworkConfigurations )
 
 
 

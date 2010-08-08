@@ -240,23 +240,13 @@ end
 
 // Preload Module Data
 local function PreLoadGamemodeModules()
-	local Folder = string.Replace( GM.Folder, "gamemodes/", "" );
-	local path, state
+	local Folder = string.Replace( GM.Folder, "gamemodes/", "" )
 	for c, d in pairs( file.FindInLua( Folder.."/gamemode/modules/*") ) do
-		path = Folder.."/gamemode/modules/"..d
 		if d:find( ".lua" ) then
-			if d:sub( 1, 3 ) == "cl_" then
-				state = "client"
-			elseif d:sub( 1, 3 ) == "sv_" then
-				state = "server"
-			else
-				state = "shared"
-			end
-			PreloadModuleData( path, state )
+			PreloadModuleData( Folder.."/gamemode/modules/"..d, "shared" )
 		elseif d == "client" or d == "server" or d == "shared" then
 			for e, f in pairs( file.FindInLua( Folder.."/gamemode/modules/"..d.."/*" ) ) do
-				path = Folder.."/gamemode/modules/"..d.."/"..f
-				PreloadModuleData( path, state )
+				PreloadModuleData( Folder.."/gamemode/modules/"..d.."/"..f, d )
 			end
 		end
 	end

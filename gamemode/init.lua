@@ -32,8 +32,7 @@ AddCSLuaFile( "includes_cl.lua" )
    Desc: Called immediately after starting the gamemode 
 ---------------------------------------------------------*/
 function GM:Initialize( )
-	GAMEMODE:SetupConfigCommands()
-	GAMEMODE:LoadNetworkConfigurations_Internal()
+
 end
 
 /*---------------------------------------------------------

@@ -25,8 +25,6 @@ include( 'includes_cl.lua' )
 ---------------------------------------------------------*/
 function GM:Initialize( )
 
-	GAMEMODE:LoadNetworkConfigurations_Internal()
-	
 end
 
 /*---------------------------------------------------------

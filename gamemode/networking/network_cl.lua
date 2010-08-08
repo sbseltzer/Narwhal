@@ -12,8 +12,6 @@
 local string = string
 local usermessage = usermessage
 local pairs = pairs
-local tonumber = tonumber
-local color_white = color_white
 
 // CLIENT version of SendNetworkedVariable.
 function GM:SendNetworkedVariable( Ent, Name, Var, storageType )
@@ -21,8 +19,7 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType )
 	storageType = storageType or "var"
 	
 	local ID = Ent:GetNetworkID()
-	
-	local storageDest = GAMEMODE.__NetworkData[storageType].Storage
+	local storageDest = NARWHAL.__NetworkData[storageType].Storage
 	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
@@ -41,7 +38,7 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType )
 	storageType = storageType or "var"
 	
 	local ID = Ent:GetNetworkID()
-	local storageDest = GAMEMODE.__NetworkData[storageType].Storage
+	local storageDest = NARWHAL.__NetworkData[storageType].Storage
 	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
@@ -50,11 +47,30 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType )
 		NARWHAL.__NetworkCache[storageDest][ID] = {}
 	end
 	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
+		if !Var then
+			ErrorNoHalt( "Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed. Client must not be in the serverside filter for this variable.\n" )
+			return
+		end
 		GAMEMODE:SendNetworkedVariable( Ent, Name, Var, storageType )
 		return Var
 	end
 	
 	return NARWHAL.__NetworkCache[storageDest][ID][Name]
+	
+end
+
+// Usermessage Hooks
+
+local function AttemptConfirmation( ID, Name, storageType, storageDest )
+	
+	if !LocalPlayer().ConCommand then
+		ErrorNoHalt( "LocalPlayer is invalid. Reattempting confirmation...\n" )
+		timer.Simple( 0.1, AttemptConfirmation, ID, Name, storageType, storageDest )
+		return
+	end
+	
+	MsgN( "LocalPlayer is valid! Sending confirmation..." )
+	RunConsoleCommand( "narwhal_nw_confirmrecievedvar", ID, Name, storageType, storageDest )
 	
 end
 
@@ -64,11 +80,9 @@ local function UMSG_RecieveVariable( um )
 	local ID = StorageData[1]
 	local storageType = StorageData[2]
 	local Name = StorageData[3]
-	local RecieveData = GAMEMODE:GetNetworkConfigurations()[storageType]
-	local storageDest = RecieveData.Storage
-	local Var = RecieveData.Func_Read( um )
-	
-	MsgN("Recieved "..storageType.." "..Var)
+	local Config = NARWHAL.__NetworkData[storageType]
+	local storageDest = Config.Storage
+	local Var = Config.Func_Read( um )
 	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
@@ -78,6 +92,11 @@ local function UMSG_RecieveVariable( um )
 	end
 	
 	NARWHAL.__NetworkCache[storageDest][ID][Name] = Var
+	
+	--LocalPlayer():ConCommand( "narwhal_nw_confirmrecievedvar " .. ID .. " " .. Name .. " " .. storageType .. " " .. storageDest )
+	--RunConsoleCommand( "narwhal_nw_confirmrecievedvar", ID, Name, storageType, storageDest )
+	--concommand.Run( LocalPlayer(), "narwhal_nw_confirmrecievedvar", {ID, Name, storageType, storageDest} )
+	AttemptConfirmation( ID, Name, storageType, storageDest )
 	
 end
 usermessage.Hook( "NETWORK_SendVariable", UMSG_RecieveVariable )
@@ -89,7 +108,7 @@ local function UMSG_RemoveVariable( um )
 	local storageType = StorageData[2]
 	local Name = StorageData[3]
 	
-	local storageDest = GAMEMODE.__NetworkTypeTranslateTable[storageType]
+	local storageDest = NARWHAL.__NetworkData[storageType].Storage
 	NARWHAL.__NetworkCache[storageDest][ID][Name] = nil
 	
 end
@@ -99,7 +118,7 @@ local function UMSG_RemoveIndex( um )
 	
 	local ID = um:ReadString()
 	
-	for k, v in pairs( GAMEMODE.__NetworkData ) do
+	for k, v in pairs( NARWHAL.__NetworkData ) do
 		if NARWHAL.__NetworkCache[v.Storage][ID] then
 			NARWHAL.__NetworkCache[v.Storage][ID] = nil
 		end
