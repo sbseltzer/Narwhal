@@ -14,6 +14,7 @@
 
 
 // Include shared files
+include( 'config.lua' )
 include( 'themes.lua' )
 include( 'modules.lua' )
 include( 'animations.lua' )

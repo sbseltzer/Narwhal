@@ -50,6 +50,7 @@ function GM:SetTheme( themeName )
 		hook.Add( unpack( v ) )
 	end
 	NARWHAL.__CurrentTheme = themeName
+	THEME = newtheme
 end
 
 // Called when deciding which theme to use
@@ -68,7 +69,6 @@ local function ResetThemeTable()
 	THEME.Title = ""
 	THEME.Author = ""
 	THEME.Contact = ""
-	THEME.Purpose = ""
 	
 	THEME.Derive = "" -- I'm thinking of making it so modules can derive from one another.
 	
@@ -191,7 +191,7 @@ end
 local function PreLoadGamemodeThemes()
 	local Folder = string.Replace( GM.Folder, "gamemodes/", "" );
 	for c, d in pairs( file.FindInLua( Folder.."/gamemode/themes/*") ) do
-		if !d:find( ".lua" ) then
+		if !d:find( "." ) then
 			for e, f in pairs( file.FindInLua( Folder.."/gamemode/themes/"..d.."/*" ) ) do
 				local state
 				if f == "init.lua" then
@@ -207,10 +207,12 @@ local function PreLoadGamemodeThemes()
 	end
 end
 
+MsgN( "Preloading Themes..." )
 PreLoadGamemodeThemes() -- Preload themes
 
 hook = nil -- We don't want your nasty hooks
 
+MsgN( "Registering Themes..." )
 // Loop through the theme data and include their dependencies first
 for k, v in pairs( ThemeFiles ) do
 	if !ThemeFiles[k] then -- This theme doesnt exist.
@@ -218,8 +220,10 @@ for k, v in pairs( ThemeFiles ) do
 		return
 	end
 	ResetThemeTable() -- Reset the Theme table
+	MsgN( "Registering Theme "..k )
 	RegisterTheme( k, ThemeFiles[k].Path, ThemeFiles[k].State ) -- Include the theme
 end
+MsgN( "Finished Registering Themes..." )
 
 hook = themeHook -- Okay you can come out now. :)
 THEME = nil -- Remove the THEME table.

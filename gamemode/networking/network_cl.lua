@@ -64,12 +64,10 @@ end
 local function AttemptConfirmation( ID, Name, storageType, storageDest )
 	
 	if !LocalPlayer().ConCommand then
-		ErrorNoHalt( "LocalPlayer is invalid. Reattempting confirmation...\n" )
 		timer.Simple( 0.1, AttemptConfirmation, ID, Name, storageType, storageDest )
 		return
 	end
 	
-	MsgN( "LocalPlayer is valid! Sending confirmation..." )
 	RunConsoleCommand( "narwhal_nw_confirmrecievedvar", ID, Name, storageType, storageDest )
 	
 end
@@ -93,9 +91,6 @@ local function UMSG_RecieveVariable( um )
 	
 	NARWHAL.__NetworkCache[storageDest][ID][Name] = Var
 	
-	--LocalPlayer():ConCommand( "narwhal_nw_confirmrecievedvar " .. ID .. " " .. Name .. " " .. storageType .. " " .. storageDest )
-	--RunConsoleCommand( "narwhal_nw_confirmrecievedvar", ID, Name, storageType, storageDest )
-	--concommand.Run( LocalPlayer(), "narwhal_nw_confirmrecievedvar", {ID, Name, storageType, storageDest} )
 	AttemptConfirmation( ID, Name, storageType, storageDest )
 	
 end

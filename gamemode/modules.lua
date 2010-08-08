@@ -34,12 +34,17 @@ local function GetModule( moduleName )
 	return NARWHAL.__Modules[moduleName]
 end
 
+function NARWHAL.GetModules()
+	return NARWHAL.__Modules
+end
+
 // Global function to include a child module for an optional given parent
-function IncludeModule( Module )
-	local t = GetModule( Module ) -- Gets the module's table
+function NARWHAL.IncludeModule( Module, ref )
+	local t = NARWHAL.GetModule( Module ) -- Gets the module's table
 	if !t then
 		error( "Inclusion of Module '"..Module.."' Failed: Not registered!\n", 2 )
 	end
+	if ref then return t end
 	return table.Copy( t ) -- Return a copy of the table.
 end
 
@@ -48,6 +53,7 @@ end
 local function ResetModuleTable()
 	
 	MODULE = {}
+	MODULE.Config = {}
 	
 	MODULE.Name = nil
 	MODULE.Title = ""
@@ -57,10 +63,20 @@ local function ResetModuleTable()
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
-		local b, e = pcall( IncludeModule( moduleName ) )
+		local b, e = pcall( NARWHAL.IncludeModule( moduleName ) )
 		if !b then
 			error( "MODULE.Require on Module '"..moduleName.."' Failed: Not registered!\n", 2 )
 		end
+	end
+	
+	// Add a method to a metatable by name.
+	function MODULE:AddMetaMethod( meta, name, func )
+		meta = FindMetaTable( meta )
+		if !meta then return end
+		local f = function( ... )
+			return func( ... )
+		end
+		meta[name] = func
 	end
 	
 	// Adds a hook for the specified module.
@@ -80,30 +96,6 @@ local function ResetModuleTable()
 		end
 	end
 	
-	// Gets a module key value, or sets one if it's nil
-	function MODULE:GetKeyValue( key, value )
-		if !self.KeyValues and !value then
-			ErrorNoHalt( "Module '"..self.Name.."' has no key values.\n" )
-			return
-		end
-		if !self.KeyValues then
-			self.KeyValues = {}
-		end
-		if !self.KeyValues[key] and value then
-			self.KeyValues[key] = value
-			return value
-		end
-		return self.KeyValues[key]
-	end
-	
-	// Sets a module key value
-	function MODULE:SetKeyValue( key, value )
-		if !self.KeyValues then
-			self.KeyValues = {}
-		end
-		self.KeyValues[key] = value
-	end
-	
 	// Generates autohooks.
 	function MODULE:GenerateHooks()
 		local hooks = moduleHook.GetTable()
@@ -119,7 +111,7 @@ end
 // Registers a specific module file
 local function RegisterModule( name, path, state )
 	
-	if !path:find(".lua") then return end -- Don't try to include the "." or ".." folders. -- path:find(".") and 
+	if !path:find(".lua") then return end
 	
 	if GetModule( name ) then
 		ErrorNoHalt( "Registration of Module '"..name.."' Failed: A module by this name already exists (Author "..MODULE.Author..")!\n" )
@@ -128,18 +120,8 @@ local function RegisterModule( name, path, state )
 	
 	// Does the actuall including
 	local function FinalInclude()
-	
-		/*local pos = path:find( "/" )
-		local lastpos
-		repeat
-			print(pos)
-			lastpos = pos
-			pos = path:find( "/", pos )
-		until ( !pos )*/
 		
 		local bLoaded, strError = pcall( CompileString( ModuleFiles[name].Code, path ) )
-		
-		--print( "PCall Module "..name..":", bLoaded, strError )
 		
 		if !bLoaded then
 			ErrorNoHalt( "Registration of Module '",name,"' Failed: "..strError.."\n" )
@@ -159,6 +141,13 @@ local function RegisterModule( name, path, state )
 			return
 		end
 		
+		if MODULE.Config then
+			for k, v in pairs( MODULE.Config ) do
+				if NARWHAL.Config.Modules[MODULE.Name] and NARWHAL.Config.Modules[MODULE.Name][k] then
+					MODULE.Config[k] = NARWHAL.Config.Modules[MODULE.Name][k]
+				end
+			end	
+		end
 		NARWHAL.__Modules[name] = MODULE
 		
 		MsgN( "Successfully registered Module '",name,"'!\n" )
@@ -283,96 +272,48 @@ MsgN("\nLoading Narwhal Modules...")
 
 PreLoadGamemodeModules() -- Preload modules
 
---PrintTable(ModuleFiles)
+local function LoadModules()
 
-MsgN("\nRegistering Narwhal Modules...")
+	MsgN("\nRegistering Narwhal Modules...")
 
-hook = nil -- We don't want your nasty hooks
+	hook = nil -- We don't want your nasty hooks
 
-// Loop through the module data and include their dependencies first
-for k, v in pairs( ModuleFiles ) do
-	if !table.HasValue( IncludedModules, k ) and !table.HasValue( FailedModules, v.Path ) then
-		LoadDependencyTree( k )
+	// Loop through the module data and include their dependencies first
+	for k, v in pairs( ModuleFiles ) do
+		if !table.HasValue( IncludedModules, k ) and !table.HasValue( FailedModules, v.Path ) then
+			LoadDependencyTree( k )
+		end
 	end
+
+	hook = moduleHook -- Okay you can come out now. :)
+
+	MODULE = nil -- Remove the MODULE table.
+
+	MsgN("\nInitializing Narwhal Modules...")
+
+	// Run all module Initialize functions if they have one.
+	for k, v in pairs( NARWHAL.__Modules ) do
+		if v.Initialize then
+			v:Initialize()
+			MsgN("Module '"..v.Name.."' Successfully Initialized!")
+		end
+		v:GenerateHooks()
+	end
+
+	MsgN("\nInitializing Narwhal Loaded, Registered, and Initialized!")
+	
 end
-
-hook = moduleHook -- Okay you can come out now. :)
-
-MODULE = nil -- Remove the MODULE table.
-
-MsgN("\nInitializing Narwhal Modules...")
-
-// Run all module Initialize functions if they have one.
-for k, v in pairs( NARWHAL.__Modules ) do
-	if v.Initialize then
-		v:Initialize()
-		MsgN("Module '"..v.Name.."' Successfully Initialized!")
-	end
-	v:GenerateHooks()
-end
-
-MsgN("\nInitializing Narwhal Loaded, Registered, and Initialized!")
+hook.Add( "Initialize", "NARWHAL_LoadModules", LoadModules )
 
 
 
 
---[[
-	for k, v in pairs( MODULE ) do
-		if type(v) == "function" then
-			if !GetModule( MODULE.Name ).Enabled then
-				MODULE.Cached[k] = v
-				MODULE[k] = function()
-					return false
-				end
-			else
-				MODULE[k] = MODULE.Cached[k]
-			end
-		end
-	end
-]]--
-/*local regPattern = "NARWHAL%.RegisterModule%s*%("..SpaceCharSpace.."MODULE"..SpaceCharSpace.."%)"
-if !RawText:find( regPattern ) then
-	ErrorNoHalt( "Registration of Module '"..Name.."' Failed: NARWHAL.RegisterModule is missing!\n" )
-	return
-end*/
-/*local function RegisterModule( MODULE )
-	
-	local name = MODULE.Name
-	local path, state = ModuleFiles[name].Path, ModuleFiles[name].State
-	
-	local function FinalInclude()
-		
-		local b, e = pcall( function() CompileString( ModuleFiles[name].Code, ModuleFiles[name].Path ) end ) --RunStringEx( ModuleFiles[name].Code, ModuleFiles[name].Path )
-		
-		print( "CompileString:", b, e)
-		--print( MODULE.Name, MODULE.__CompletedInclude )
-		
-		if !MODULE then return end
-		if GetModule( name ) then
-			return
-		end
-		NARWHAL.__Modules[name] = MODULE
-		MsgN("Successfully registered Module '",name,"'!\n")
-	end
-	
-	if state == "client" then
-		if CLIENT then
-			FinalInclude()
-		end
-	elseif state == "server" then
-		if SERVER then
-			FinalInclude()
-		end
-	elseif state == "shared" then
-		FinalInclude()
-	end
-	
-end*/
 
---function NARWHAL.RegisterModule( MODULE )
-	--RegisterModule( MODULE )
-	--MODULE.__CompletedInclude = true
-	--if ModuleFiles[MODULE.Name] then
-		--LoadDependencyTree( MODULE.Name )
-	--end
---end
+
+
+
+
+
+
+
+

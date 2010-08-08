@@ -52,9 +52,11 @@ local function CheckForConfirmation( ply, ID, Name, storageType, storageDest, re
 		return
 	end
 	
-	local maxRetries, retryDelay, retryAgain = 50, 0.1, 30
+	local maxRetries, retryDelay, retryAgain = 30, 0.1, 3
 	if retries < maxRetries then
-		ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(UTIL_GetByNetworkID( ID )).." failed for "..tostring(ply).." after "..retries.." retries.\n" )
+		if retries >= 4 then
+			ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(UTIL_GetByNetworkID( ID )).." failed for "..tostring(ply).." after "..retries.." retries.\n" )
+		end
 		timer.Simple( retryDelay, CheckForConfirmation, ply, ID, Name, storageType, storageDest, retries + 1, tSendData )
 	elseif retries == maxRetries then
 		ErrorNoHalt( tostring(ply).." may be having connection problems. Will reattempt in "..retryAgain.." seconds.\n" )
@@ -123,13 +125,6 @@ end
 
 // SERVER version of FetchNetworkedVariable.
 function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
-	
-	// We don't want to go any further if some of our args are invalid
-	if !Ent or !ValidEntity( Ent ) or ( string.lower( type( Ent ) ) != "entity" and string.lower( type( Ent ) ) != "player" ) then
-		error( "GAMEMODE.FetchNetworkedVariable Failed: Bad argument #1 (Entity or Player expected, got "..type( Ent )..")\n", 4 )
-	elseif !Name then
-		error( "GAMEMODE.FetchNetworkedVariable Failed: Bad argument #2 (String or Number expected, got "..type( Name )..")\n", 4 )
-	end
 	
 	storageType = storageType or "var"
 	

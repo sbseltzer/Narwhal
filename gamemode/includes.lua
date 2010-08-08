@@ -25,19 +25,18 @@ resource.AddFile( "models/Skeleton/metroanimtree.mdl" )
 // Include server files
 include( 'config.lua' )
 include( 'player.lua' )
-include( 'money.lua' )
-include( 'achievements.lua' )
 include( 'networking/network.lua' )
 
 // Add shared files
+AddCSLuaFile( "config.lua" )
 AddCSLuaFile( "themes.lua" )
 AddCSLuaFile( "modules.lua" )
 AddCSLuaFile( "animations.lua" )
 AddCSLuaFile( "player_shd.lua" )
+AddCSLuaFile( "networking/network_shd.lua" )
 
 // Add client files
 AddCSLuaFile( "networking/network_cl.lua" )
-AddCSLuaFile( "networking/network_shd.lua" )
 
 // Temp files for testing
 include( 'sv_testhooks.lua' )

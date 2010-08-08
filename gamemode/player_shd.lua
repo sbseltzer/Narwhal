@@ -6,7 +6,7 @@
 ---------------------------------------------------------*/
 function GM:PlayerNoClip( pl, on )
 	
-	return GAMEMODE.Config.PlayerCanNoClip
+	return NARWHAL.Config.PlayerCanNoClip
 	
 end
 

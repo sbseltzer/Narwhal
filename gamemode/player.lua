@@ -37,7 +37,7 @@ end
 ---------------------------------------------------------*/
 function GM:CanPlayerSuicide( ply )
 	
-	return GAMEMODE.Config.PlayerCanSuicide
+	return NARWHAL.Config.PlayerCanSuicide
 	
 end
 
@@ -48,7 +48,7 @@ end
 ---------------------------------------------------------*/
 function GM:PlayerSwitchFlashlight( ply, SwitchOn )
 	
-	return GAMEMODE.Config.PlayerCanSwitchFlashlight
+	return NARWHAL.Config.PlayerCanSwitchFlashlight
 	
 end
 
