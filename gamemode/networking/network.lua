@@ -1,4 +1,3 @@
-
 /*---------------------------------------------------------
 
 	Developer's Notes:
@@ -35,8 +34,8 @@ local ErrorNoHalt = ErrorNoHalt
 local ValidEntity = ValidEntity
 local RecipientFilter = RecipientFilter
 
-local function CheckForConfirmation( ply, ID, Name, storageType, storageDest, retries, tSendData )
-
+local function CheckForConfirmation( ply, Ent, Name, storageType, storageDest, retries, tSendData )
+	local ID = Ent:GetNetworkID()
 	if !ply then
 		local msg
 		if retries > 0 then
@@ -44,7 +43,7 @@ local function CheckForConfirmation( ply, ID, Name, storageType, storageDest, re
 		else
 			msg = "The player was never valid."
 		end
-		ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(UTIL_GetByNetworkID( ID )).." failed for "..tostring(ply).." because they are invalid. "..msg.."\n" )
+		ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(Ent).." failed for "..tostring(ply).." because they are invalid. "..msg.."\n" )
 		return
 	end
 	
@@ -55,12 +54,12 @@ local function CheckForConfirmation( ply, ID, Name, storageType, storageDest, re
 	local maxRetries, retryDelay, retryAgain = 30, 0.1, 3
 	if retries < maxRetries then
 		if retries >= 4 then
-			ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(UTIL_GetByNetworkID( ID )).." failed for "..tostring(ply).." after "..retries.." retries.\n" )
+			ErrorNoHalt( "Sending of networked "..storageType.." '"..Name.."' on "..tostring(Ent).." failed for "..tostring(ply).." after "..retries.." retries.\n" )
 		end
-		timer.Simple( retryDelay, CheckForConfirmation, ply, ID, Name, storageType, storageDest, retries + 1, tSendData )
+		timer.Simple( retryDelay, CheckForConfirmation, ply, Ent, Name, storageType, storageDest, retries + 1, tSendData )
 	elseif retries == maxRetries then
 		ErrorNoHalt( tostring(ply).." may be having connection problems. Will reattempt in "..retryAgain.." seconds.\n" )
-		timer.Simple( retryAgain, CheckForConfirmation, ID, Name, storageType, storageDest, retries + 1, tSendData )
+		timer.Simple( retryAgain, CheckForConfirmation, ply, Ent, Name, storageType, storageDest, retries + 1, tSendData )
 	else
 		ErrorNoHalt( "Reattempting network syncronization for "..tostring(ply).."...\n" )
 		GAMEMODE:SendNetworkedVariable( unpack( tSendData ) )
@@ -110,7 +109,9 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	end
 	
 	umsg.Start( "NETWORK_SendVariable", Filter )
-		umsg.String( ID .. " " .. storageType .. " " .. Name )
+		umsg.Short( Ent:EntIndex() )
+		umsg.Char( NARWHAL.__NetworkTypeID2[storageType] - 129)
+		umsg.String( Name )
 		Config.Func_Send( Var )
 	umsg.End()
 	
@@ -118,7 +119,7 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	for k, v in pairs( Filter ) do
 		table.insert( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, v )
-		CheckForConfirmation( v, ID, Name, storageType, storageDest, 0, {Ent, Name, Var, storageType, Filter} )
+		CheckForConfirmation( v, Ent, Name, storageType, storageDest, 0, {Ent, Name, Var, storageType, Filter} )
 	end
 	
 end
@@ -151,9 +152,26 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 end
 
+function GM:RemoveNetworkedVariables( ply )
+
+	umsg.Start( "NETWORK_RemoveIndex" )
+		umsg.String(ply:GetNetworkID())
+	umsg.End()
+	
+	for k, v in pairs( NARWHAL.__NetworkData ) do
+		if NARWHAL.__NetworkCache[v.Storage][ply:GetNetworkID()] then
+			NARWHAL.__NetworkCache[v.Storage][ply:GetNetworkID()] = nil
+		end
+	end
+	
+end
+
+
 local function ConfirmRecievedVar( ply, cmd, args )
 
 	local ID, Name, storageType, storageDest, Key = unpack( args )
+	local Ent = Entity(tonumber(ID))
+	ID = Ent:GetNetworkID()
 	if !NARWHAL.__NetworkCache[storageDest] or !NARWHAL.__NetworkCache[storageDest][ID] or !NARWHAL.__NetworkCache[storageDest][ID][Name] or !NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting or !table.HasValue( NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting, ply ) then
 		return
 	end
@@ -169,27 +187,3 @@ local function ConfirmRecievedVar( ply, cmd, args )
 	
 end
 concommand.Add( "narwhal_nw_confirmrecievedvar", ConfirmRecievedVar )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

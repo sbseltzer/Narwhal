@@ -18,11 +18,10 @@ local SERVER = SERVER
 local CLIENT = CLIENT
 
 local ThemeFiles = {}
+local themeHook = hook
 
 NARWHAL.__Themes = {}
 NARWHAL.__CurrentTheme = "Default"
-
-local themeHook = hook
 
 // Gets the current gamemode theme
 function GM:GetCurrentTheme()

@@ -1,4 +1,3 @@
-
 /*---------------------------------------------------------
 
 	Developer's Notes:
@@ -21,6 +20,8 @@ local tostring = tostring
 local FindMetaTable = FindMetaTable
 
 NARWHAL.__NetworkData = {}
+NARWHAL.__NetworkTypeID = {}
+NARWHAL.__NetworkTypeID2 = {}
 NARWHAL.__NetworkCache = {} -- Set up the shared Network Cache table
 NARWHAL.__NetworkCache.Booleans = {} -- Stores NWBools
 NARWHAL.__NetworkCache.Strings = {} -- Stores NWStrings
@@ -37,17 +38,11 @@ NARWHAL.__NetworkCache.Vars = {} -- Stores NWVars
 local function GetByIndexEx( stype, id )
 	local t, i
 	if stype == "ent" then
-		for _, ent in pairs( ents.GetAll() ) do
-			if ValidEntity( ent ) then
-				if ent:EntIndex() == id then
-					return ent
-				end
-			end
-		end
+		return id
 	elseif stype == "ply" then
 		for _, ply in pairs( player.GetAll() ) do
 			if ValidEntity( ply ) then
-				if ply:UniqueID() == id then
+				if ply:UserID() == id then
 					return ply
 				end
 			end
@@ -80,6 +75,8 @@ function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcR
 		tData["Func_Read"] = funcRead
 	end
 	NARWHAL.__NetworkData[sType] = tData
+	NARWHAL.__NetworkTypeID[#NARWHAL.__NetworkTypeID + 1] = sType
+	NARWHAL.__NetworkTypeID2[sType] = #NARWHAL.__NetworkTypeID
 	if !NARWHAL.__NetworkCache[sStore] then
 		NARWHAL.__NetworkCache[sStore] = {}
 	end
@@ -157,16 +154,40 @@ function GM:LoadInternalNetworkConfigurations()
 	GAMEMODE:AddValidNetworkType( "entity", "Entity", "Entities",
 		function( var )
 			local vType = type( var )
-			if vType != "entity" and vType != "player" then
+			if vType != "Entity" and vType != "Player" then
 				error( "Bad argument #2 (Player or Entity expected, got "..vType..")\n", 2 )
 			end
-			return var:GetNetworkID()
+			return var
 		end,
-		function( var ) umsg.String( var ) end,
+		function( var )
+			local vType = type( var )
+			if vType == "Entity" then
+				umsg.Char(0)
+				umsg.Short(var:EntIndex())
+			elseif vType == "Player" then
+				umsg.Char(1)
+				umsg.Short(var:UserID()-32770)
+			end
+		end,
 		function( um )
-			local id = um:ReadString()
-			local entType, entID = id:sub( 1, 3 ), id:sub( 3 )
-			return UTIL_GetByNetworkID( entType, entID )
+			local entType = um:ReadChar()
+			local entID = 0
+
+			if entType == 0 then
+				return Entity( um:ReadShort() )
+			elseif entType == 1 then
+				local id = um:ReadShort() + 32770
+				for _, ply in pairs( player.GetAll() ) do
+					if ValidEntity( ply ) then
+						if ply:UserID() == id then
+							return ply
+						end
+					end
+				end
+			else
+				error("Fatal error receiving entity(invalid type)")
+			end
+			return NullEntity()
 		end
 	)
 
@@ -252,12 +273,16 @@ function GM:LoadInternalNetworkConfigurations()
 	local ENTITY = FindMetaTable( "Entity" ) -- Here is the entity metatable. This lets us add methods to all entities.
 	if !ENTITY then return end
 	
-	// A handy function for getting network ID's.
+	// A handy function for getting network ID's. This is no longer networkable
+	local NextID = 0
 	function ENTITY:GetNetworkID()
 		if self:IsPlayer() then
-			return "ply"..self:UniqueID()
+			return "ply"..self:UserID()
+		elseif self.NetworkID then
+			return "ent"..self.NetworkID
 		else
-			return "ent"..self:EntIndex()
+			NextID = NextID + 1
+			return "ent"..NextID
 		end
 	end
 	
@@ -319,10 +344,5 @@ function GM:LoadInternalNetworkConfigurations()
 	
 end
 hook.Add( "Initialize", "NARWHAL_LoadNWConfig", GM.LoadInternalNetworkConfigurations )
-
-
-
-
-
 
 

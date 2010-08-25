@@ -15,6 +15,8 @@
 include( 'includes_shd.lua' )
 
 DeriveGamemode( "base" )
+--DeriveGamemode( NARWHAL.Derivative )
+--DeriveGamemode( NARWHAL.Derivative )
 
 GM.Name 		= "Narwhal Base"
 GM.Author 		= "Team GModCentral"
@@ -119,7 +121,7 @@ function GM:CreateTeams()
 		team.SetSpawnPoint( k, v.SpawnPoints ) // <-- This would be info_terrorist or some entity that is in your map
 		
 	end
-	
+	--team.CreateTeam( index, name, color, joinable, spawns )
 	team.SetSpawnPoint( TEAM_SPECTATOR, "worldspawn" ) 
 
 end

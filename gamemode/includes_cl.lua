@@ -18,3 +18,10 @@ include( 'networking/network_cl.lua' )
 
 // Temp files for testing
 include( 'cl_testhooks.lua' )
+
+local Folder = string.Replace( GM.Folder, "gamemodes/", "" )
+for c, d in pairs( file.FindInLua( Folder.."/gamemode/client/*") ) do
+	if d:find( ".lua" ) then
+		include( Folder.."/gamemode/client/"..d )
+	end
+end

@@ -1,9 +1,10 @@
-
 /*
+
 	Module files are read to find their dependencies before being included.
 	Their name, path, state, and dependencies are written to a table. 
 	Global Module table is set up.
 	Each module is loaded and any dependencies are loaded first in a recursive function.
+	
 */
 
 local hook = hook
@@ -19,34 +20,56 @@ local AddCSLuaFile = AddCSLuaFile
 local SERVER = SERVER
 local CLIENT = CLIENT
 
-NARWHAL.__Modules = {}
-
+local Modules = {} -- We aren't going to put modules on a global table.
 local ModuleFiles = {}
 local IncludedModules = {}
 local FailedModules = {}
 local moduleHook = hook
 
+local function GetModules()
+	return Modules
+end
+
 // Gets the module data from the global table
 local function GetModule( moduleName )
-	if !NARWHAL.__Modules[moduleName] then
+	if !Modules[moduleName] then
 		return false
 	end
-	return NARWHAL.__Modules[moduleName]
+	return Modules[moduleName]
 end
 
-function NARWHAL.GetModules()
-	return NARWHAL.__Modules
-end
-
-// Global function to include a child module for an optional given parent
-function NARWHAL.IncludeModule( Module, ref )
-	local t = NARWHAL.GetModule( Module ) -- Gets the module's table
+// Global function to include a module
+local function IncludeModule( Module, ref )
+	local t = GetModule( Module ) -- Gets the module's table
 	if !t then
 		error( "Inclusion of Module '"..Module.."' Failed: Not registered!\n", 2 )
 	end
-	if ref then return t end
-	return table.Copy( t ) -- Return a copy of the table.
+	if t.Hooks[1] then
+		for _, v in pairs( t.Hooks ) do
+			t:Hook( unpack(v), true )
+		end
+	end
+	if ref then return t end -- Return a reference of the table so we can edit it globally.
+	return table.Copy( t ) -- Return a copy of the table so we can use modules as instances.
 end
+
+local function IncludeModule( Module, ref )
+	local t = GetModule( Module ) -- Gets the module's table
+	if !t then
+		error( "Inclusion of Module '"..Module.."' Failed: Not registered!\n", 2 )
+	end
+	if t.Hooks[1] then
+		for _, v in pairs( t.Hooks ) do
+			t:Hook( unpack(v), true )
+		end
+	end
+	if ref then return t end -- Return a reference of the table so we can edit it globally.
+	return table.Copy( t ) -- Return a copy of the table so we can use modules as instances.
+end
+
+NARWHAL.GetModule = GetModule // Does this make sense?
+NARWHAL.GetModules = GetModules
+NARWHAL.IncludeModule = IncludeModule
 
 // Resets the Module table
 // Here we define a set of members and functions that are available in all modules.
@@ -54,6 +77,7 @@ local function ResetModuleTable()
 	
 	MODULE = {}
 	MODULE.Config = {}
+	MODULE.Hooks = {}
 	
 	MODULE.Name = nil
 	MODULE.Title = ""
@@ -63,25 +87,16 @@ local function ResetModuleTable()
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
-		local b, e = pcall( NARWHAL.IncludeModule( moduleName ) )
-		if !b then
-			error( "MODULE.Require on Module '"..moduleName.."' Failed: Not registered!\n", 2 )
-		end
-	end
-	
-	// Add a method to a metatable by name.
-	function MODULE:AddMetaMethod( meta, name, func )
-		meta = FindMetaTable( meta )
-		if !meta then return end
-		local f = function( ... )
-			return func( ... )
-		end
-		meta[name] = func
+		return IncludeModule( moduleName )
 	end
 	
 	// Adds a hook for the specified module.
-	function MODULE:Hook( hookName, uniqueName, func )
+	function MODULE:Hook( hookName, uniqueName, func, hookForReal )
 		local self = self or MODULE
+		if !hookForReal then
+			table.insert( self.Hooks, { hookName, uniqueName, func } )
+			return
+		end
 		local isMember = false
 		for k, v in pairs( self ) do
 			if v == func then
@@ -94,6 +109,12 @@ local function ResetModuleTable()
 		else
 			moduleHook.Add( hookName, "MODULES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
 		end
+	end
+	
+	// Removes a hook for the specified module.
+	function MODULE:UnHook( hookName, uniqueName )
+		local self = self or MODULE
+		moduleHook.Remove( hookName, "MODULES."..self.Name..".HOOK."..uniqueName )
 	end
 	
 	// Generates autohooks.
@@ -120,8 +141,9 @@ local function RegisterModule( name, path, state )
 	
 	// Does the actuall including
 	local function FinalInclude()
-		
-		local bLoaded, strError = pcall( CompileString( ModuleFiles[name].Code, path ) )
+		local a = CompileString(ModuleFiles[name].Code, path)
+		if !a then return end // It printed error already
+		local bLoaded, strError = pcall( a )
 		
 		if !bLoaded then
 			ErrorNoHalt( "Registration of Module '",name,"' Failed: "..strError.."\n" )
@@ -148,7 +170,7 @@ local function RegisterModule( name, path, state )
 				end
 			end	
 		end
-		NARWHAL.__Modules[name] = MODULE
+		Modules[name] = MODULE
 		
 		MsgN( "Successfully registered Module '",name,"'!\n" )
 		
@@ -292,7 +314,7 @@ local function LoadModules()
 	MsgN("\nInitializing Narwhal Modules...")
 
 	// Run all module Initialize functions if they have one.
-	for k, v in pairs( NARWHAL.__Modules ) do
+	for k, v in pairs( Modules ) do
 		if v.Initialize then
 			v:Initialize()
 			MsgN("Module '"..v.Name.."' Successfully Initialized!")
@@ -304,16 +326,3 @@ local function LoadModules()
 	
 end
 hook.Add( "Initialize", "NARWHAL_LoadModules", LoadModules )
-
-
-
-
-
-
-
-
-
-
-
-
-

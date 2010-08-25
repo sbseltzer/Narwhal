@@ -1,4 +1,3 @@
-
 /*---------------------------------------------------------
 
 	Developer's Notes:
@@ -73,11 +72,10 @@ local function AttemptConfirmation( ID, Name, storageType, storageDest )
 end
 
 local function UMSG_RecieveVariable( um )
-	
-	local StorageData = string.Explode( " ", um:ReadString() )
-	local ID = StorageData[1]
-	local storageType = StorageData[2]
-	local Name = StorageData[3]
+	local ent = Entity(um:ReadShort())
+	local ID = ent:GetNetworkID()
+	local storageType = NARWHAL.__NetworkTypeID[um:ReadChar() + 129]
+	local Name = um:ReadString()
 	local Config = NARWHAL.__NetworkData[storageType]
 	local storageDest = Config.Storage
 	local Var = Config.Func_Read( um )
@@ -91,7 +89,7 @@ local function UMSG_RecieveVariable( um )
 	
 	NARWHAL.__NetworkCache[storageDest][ID][Name] = Var
 	
-	AttemptConfirmation( ID, Name, storageType, storageDest )
+	AttemptConfirmation( ent:EntIndex(), Name, storageType, storageDest )
 	
 end
 usermessage.Hook( "NETWORK_SendVariable", UMSG_RecieveVariable )
@@ -121,8 +119,6 @@ local function UMSG_RemoveIndex( um )
 	
 end
 usermessage.Hook( "NETWORK_RemoveIndex", UMSG_RemoveIndex )
-
-
 
 
 

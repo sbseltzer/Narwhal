@@ -129,17 +129,17 @@ Anims.Male[ "models" ] = {
 	"models/kleiner.mdl"
 }
 Anims.Male[ "default" ] = { 
-        [ "idle" ] = "ACT_IDLE",
-        [ "walk" ] = "ACT_WALK",
-        [ "run" ] = "ACT_RUN",
-        [ "jump" ] = "ACT_JUMP",
-        [ "land" ] = "ACT_LAND",
-        [ "fly" ] = "ACT_GLIDE",
-        [ "sit" ] = "ACT_BUSY_SIT_CHAIR",
-        [ "sitground" ] = "ACT_BUSY_SIT_GROUND",
-        [ "flinch" ] = {
-                ["explosion"] = "ACT_GESTURE_FLINCH_BLAST"
-                },
+		[ "idle" ] = "ACT_IDLE",
+		[ "walk" ] = "ACT_WALK",
+		[ "run" ] = "ACT_RUN",
+		[ "jump" ] = "ACT_JUMP",
+		[ "land" ] = "ACT_LAND",
+		[ "fly" ] = "ACT_GLIDE",
+		[ "sit" ] = "ACT_BUSY_SIT_CHAIR",
+		[ "sitground" ] = "ACT_BUSY_SIT_GROUND",
+		[ "flinch" ] = {
+				["explosion"] = "ACT_GESTURE_FLINCH_BLAST"
+				},
 		[ "crouch" ] = {
 				[ "idle" ] = "ACT_COVER_LOW",
 				[ "walk" ] = "ACT_WALK_CROUCH",
@@ -147,171 +147,171 @@ Anims.Male[ "default" ] = {
 				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
 		},
 		[ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        }
+				[ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		}
 }
 Anims.Male[ "pistol" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_PISTOL",
-        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_PISTOL",
-        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_PISTOL",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_AIM_PISTOL",
-                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_AIM_PISTOL"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_PISTOL",
+		[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_PISTOL",
+		[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_PISTOL",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_AIM_PISTOL",
+				[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_AIM_PISTOL"
+		},
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_PISTOL",
-        [ "reload" ] = "ACT_GESTURE_RELOAD_PISTOL"
+		[ "reload" ] = "ACT_GESTURE_RELOAD_PISTOL"
 }
 Anims.Male[ "ar2" ] = {
-        [ "idle" ] = "ACT_IDLE_SMG1_RELAXED",
-        [ "walk" ] = "ACT_WALK_RIFLE_RELAXED",
-        [ "run" ] = "ACT_RUN_RIFLE_RELAXED",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW",
-                [ "walk" ] = "ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        },
+		[ "idle" ] = "ACT_IDLE_SMG1_RELAXED",
+		[ "walk" ] = "ACT_WALK_RIFLE_RELAXED",
+		[ "run" ] = "ACT_RUN_RIFLE_RELAXED",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW",
+				[ "walk" ] = "ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SMG1"
 }
 
 Anims.Male[ "smg" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_SMG1",
-        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_RIFLE",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_RIFLE",
-                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_RIFLE"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_SMG1",
+		[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_RIFLE",
+		[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_RIFLE",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_SMG1_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_RIFLE",
+				[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN_RIFLE"
+		},
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_SMG1",
-        [ "reload" ] = "ACT_GESTURE_RELOAD_SMG1"
+		[ "reload" ] = "ACT_GESTURE_RELOAD_SMG1"
 }
 
 Anims.Male[ "shotgun" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_RIFLE",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE_ANGRY_SHOTGUN",
-                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_AIM_SHOTGUN",
-                [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_AIM_SHOTGUN"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_RIFLE",
+		[ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_RIFLE",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE_ANGRY_SHOTGUN",
+				[ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_AIM_SHOTGUN",
+				[ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_AIM_SHOTGUN"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SHOTGUN"
 }
 
 Anims.Male[ "crossbow" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_RIFLE",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE_ANGRY",
-                [ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_AIM_RIFLE",
-                [ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_AIM_RIFLE"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_RIFLE",
+		[ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_RIFLE",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_IDLE_ANGRY",
+				[ "walk" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_WALK_AIM_RIFLE",
+				[ "run" ] = "&switch:models/Skeleton/combineanimtree.mdl;ACT_RUN_AIM_RIFLE"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_AR2"
 }
 
 Anims.Male[ "rpg" ] = {
-        [ "idle" ] = "ACT_IDLE_RPG",
-        [ "walk" ] = "ACT_WALK_RPG_RELAXED",
-        [ "run" ] = "ACT_RUN_RPG_RELAXED",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW_RPG",
-                [ "walk" ] = "ACT_WALK_CROUCH_RPG",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_ANGRY_RPG",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        },
+		[ "idle" ] = "ACT_IDLE_RPG",
+		[ "walk" ] = "ACT_WALK_RPG_RELAXED",
+		[ "run" ] = "ACT_RUN_RPG_RELAXED",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW_RPG",
+				[ "walk" ] = "ACT_WALK_CROUCH_RPG",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_ANGRY_RPG",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SMG1"
 }
 
 Anims.Male[ "melee" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_ANGRY",
-                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK",
+		[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_ANGRY",
+				[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN"
+		},
 		["fire"] = "ACT_MELEE_ATTACK_SWING_GESTURE"
 }
 
 Anims.Male[ "grenade" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
-                [ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_ANGRY",
-                [ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK",
+		[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
+				[ "walk" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_WALK_ANGRY",
+				[ "run" ] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_RUN"
+		},
 		["fire"] = "&switch:models/Skeleton/metroanimtree.mdl;ACT_COMBINE_THROW_GRENADE"
 }
 
 Anims.Male[ "slam" ] = {
-        [ "idle" ] = "ACT_IDLE",
-        [ "walk" ] = "ACT_WALK_SUITCASE",
-        [ "run" ] = "ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW",
-                [ "walk" ] = "ACT_WALK_CROUCH",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_RPG"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_PACKAGE",
-                [ "walk" ] = "ACT_WALK_PACKAGE",
-                [ "run" ] = "ACT_RUN"
-        },
+		[ "idle" ] = "ACT_IDLE",
+		[ "walk" ] = "ACT_WALK_SUITCASE",
+		[ "run" ] = "ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW",
+				[ "walk" ] = "ACT_WALK_CROUCH",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_RPG"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_PACKAGE",
+				[ "walk" ] = "ACT_WALK_PACKAGE",
+				[ "run" ] = "ACT_RUN"
+		},
 		["fire"] = "ACT_PICKUP_RACK"
 }
  
@@ -324,17 +324,17 @@ Anims.Female[ "models" ] = {
  
 }
 Anims.Female[ "default" ] = { 
-        [ "idle" ] = "ACT_IDLE",
-        [ "walk" ] = "ACT_WALK",
-        [ "run" ] = "ACT_RUN",
-        [ "jump" ] = "ACT_JUMP",
-        [ "land" ] = "ACT_LAND",
-        [ "fly" ] = "ACT_GLIDE",
-        [ "sit" ] = "ACT_BUSY_SIT_CHAIR",
-        [ "sitground" ] = "ACT_BUSY_SIT_GROUND",
-        [ "flinch" ] = {
-                ["explosion"] = "ACT_GESTURE_FLINCH_BLAST"
-                },
+		[ "idle" ] = "ACT_IDLE",
+		[ "walk" ] = "ACT_WALK",
+		[ "run" ] = "ACT_RUN",
+		[ "jump" ] = "ACT_JUMP",
+		[ "land" ] = "ACT_LAND",
+		[ "fly" ] = "ACT_GLIDE",
+		[ "sit" ] = "ACT_BUSY_SIT_CHAIR",
+		[ "sitground" ] = "ACT_BUSY_SIT_GROUND",
+		[ "flinch" ] = {
+				["explosion"] = "ACT_GESTURE_FLINCH_BLAST"
+				},
 		[ "crouch" ] = {
 				[ "idle" ] = "ACT_COVER_LOW",
 				[ "walk" ] = "ACT_WALK_CROUCH",
@@ -342,187 +342,187 @@ Anims.Female[ "default" ] = {
 				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
 		},
 		[ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        }
+				[ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		}
 }
 Anims.Female[ "pistol" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_PISTOL",
-        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_PISTOL",
-                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_PISTOL"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_PISTOL",
+		[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+		[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_PISTOL",
+				[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_PISTOL"
+		},
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_PISTOL",
 }
 Anims.Female[ "ar2" ] = {
-        [ "idle" ] = "ACT_IDLE_SMG1_RELAXED",
-        [ "walk" ] = "ACT_WALK_RIFLE_RELAXED",
-        [ "run" ] = "ACT_RUN_RIFLE_RELAXED",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW",
-                [ "walk" ] = "ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        },
+		[ "idle" ] = "ACT_IDLE_SMG1_RELAXED",
+		[ "walk" ] = "ACT_WALK_RIFLE_RELAXED",
+		[ "run" ] = "ACT_RUN_RIFLE_RELAXED",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW",
+				[ "walk" ] = "ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SMG1"
 }
 
 Anims.Female[ "smg" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_SMG1",
-        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_RIFLE",
-        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_RIFLE",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
-                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_SMG1",
+		[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_RIFLE",
+		[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_RIFLE",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_SMG1",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
+				[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
+		},
 		[ "fire" ] = "ACT_GESTURE_RANGE_ATTACK_SMG1",
 }
 
 Anims.Female[ "shotgun" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_SHOTGUN_STIMULATED",
-        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_RIFLE_RELAXED",
-        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_RIFLE_RELAXED",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_RPG",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
-                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_SHOTGUN_STIMULATED",
+		[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_RIFLE_RELAXED",
+		[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_RIFLE_RELAXED",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RANGE_AIM_AR2_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_RPG",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_AIM_RIFLE",
+				[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN_AIM_RIFLE"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SHOTGUN"
 }
 
 Anims.Female[ "crossbow" ] = {
-        [ "idle" ] = "ACT_IDLE_SMG1_RELAXED",
-        [ "walk" ] = "ACT_WALK_RIFLE_RELAXED",
-        [ "run" ] = "ACT_RUN_RIFLE_RELAXED",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW",
-                [ "walk" ] = "ACT_WALK_CROUCH_RIFLE",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        },
+		[ "idle" ] = "ACT_IDLE_SMG1_RELAXED",
+		[ "walk" ] = "ACT_WALK_RIFLE_RELAXED",
+		[ "run" ] = "ACT_RUN_RIFLE_RELAXED",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW",
+				[ "walk" ] = "ACT_WALK_CROUCH_RIFLE",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_AIM_RIFLE_STIMULATED",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SMG1"
 }
 
 Anims.Female[ "rpg" ] = {
-        [ "idle" ] = "ACT_IDLE_RPG",
-        [ "walk" ] = "ACT_WALK_RPG_RELAXED",
-        [ "run" ] = "ACT_RUN_RPG_RELAXED",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW_RPG",
-                [ "walk" ] = "ACT_WALK_CROUCH_RPG",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_ANGRY_RPG",
-                [ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
-                [ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
-        },
+		[ "idle" ] = "ACT_IDLE_RPG",
+		[ "walk" ] = "ACT_WALK_RPG_RELAXED",
+		[ "run" ] = "ACT_RUN_RPG_RELAXED",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW_RPG",
+				[ "walk" ] = "ACT_WALK_CROUCH_RPG",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_AIM_RIFLE"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_ANGRY_RPG",
+				[ "walk" ] = "ACT_WALK_AIM_RIFLE_STIMULATED",
+				[ "run" ] = "ACT_RUN_AIM_RIFLE_STIMULATED"
+		},
 		["fire"] = "ACT_GESTURE_RANGE_ATTACK_SMG1"
 }
 
 Anims.Female[ "melee" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_MANNEDGUN",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_PACKAGE",
-                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+		[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_MANNEDGUN",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_PACKAGE",
+				[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
+		},
 		["fire"] = "ACT_MELEE_ATTACK_SWING"
 }
 
 Anims.Female[ "grenade" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_PACKAGE",
-                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+		[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_PISTOL",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_PACKAGE",
+				[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
+		},
 		["fire"] = "ACT_MELEE_ATTACK_SWING"
 }
 
 Anims.Female[ "grenade" ] = {
-        [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
-        [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
-        [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
-                [ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
-                [ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
-                [ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_ANGRY",
-                [ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
-        },
+		[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE",
+		[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK",
+		[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH",
+				[ "aimidle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COVER_PISTOL_LOW",
+				[ "aimwalk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_CROUCH"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_IDLE_ANGRY_MELEE",
+				[ "walk" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_WALK_ANGRY",
+				[ "run" ] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_RUN"
+		},
 		["fire"] = "&switch:models/Skeleton/alyxanimtree.mdl;ACT_COMBINE_THROW_GRENADE"
 }
 
 Anims.Female[ "slam" ] = {
-        [ "idle" ] = "ACT_IDLE",
-        [ "walk" ] = "ACT_WALK_SUITCASE",
-        [ "run" ] = "ACT_RUN",
-        [ "crouch" ] = {
-                [ "idle" ] = "ACT_COVER_LOW",
-                [ "walk" ] = "ACT_WALK_CROUCH",
-                [ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
-                [ "aimwalk" ] = "ACT_WALK_CROUCH_RPG"
-                },
-        [ "aim" ] = {
-                [ "idle" ] = "ACT_IDLE_PACKAGE",
-                [ "walk" ] = "ACT_WALK_PACKAGE",
-                [ "run" ] = "ACT_RUN"
-        },
+		[ "idle" ] = "ACT_IDLE",
+		[ "walk" ] = "ACT_WALK_SUITCASE",
+		[ "run" ] = "ACT_RUN",
+		[ "crouch" ] = {
+				[ "idle" ] = "ACT_COVER_LOW",
+				[ "walk" ] = "ACT_WALK_CROUCH",
+				[ "aimidle" ] = "ACT_RANGE_AIM_SMG1_LOW",
+				[ "aimwalk" ] = "ACT_WALK_CROUCH_RPG"
+				},
+		[ "aim" ] = {
+				[ "idle" ] = "ACT_IDLE_PACKAGE",
+				[ "walk" ] = "ACT_WALK_PACKAGE",
+				[ "run" ] = "ACT_RUN"
+		},
 		["fire"] = "ACT_PICKUP_RACK"
 }
 
@@ -575,7 +575,6 @@ local function HandleSequence( ply, seq )
 			return tonumber( exp[2] )
 		end
 	else
-		
 		if ply:GetModel() != "models/Skeleton/femaleanimtree.mdl" or ply:GetModel() != "models/Skeleton/maleanimtree.mdl" then
 			if ply:GetNWBool( "charloaded", false ) then
 				if( ply:GetNWString( "gender", "Male" ) == "Female" ) then
@@ -593,16 +592,13 @@ local function HandleSequence( ply, seq )
 				--ply:SetModel( "models/barney.mdl" )
 			end
 		end
-		
 	end
-	
 	
 	return FindEnumeration( seq )
 	
 end
 
 local function getgender( ply )
-
 
 	local model = string.lower( ply:GetModel() )
 	if table.HasValue( Anims.Female[ "models" ], string.lower( model ) ) or ply:GetNWString( "gender", "Male" ) == "Female" then
@@ -616,7 +612,6 @@ end
 local shotgunholdtypes = {
 	"shotgun",
 	"physgun"
-	
 }
 
 local meleeholdtypes = {
@@ -625,7 +620,7 @@ local meleeholdtypes = {
 	"melee2",
 	"melee" 
 }
-		
+
 local function DetectHoldType( act )
 	if string.match(  act, "pistol" ) then
 		return "pistol"
@@ -656,7 +651,6 @@ local function DetectHoldType( act )
 		return "slam"
 	end
 	return "default"
-	
 end
 
 function GM:UpdateAnimation( ply, velocity, maxseqgroundspeed )
@@ -676,11 +670,11 @@ function GM:UpdateAnimation( ply, velocity, maxseqgroundspeed )
 	local rate = 1.0
 	
 	if len2d > 0.5 then
-			rate =  ( ( len2d * 0.8 ) / maxseqgroundspeed )
+		rate =  ( ( len2d * 0.8 ) / maxseqgroundspeed )
 	end
 	
 	rate = math.Clamp(rate, 0, 1.5)
-        // you can obviously set your own playback rate
+	// you can obviously set your own playback rate
 	
 	ply:SetPlaybackRate( rate )
 end
@@ -698,232 +692,236 @@ local function HandleLanding( ply )
 end
 
 function GM:HandlePlayerJumping( ply )
-
-        
-        // don't airwalk, pretend we're floating, but we can airwalk underwater
-        if !ply.m_bJumping && !ply:OnGround() && ply:WaterLevel() <= 0 then
-                ply.m_bJumping = true
-                ply.m_bFirstJumpFrame = false
-                ply.m_flJumpStartTime = CurTime()
-        end
-        
-        if ply.m_bJumping then
-				--print( "I'M FUCKING JUMPING" )
-                if ply.m_bFirstJumpFrame then
-                        ply.m_bFirstJumpFrame = false
-                        ply:AnimRestartMainSequence()
-                end
-                
-                if ply:WaterLevel() >= 2 then
-                        ply.m_bJumping = false
-                        ply:AnimRestartMainSequence()
-				end
-				
-                if (CurTime() - ply.m_flJumpStartTime) > 0.6 then
-                        if ply:OnGround() and !ply.m_bLanding then
-							ply.m_bLanding = true
-							ply:Freeze( true )
-							timer.Simple( 0.3, function()
-								ply.m_bLanding = false
-								ply.m_bJumping = false
-								ply:Freeze( false )
-								/*
-								ply.CalcSeqOverride = -1
-								ply:AnimRestartMainSequence()*/
-							end)
-							return true
-							--ply:AnimRestartMainSequence()
-                        end
-				else
-					if ply:OnGround() and !ply.m_bLanding then
-						ply.m_bJumping = false
-                        ply:AnimRestartMainSequence()
-					end
-                end
-                
-                if ply.m_bJumping then
-					if !ply.m_bLanding then
-                        ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ "default" ][ "jump" ] )
-					else
-						ply.CalcIdeal = ACT_LAND
-					end
-                        return true
-                end
-        end
-        
-        return false
-end
- 
-function GM:HandlePlayerDucking( ply, velocity )
-
-		local holdtype = "default"
-		if( ValidEntity(  ply:GetActiveWeapon() ) ) then
-			holdtype = DetectHoldType( ply:GetActiveWeapon():GetHoldType() ) 
+	
+	// don't airwalk, pretend we're floating, but we can airwalk underwater
+	if !ply.m_bJumping && !ply:OnGround() && ply:WaterLevel() <= 0 then
+		ply.m_bJumping = true
+		ply.m_bFirstJumpFrame = false
+		ply.m_flJumpStartTime = CurTime()
+	end
+	
+	if ply.m_bJumping then
+		--print( "I'M FUCKING JUMPING" )
+		if ply.m_bFirstJumpFrame then
+			ply.m_bFirstJumpFrame = false
+			ply:AnimRestartMainSequence()
 		end
-        if ply:Crouching() then
-			--print( "I'M FUCKING DUCKING" )
-			if ply:GetNWBool( "aiming", false ) then
-                local len2d = velocity:Length2D()
-                if len2d > 0.5 then
-                        ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "crouch" ][ "aimwalk" ] )
-                else
-                        ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype][ "crouch" ][ "aimidle" ] )
-                end
+		
+		if ply:WaterLevel() >= 2 then
+			ply.m_bJumping = false
+			ply:AnimRestartMainSequence()
+		end
+		
+		if (CurTime() - ply.m_flJumpStartTime) > 0.6 then
+			if ply:OnGround() and !ply.m_bLanding then
+				ply.m_bLanding = true
+				ply:Freeze( true )
+				timer.Simple( 0.3, function()
+					ply.m_bLanding = false
+					ply.m_bJumping = false
+					ply:Freeze( false )
+					/*
+					ply.CalcSeqOverride = -1
+					ply:AnimRestartMainSequence()*/
+				end)
+				return true
+				--ply:AnimRestartMainSequence()
+			end
+		else
+			if ply:OnGround() and !ply.m_bLanding then
+				ply.m_bJumping = false
+				ply:AnimRestartMainSequence()
+			end
+		end
+		
+		if ply.m_bJumping then
+			if !ply.m_bLanding then
+				ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ "default" ][ "jump" ] )
 			else
-				local len2d = velocity:Length2D()
-                
-                if len2d > 0.5 then
-						ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "crouch" ][ "walk" ] )
-                else
-                        ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "crouch" ][ "idle" ] )
-                end
+				ply.CalcIdeal = ACT_LAND
 			end
 			return true
-        end
-        
-        return false
+		end
+	end
+	
+	return false
+end
+	
+function GM:HandlePlayerDucking( ply, velocity )
+	local holdtype = "default"
+	if( ValidEntity(  ply:GetActiveWeapon() ) ) then
+		holdtype = DetectHoldType( ply:GetActiveWeapon():GetHoldType() ) 
+	end
+	if ply:Crouching() then
+		--print( "I'M FUCKING DUCKING" )
+		if ply:GetNWBool( "aiming", false ) then
+			local len2d = velocity:Length2D()
+			if len2d > 0.5 then
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "crouch" ][ "aimwalk" ] )
+			else
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype][ "crouch" ][ "aimidle" ] )
+			end
+		else
+			local len2d = velocity:Length2D()
+			
+			if len2d > 0.5 then
+				ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "crouch" ][ "walk" ] )
+			else
+				ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "crouch" ][ "idle" ] )
+			end
+		end
+		return true
+	end
+	
+	return false
 end
  
 function GM:HandlePlayerSwimming( ply )
 
-        if ply:WaterLevel() >= 2 then
-		
-				ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ "default" ][ "fly" ] )
-				--print( "I'M FUCKING SWIMMING" )
-                ply.m_bInSwim = true
-        else
-                ply.m_bInSwim = false
-                if !ply.m_bFirstSwimFrame then
-                        ply.m_bFirstSwimFrame = true
-                end
-        end
-        
-        return false
+	if ply:WaterLevel() >= 2 then
+		ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ "default" ][ "fly" ] )
+		--print( "I'M FUCKING SWIMMING" )
+		ply.m_bInSwim = true
+	else
+		ply.m_bInSwim = false
+		if !ply.m_bFirstSwimFrame then
+			ply.m_bFirstSwimFrame = true
+		end
+	end
+	
+	return false
+	
 end
  
 function GM:HandlePlayerDriving( ply )
  
-        if ply:InVehicle() then
-			--print( "I'M FUCKING DRIVING" )
-			 local pVehicle = ply:GetVehicle()
-            local class = pVehicle:GetClass()
-                        
-				if ( class == "prop_vehicle_prisoner_pod" && pVehicle:GetModel() == "models/vehicles/prisoner_pod_inner.mdl" ) then
-                        ply.CalcIdeal = ACT_IDLE
-                else
-						ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ "default" ][ "sit" ] )
-                end
-                        
-                return true
-        end
-        
-        return false
+	if ply:InVehicle() then
+		--print( "I'M FUCKING DRIVING" )
+		local pVehicle = ply:GetVehicle()
+		local class = pVehicle:GetClass()
+		
+		if ( class == "prop_vehicle_prisoner_pod" && pVehicle:GetModel() == "models/vehicles/prisoner_pod_inner.mdl" ) then
+			ply.CalcIdeal = ACT_IDLE
+		else
+			ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ "default" ][ "sit" ] )
+		end
+		
+		return true
+	end
+	
+	return false
+	
 end
 
 function GM:CalcMainActivity( ply, velocity ) 
-		local holdtype = "default"
-		if( ValidEntity(  ply:GetActiveWeapon() ) ) then
-			holdtype = DetectHoldType( ply:GetActiveWeapon():GetHoldType() ) 
-		end
-		--print( "I'M FUCKING SETTING THE HOLDTYPE TO " .. holdtype )
-        ply.CalcIdeal = ACT_IDLE
-        ply.CalcSeqOverride = -1
-        
-        if self:HandlePlayerDriving( ply ) ||
-                self:HandlePlayerJumping( ply ) ||
-                self:HandlePlayerDucking( ply, velocity ) ||
-                self:HandlePlayerSwimming( ply ) then
-				
+	local holdtype = "default"
+	if( ValidEntity(  ply:GetActiveWeapon() ) ) then
+		holdtype = DetectHoldType( ply:GetActiveWeapon():GetHoldType() ) 
+	end
+	--print( "I'M FUCKING SETTING THE HOLDTYPE TO " .. holdtype )
+	ply.CalcIdeal = ACT_IDLE
+	ply.CalcSeqOverride = -1
+	
+	if self:HandlePlayerDriving( ply ) ||
+		self:HandlePlayerJumping( ply ) ||
+		self:HandlePlayerDucking( ply, velocity ) ||
+		self:HandlePlayerSwimming( ply ) then
+		-- IS SOMETHING SUPPOSED TO HAPPEN HERE??????????????????????????????????????????????????????????????
+	else
+	
+		local len2d = velocity:Length2D()
+		
+		if ply:GetNWBool( "aiming", false ) then
+			if len2d > 180 then
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "run" ] )
+				--print( "I'M FUCKING RUNNING WHILE AIMING" )
+			elseif len2d > 0.5 then
+				--print( "I'M FUCKING WALKING WHILE AIMING" )
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "aim" ][ "walk" ] )
+			else
+				--print( "I'M FUCKING STANDING WHILE AIMING" )
+				ply.CalcIdeal  = HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "aim" ][ "idle" ] )
+			end
 		else
-                local len2d = velocity:Length2D()
-				
-					if ply:GetNWBool( "aiming", false ) then
-						if len2d > 180 then
-							ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "run" ] )
-							--print( "I'M FUCKING RUNNING WHILE AIMING" )
-						elseif len2d > 0.5 then
-							--print( "I'M FUCKING WALKING WHILE AIMING" )
-							ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "aim" ][ "walk" ] )
-						else
-							--print( "I'M FUCKING STANDING WHILE AIMING" )
-							ply.CalcIdeal  = HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "aim" ][ "idle" ] )
-						end
-					else
-						if len2d > 180 then
-							--print( "I'M FUCKING RUNNING" )
-							ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "run" ] )
-						elseif len2d > 0.5 then
-							--print( "I'M FUCKING WALKING" )
-							ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "walk" ] )
-						else
-							--print( "I'M FUCKING STANDING" )
-							ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "idle" ] )
-						end
-					end
-
-
-        end
-        --print( tostring( ply.CalcSeqOverride ) .. " IS THE SEQUENCE!" )
-        return ply.CalcIdeal, ply.CalcSeqOverride
+			if len2d > 180 then
+				--print( "I'M FUCKING RUNNING" )
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "run" ] )
+			elseif len2d > 0.5 then
+				--print( "I'M FUCKING WALKING" )
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "walk" ] )
+			else
+				--print( "I'M FUCKING STANDING" )
+				ply.CalcIdeal =  HandleSequence( ply, Anims[ getgender( ply ) ][  holdtype ][ "idle" ] )
+			end
+		end
+	end
+	--print( tostring( ply.CalcSeqOverride ) .. " IS THE SEQUENCE!" )
+	return ply.CalcIdeal, ply.CalcSeqOverride
 end		
-        
+
 function GM:TranslateActivity( ply, act )
-		
-		--We're not translating through the weapon
-		return act
-		
+	
+	--We're not translating through the weapon
+	return act
+	
 end
  
 function GM:DoAnimationEvent( ply, event, data )
 
-		local holdtype = "default"
-		if( ValidEntity(  ply:GetActiveWeapon() ) ) then
-			holdtype = DetectHoldType( ply:GetActiveWeapon():GetHoldType() ) 
+	local holdtype = "default"
+	if( ValidEntity(  ply:GetActiveWeapon() ) ) then
+		holdtype = DetectHoldType( ply:GetActiveWeapon():GetHoldType() ) 
+	end
+
+	if event == PLAYERANIMEVENT_ATTACK_PRIMARY then
+	
+		if Anims[ getgender( ply ) ][ holdtype ][ "fire" ] then
+			if( string.match( Anims[ getgender( ply ) ][ holdtype ][ "fire" ], "GESTURE" ) ) then
+				ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, FindEnumeration(  Anims[ getgender( ply ) ][ holdtype ][ "fire" ] ) ) -- Not a sequence, so I don't use HandleSequence here.
+			else
+				ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "fire" ] )
+			end	
+		else
+			ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GESTURE_RANGE_ATTACK_SMG1 )
 		end
 
-        if event == PLAYERANIMEVENT_ATTACK_PRIMARY then
-				if Anims[ getgender( ply ) ][ holdtype ][ "fire" ] then
-						if( string.match( Anims[ getgender( ply ) ][ holdtype ][ "fire" ], "GESTURE" ) ) then
-								ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, FindEnumeration(  Anims[ getgender( ply ) ][ holdtype ][ "fire" ] ) ) -- Not a sequence, so I don't use HandleSequence here.
-						else
-								ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "fire" ] )
-						end	
-				else
-						ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GESTURE_RANGE_ATTACK_SMG1 )
-				end
-
-                return ACT_VM_PRIMARYATTACK
-                
-        elseif event == PLAYERANIMEVENT_RELOAD then
-				if Anims[ getgender( ply ) ][ holdtype ][ "reload" ] then
-						if( string.match( Anims[ getgender( ply ) ][ holdtype ][ "reload" ], "GESTURE" ) ) then
-								ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, FindEnumeration(  Anims[ getgender( ply ) ][ holdtype ][ "reload" ] ) )
-						else
-								ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "reload" ] )
-						end	
-				else
-                        ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GESTURE_RELOAD_SMG1 )
-				end
-                
-                return ACT_INVALID
-		elseif event == PLAYERANIMEVENT_CANCEL_RELOAD then
-        
-                ply:AnimResetGestureSlot( GESTURE_SLOT_ATTACK_AND_RELOAD )
-                
-                return ACT_INVALID
-        end
-                
-        if event == PLAYERANIMEVENT_JUMP then
-        
-                ply.m_bJumping = true
-                ply.m_bFirstJumpFrame = true
-                ply.m_flJumpStartTime = CurTime()
-                
-                ply:AnimRestartMainSequence()
-                
-                return ACT_INVALID
-                
+		return ACT_VM_PRIMARYATTACK
+		
+	elseif event == PLAYERANIMEVENT_RELOAD then
+	
+		if Anims[ getgender( ply ) ][ holdtype ][ "reload" ] then
+			if( string.match( Anims[ getgender( ply ) ][ holdtype ][ "reload" ], "GESTURE" ) ) then
+				ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, FindEnumeration(  Anims[ getgender( ply ) ][ holdtype ][ "reload" ] ) )
+			else
+				ply.CalcIdeal = HandleSequence( ply, Anims[ getgender( ply ) ][ holdtype ][ "reload" ] )
+			end	
+		else
+			ply:AnimRestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GESTURE_RELOAD_SMG1 )
 		end
- 
-        return nil
+		
+		return ACT_INVALID
+		
+	elseif event == PLAYERANIMEVENT_CANCEL_RELOAD then
+	
+		ply:AnimResetGestureSlot( GESTURE_SLOT_ATTACK_AND_RELOAD )
+		
+		return ACT_INVALID
+		
+	end
+	
+	if event == PLAYERANIMEVENT_JUMP then
+		
+		ply.m_bJumping = true
+		ply.m_bFirstJumpFrame = true
+		ply.m_flJumpStartTime = CurTime()
+		
+		ply:AnimRestartMainSequence()
+		
+		return ACT_INVALID
+		
+	end
+
+	return nil
+	
 end
+

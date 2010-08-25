@@ -41,3 +41,29 @@ AddCSLuaFile( "networking/network_cl.lua" )
 // Temp files for testing
 include( 'sv_testhooks.lua' )
 AddCSLuaFile( "cl_testhooks.lua" )
+
+local function LoadFiles( state )
+	local Folder = string.Replace( GM.Folder, "gamemodes/", "" )
+	for c, d in pairs( file.FindInLua( Folder.."/gamemode/"..state.."/*") ) do
+		if d:find( ".lua" ) then
+			if state:lower() == "client" then
+				AddCSLuaFile( Folder.."/gamemode/"..state.."/"..d )
+			elseif state:lower() == "server" then
+				include( Folder.."/gamemode/"..state.."/"..d )
+			elseif state:lower() == "shared" then
+				include( Folder.."/gamemode/"..state.."/"..d )
+				AddCSLuaFile( Folder.."/gamemode/"..state.."/"..d )
+			end
+		end
+	end
+end
+
+LoadFiles( "client" )
+LoadFiles( "server" )
+--LoadFiles( "shared" )
+
+
+
+
+
+

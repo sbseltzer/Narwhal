@@ -20,3 +20,13 @@ include( 'modules.lua' )
 include( 'animations.lua' )
 include( 'player_shd.lua' )
 include( 'networking/network_shd.lua' )
+
+local Folder = string.Replace( GM.Folder, "gamemodes/", "" )
+for c, d in pairs( file.FindInLua( Folder.."/gamemode/shared/*") ) do
+	if d:find( ".lua" ) then
+		if SERVER then
+			AddCSLuaFile( Folder.."/gamemode/shared/"..d )
+		end
+		include( Folder.."/gamemode/shared/"..d )
+	end
+end
