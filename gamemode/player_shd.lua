@@ -1,12 +1,16 @@
 
 /*---------------------------------------------------------
-   Name: gamemode:PlayerNoClip( player, bool )
-   Desc: Player pressed the noclip key, return true if
-		  the player is allowed to noclip, false to block
+   Name: gamemode:PlayerConnect( )
+   Desc: Player has connects to the server (hasn't spawned)
 ---------------------------------------------------------*/
-function GM:PlayerNoClip( pl, on )
-	
-	return NARWHAL.Config.PlayerCanNoClip
-	
+function GM:PlayerConnect( name, address )
+
 end
 
+/*---------------------------------------------------------
+   Name: gamemode:PlayerAuthed( )
+   Desc: Player's STEAMID has been authed
+---------------------------------------------------------*/
+function GM:PlayerAuthed( ply, SteamID, UniqueID )
+
+end

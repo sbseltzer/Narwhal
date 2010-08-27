@@ -2,7 +2,7 @@
 
 	Developer's Notes:
 	
-	This file has our shared tables and entity methods.
+	This file has our shared networking tables and entity methods.
 	
 	Note: This may need some cleaning up.
 
@@ -10,6 +10,7 @@
 
 // Declare frequently used globals as locals to enhance performance
 local string = string
+local table = table
 local math = math
 local umsg = umsg
 local type = type
@@ -17,7 +18,14 @@ local error = error
 local pairs = pairs
 local tonumber = tonumber
 local tostring = tostring
+local tobool = tobool
 local FindMetaTable = FindMetaTable
+local ValidEntity = ValidEntity
+local ErrorNoHalt = ErrorNoHalt
+local Entity = Entity
+local NullEntity = NullEntity
+local SERVER = SERVER
+local CLIENT = CLIENT
 
 NARWHAL.__NetworkData = {}
 NARWHAL.__NetworkTypeID = {}
@@ -35,30 +43,8 @@ NARWHAL.__NetworkCache.Effects = {} -- Stores NWEffects
 NARWHAL.__NetworkCache.Tables = {} -- Stores NWTables
 NARWHAL.__NetworkCache.Vars = {} -- Stores NWVars
 
-local function GetByIndexEx( stype, id )
-	local t, i
-	if stype == "ent" then
-		return id
-	elseif stype == "ply" then
-		for _, ply in pairs( player.GetAll() ) do
-			if ValidEntity( ply ) then
-				if ply:UserID() == id then
-					return ply
-				end
-			end
-		end
-	else
-		return
-	end
-end
-
-// Utility function for getting entities by network ID.
-function UTIL_GetByNetworkID( id )
-	return GetByIndexEx( id:sub( 1, 3 ), id:sub( 4 ) )
-end
-
 // This is a function for getting the network configurations.
-function GM:GetNWData()
+function GM:GetNetworkData()
 	return NARWHAL.__NetworkData
 end
 
@@ -83,7 +69,7 @@ function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcR
 end
 
 // Here's our internal configuration loading. Devs can load their own in the other function.
-function GM:LoadInternalNetworkConfigurations()
+local function LoadInternalNetworkConfigurations()
 	
 	// BOOLEANS
 	GAMEMODE:AddValidNetworkType( "boolean", "Bool", "Booleans",
@@ -271,7 +257,7 @@ function GM:LoadInternalNetworkConfigurations()
 	
 	// A handy function for getting network ID's. This is no longer networkable
 	local NextID = 0
-	function ENTITY:GetNetworkID()
+	ENTITY.GetNetworkID = function( self )
 		if self:IsPlayer() then
 			return "ply"..self:UserID()
 		elseif self.NetworkID then
@@ -339,6 +325,6 @@ function GM:LoadInternalNetworkConfigurations()
 	end
 	
 end
-hook.Add( "Initialize", "NARWHAL_LoadNWConfig", GM.LoadInternalNetworkConfigurations )
+hook.Add( "Initialize", "NARWHAL_LoadNetworkConfigurations", LoadInternalNetworkConfigurations )
 
 

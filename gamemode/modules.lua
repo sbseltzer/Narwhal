@@ -336,8 +336,17 @@ local function LoadDependencyTree( name )
 	for _, inc in pairs( ModuleFiles[name].Dependencies ) do -- Loop through the module's dependencies
 		print("\tChecking validity for include "..inc)
 		if ModuleFiles[inc] then -- If the include exists
-			if ModuleFiles[inc].State != "shared" and ModuleFiles[inc].State != ModuleFiles[name].State then
-				ErrorNoHalt( "WARNING: Module '"..name.."' is in the "..ModuleFiles[name].State:upper().." Lua state, and uses dependency '"..inc.."' which exists in the "..ModuleFiles[inc].State:upper().." Lua state! You may encounter some errors.\n" )
+			local dState, mState = ModuleFiles[inc].State, ModuleFiles[name].State
+			if dState != "shared" and dState != mState then
+				if mState != "shared" then
+					if _G[mState:upper()] then
+						MsgN( "\nWARNING: Module '"..name.."' is in the "..mState:upper().." Lua state, and uses dependency '"..inc.."' which exists in the "..dState:upper().." Lua state! You may encounter some errors.\n" )
+					end
+				else
+					if !_G[dState:upper()] then
+						MsgN( "\nWARNING: Module '"..name.."' is in the "..mState:upper().." Lua state, and uses dependency '"..inc.."' which exists in the "..dState:upper().." Lua state! You may encounter some errors.\n" )
+					end
+				end
 				return
 			end
 			if table.HasValue( FailedModules, inc ) then -- Looks like this module has been deemed as failed. Fail any modules that depended on it.

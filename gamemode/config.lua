@@ -20,11 +20,6 @@ NARWHAL.Config["UseStore"]					= true	-- Toggle the gobal store platform.
 NARWHAL.Config["UseAchievements"] 			= true	-- Toggle the achievements system.
 NARWHAL.Config["UseSandboxMenu"]			= true	-- Toggle sandbox features? - TODO?
 
-// Player related stuff
-NARWHAL.Config["PlayerCanNoClip"]			= false	-- Toggle player's ability to use noclip without sv_cheats being 1
-NARWHAL.Config["PlayerCanSuicide"]			= true	-- Toggle player's ability to commit suicide
-NARWHAL.Config["PlayerCanSwitchFlashlight"]	= true	-- Toggle player's ability to switch flashlight
-
 // Module related stuff
 NARWHAL.Config["ModuleListType"]			= "white"	-- Choices are "white" or "black" for whether you want to whitelist of blacklist modules.
 NARWHAL.Config["ModuleList"]				= {}		-- Here you list all the modules you want or don't want.

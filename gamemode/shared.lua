@@ -38,32 +38,25 @@ function NARWHAL.EditTeam( iTeamNum, strGlobal, strName, tblColor, tblSpawnPoint
 	GM:CreateTeams()
 end
 
-// Fill this in to add your own network structures.
+/*---------------------------------------------------------
+   Name: LoadNetworkConfigurations
+   Desc: Called internally to load custom network configurations.
+---------------------------------------------------------*/
 function GM:LoadNetworkConfigurations()
+	-- GAMEMODE:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
 	-- Refer to network/network_shd.lua
 end
 
-// Called when deciding which theme to use
+/*---------------------------------------------------------
+   Name: ForceTheme
+   Desc: Called when deciding which theme to use
+---------------------------------------------------------*/
 function GM:ForceTheme()
 	return "Default"
 end
 
 --NARWHAL.AddTeam( 1, "ONE", "Team 1 Name", Color(100,200,100), { "info_player_start" } )
 --NARWHAL.AddTeam( 2, "TWO", "Team 2 Name", Color(200,100,200), { "info_player_start" } )
-
-/*---------------------------------------------------------
-   Name: gamemode:PlayerConnect( )
-   Desc: Player has connects to the server (hasn't spawned)
----------------------------------------------------------*/
-function GM:PlayerConnect( name, address )
-end
-
-/*---------------------------------------------------------
-   Name: gamemode:PlayerAuthed( )
-   Desc: Player's STEAMID has been authed
----------------------------------------------------------*/
-function GM:PlayerAuthed( ply, SteamID, UniqueID )
-end
 
 /*---------------------------------------------------------
    Name: EntityRemoved
