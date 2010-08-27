@@ -21,12 +21,11 @@ include( 'animations.lua' )
 include( 'player_shd.lua' )
 include( 'networking/network_shd.lua' )
 
+// Putting files in the shared folder will automatically include and AddCSLuaFile the contents
 local Folder = string.Replace( GM.Folder, "gamemodes/", "" )
-for c, d in pairs( file.FindInLua( Folder.."/gamemode/shared/*") ) do
-	if d:find( ".lua" ) then
-		if SERVER then
-			AddCSLuaFile( Folder.."/gamemode/shared/"..d )
-		end
-		include( Folder.."/gamemode/shared/"..d )
+for c, d in pairs( file.FindInLua( Folder.."/gamemode/shared/*.lua") ) do
+	if SERVER then
+		AddCSLuaFile( Folder.."/gamemode/shared/"..d )
 	end
+	include( Folder.."/gamemode/shared/"..d )
 end

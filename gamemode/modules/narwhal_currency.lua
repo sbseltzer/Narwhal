@@ -31,7 +31,7 @@ function MODULE:CreateCurrency( name, set, get, add, take, give )
 	
 	// Get can be shared. ;)
 	if get then
-		function PLAYER[get]( self )
+		PLAYER[get] = function( self )
 			return self:FetchNWInt( networkname, 0 )
 		end
 	end
@@ -39,22 +39,22 @@ function MODULE:CreateCurrency( name, set, get, add, take, give )
 	if CLIENT then return end -- We don't want the client to be able to change money stuff.
 	
 	if set then
-		function PLAYER[set]( self, amount )
+		PLAYER[set] = function( self, amount )
 			self:SendNWInt( networkname, amount )
 		end
 	end
 	if add then
-		function PLAYER[add]( self, amount )
+		PLAYER[add] = function( self, amount )
 			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
 		end
 	end
 	if take then
-		function PLAYER[take]( self, amount )
+		PLAYER[take] = function( self, amount )
 			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
 		end
 	end
 	if give then
-		function PLAYER[give]( self, ply, amount )
+		PLAYER[give] = function( self, ply, amount )
 			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
 			ply:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
 		end

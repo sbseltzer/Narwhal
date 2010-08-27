@@ -82,10 +82,6 @@ function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcR
 	end
 end
 
-function GM:LoadNetworkConfigurations()
-	
-end
-
 // Here's our internal configuration loading. Devs can load their own in the other function.
 function GM:LoadInternalNetworkConfigurations()
 	

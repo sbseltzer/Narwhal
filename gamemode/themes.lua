@@ -52,11 +52,6 @@ function GM:SetTheme( themeName )
 	THEME = newtheme
 end
 
-// Called when deciding which theme to use
-function GM:ForceTheme()
-	return "Default"
-end
-
 // Resets the Theme table
 // Here we define a set of members and functions that are available in all themes.
 local function ResetThemeTable()

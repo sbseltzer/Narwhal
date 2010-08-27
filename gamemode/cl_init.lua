@@ -2,11 +2,6 @@
 /*---------------------------------------------------------
 
 	Developer's Notes:
-	
-	Keep your including to init.lua, cl_init.lua, and
-	shared.lua. Try not to do much more editing than
-	include and AddCSLuaFile in these files unless
-	absolutely neccessary.
 
 ---------------------------------------------------------*/
 

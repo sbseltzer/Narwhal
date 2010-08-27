@@ -2,21 +2,15 @@
 /*---------------------------------------------------------
 
 	Developer's Notes:
-	
-	Keep your including to init.lua, cl_init.lua, and
-	shared.lua. Try not to do much more editing than
-	include and AddCSLuaFile in these files unless
-	absolutely neccessary.
 
 ---------------------------------------------------------*/
 
+// This is experimental.
 NARWHAL_DERIVATIVE = NARWHAL_DERIVATIVE or "base"
 
 // Include shared files
 include( 'includes_shd.lua' )
 
---DeriveGamemode( "base" )
---DeriveGamemode( NARWHAL.Derivative )
 DeriveGamemode( NARWHAL_DERIVATIVE )
 
 GM.Name 		= "Narwhal Base"
@@ -42,6 +36,16 @@ function NARWHAL.EditTeam( iTeamNum, strGlobal, strName, tblColor, tblSpawnPoint
 	local GM = GM or GAMEMODE
 	GM.NarwhalTeams[iTeamNum] = { Global = strGlobal, Name = strName, Color = tblColor, SpawnPoints = tblSpawnPoints }
 	GM:CreateTeams()
+end
+
+// Fill this in to add your own network structures.
+function GM:LoadNetworkConfigurations()
+	-- Refer to network/network_shd.lua
+end
+
+// Called when deciding which theme to use
+function GM:ForceTheme()
+	return "Default"
 end
 
 --NARWHAL.AddTeam( 1, "ONE", "Team 1 Name", Color(100,200,100), { "info_player_start" } )

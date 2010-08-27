@@ -4,20 +4,21 @@
 	Developer's Notes:
 	
 	Configurations for the entire gamemode.
+	This file is still under construction.
 
 ---------------------------------------------------------*/
 
 NARWHAL.Config = {}
 
 // Feature toggling
-NARWHAL.Config["UseModules"]					= true	-- Toggle Module Loading.
+NARWHAL.Config["UseModules"]				= true	-- Toggle Module Loading.
 NARWHAL.Config["UseThemes"]					= true	-- Toggle Theme Loading
 NARWHAL.Config["UseMySQL"]					= true	-- Toggle MySQL Interfaces.
 NARWHAL.Config["UseAnims"]					= true	-- Toggle the player NPC animations.
 NARWHAL.Config["UseMoney"]					= true	-- Toggle the money system.
 NARWHAL.Config["UseStore"]					= true	-- Toggle the gobal store platform.
 NARWHAL.Config["UseAchievements"] 			= true	-- Toggle the achievements system.
-NARWHAL.Config["UseSandboxMenu"]				= true	-- Toggle sandbox features? - TODO?
+NARWHAL.Config["UseSandboxMenu"]			= true	-- Toggle sandbox features? - TODO?
 
 // Player related stuff
 NARWHAL.Config["PlayerCanNoClip"]			= false	-- Toggle player's ability to use noclip without sv_cheats being 1
@@ -25,9 +26,9 @@ NARWHAL.Config["PlayerCanSuicide"]			= true	-- Toggle player's ability to commit
 NARWHAL.Config["PlayerCanSwitchFlashlight"]	= true	-- Toggle player's ability to switch flashlight
 
 // Module related stuff
-NARWHAL.Config["ModuleListType"]				= "white"	-- Choices are "white" or "black" for whether you want to whitelist of blacklist modules.
-NARWHAL.Config["ModuleList"]					= {}		-- Here you list all the modules you want or don't want.
-NARWHAL.Config["Modules"]						= {}
+NARWHAL.Config["ModuleListType"]			= "white"	-- Choices are "white" or "black" for whether you want to whitelist of blacklist modules.
+NARWHAL.Config["ModuleList"]				= {}		-- Here you list all the modules you want or don't want.
+NARWHAL.Config["Modules"]					= {}
 
 // Please choose one or the other.
 // If the same module name appears on both, the blacklist will take priority.

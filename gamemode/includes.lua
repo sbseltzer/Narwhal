@@ -58,8 +58,12 @@ local function LoadFiles( state )
 	end
 end
 
-LoadFiles( "client" )
+// Putting files in the server folder will automatically include the contents.
 LoadFiles( "server" )
+
+// Putting files in the client folder will automatically AddCSLuaFile the contents.
+LoadFiles( "client" )
+
 --LoadFiles( "shared" )
 
 
