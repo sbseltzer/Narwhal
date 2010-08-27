@@ -1,0 +1,75 @@
+----------------------------------
+-- Narwhal Networking Utilities --
+----------------------------------
+
+Player and Entity Methods:
+	Entity:GetNetworkID()
+	Entity:SendNetworked<Type>( name, variable[, table_filter] )
+	Entity:FetchNetworked<Type>( name[, variable[, table_filter]] )
+	Both Send and Fetch have a NW alias (i.e. SendNetworkedTable can also be SendNWTable)
+	
+Supported Types:
+	String
+	Bool
+	Int
+	Float
+	Vector
+	Angle
+	Entity
+	Effect
+	Color
+	Table
+
+Gamemode Hooks:
+	GAMEMODE:SendNetworkedVariable( Ent, name, variable[, filter] )
+		Internal - Do not call
+	GAMEMODE:FetchNetworkedVariable( Ent, name[, variable[, filter]] )
+		Internal - Do not call
+	GAMEMODE:RemoveNetworkedVariables( Ent )
+		Internal - Do not call
+	GAMEMODE:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
+		sType is a reference name that acts as the storage location in the network configuration table.
+			For example, the sType for SendNetworkedString is "string". For something like Color, we've used "color", since Colors are actually tables.
+			The sType just needs to be a unique reference name.
+		sRef is the nice name used in the entity utils.
+			So when sRef is "Table", we get SendNetworkedTable and FetchNetworkedTable (and their NW aliases).
+		sStore is the reference name that acts as the storage location in the network cache table.
+			This is like sType, as it is used internally and just needs to be unique.
+		funcCheck is a function you can use to check for variable related errors.
+			The variable is passed as an argument.
+			This is where you can do any custom encoding. You can also do that in funcSend, but you need to return the resulting variable here anyway.
+		funcSend is the function where you manually send it on the Server.
+			The variable is passed as an argument.
+			Use the umsg library to send it to the Client, as this function is called between the umsg.Start and umsg.End statements.
+		funcRead is the function where you manually read it on the Client.
+			This is called from a usermessage hook, so the bf_read object is passed as an argument.
+	GAMEMODE:LoadNetworkConfigurations()
+		This is an empty shared hook. This is where you set up any custom data structures you want to network.
+		Here you would call GAMEMODE.AddValidNetworkType.
+	GAMEMODE:GetNetworkData()
+		Returns the table of network configurations.
+		
+How it works:
+	Just like SetNetworkedVar, these utilities syncronize serverside data with the client. It works a little differently, though.
+	How GMod's NWVars work:
+		In GMod, Networked vars get stored on the server and are flagged as changed or unchanged. When SetNetworkedVar is called, they get flagged as changed.
+		Then every 0.1 seconds or so, the server loops through all of the vars and looks for the ones that are flagged as changed, and sends them.
+		Looping through lots of these so frequently can become expensive, and that's why using lots of Networked vars can lag the server.
+	How Narwhal NWVars work:
+		In Narwhal, vars are only sent when SendNetworkedVar is called. It doesn't frequently loop through a potentially large table of variables.
+		Narwhal also has an retry feature to make sure clients recieved the vars, but it will quit after a certain amount of time.
+		Data is primarily serialized using GLON, and then is sent to the client via usermessage.
+		A nice little feature we have here is the ability to create your own filter settings for each individual NWVar.
+		Filters need to be in the form of a table, and will default to all players if not specified.
+	Network Configurations:
+		Network Configurations are what defines what kinds of data can be sent using Narwhal.
+		Developers can add their own by calling GAMEMODE.AddValidNetworkType in GAMEMODE.LoadNetworkConfigurations.
+		This allows developers to make their own networkable data structures. A good example would be Colors.
+		Colors in GMod are actually tables, but with a specific design. Colors are only supposed to have an 'r', 'g', 'b', and 'a' member.
+		Rather than serializing a table every time, we can send them as chars, which is faster and more efficient.
+		Basically, if you have an object that follows a very specific structure, and you want to be able to network it, you have the option of adding it.
+		By making a network configuration, it will create a cache for it, and even generate the entity utilities for you.
+	That's about all there is in terms of inner workings.
+
+
+

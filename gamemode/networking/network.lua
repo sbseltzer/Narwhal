@@ -152,15 +152,15 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 end
 
-function GM:RemoveNetworkedVariables( ply )
+function GM:RemoveNetworkedVariables( Ent )
 
 	umsg.Start( "NETWORK_RemoveIndex" )
-		umsg.String(ply:GetNetworkID())
+		umsg.String(Ent:GetNetworkID())
 	umsg.End()
 	
 	for k, v in pairs( NARWHAL.__NetworkData ) do
-		if NARWHAL.__NetworkCache[v.Storage][ply:GetNetworkID()] then
-			NARWHAL.__NetworkCache[v.Storage][ply:GetNetworkID()] = nil
+		if NARWHAL.__NetworkCache[v.Storage][Ent:GetNetworkID()] then
+			NARWHAL.__NetworkCache[v.Storage][Ent:GetNetworkID()] = nil
 		end
 	end
 	

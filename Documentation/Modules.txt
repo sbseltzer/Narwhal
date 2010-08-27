@@ -1,0 +1,53 @@
+----------------------------
+-- Narwhal Modules System --
+----------------------------
+
+General Info:
+	Narwhal Modules are basically like glorified plugins.
+	Modules are encapsulated, and any errors produced by them will get intercepted by a protected call before they can harm your gamemode.
+	You can add hooks to your modules, but not with hook.Add. You need to use MODULE:Hook( hook, uniquename, func ).
+
+Narwhal Functions:
+	NARWHAL.IncludeModule( moduleName, bRef )
+		Use this to get access to a module's table.
+		When bRef is true, it will return a reference of the module table, but this is not recommended.
+		Otherwise, it will pass a copy of the table, which allows you to use modules as instances of themselves. This is a much safer way of accessing modules.
+	NARWHAL.GetModule( moduleName )
+		This returns a reference of a module's table.
+	NARWHAL.GetModules()
+		This returns the table containing all registered modules.
+
+MODULE Functions:
+	MODULE.Require( moduleName )
+		Use this inside your modules whenever you want to use another module.
+		Example:
+			local database = MODULE.Require("narwhal_database")
+		The module loader searches for these statements to build dependency trees, so try to avoid involving conditions with requiring when possible.
+	MODULE:Hook( hookName, uniqueName, func )
+		hook.Add doesn't work when modules are being loaded, so you need to use this instead.
+	MODULE:Initialize()
+		Called after the modules have been loaded.
+	
+MODULE Values:
+	MODULE.Name - The reference name of the module. This is what you'd use in NARWHAL.IncludeModule or MODULE.Require.
+	MODULE.Title - The nice-name of the module.
+	MODULE.Author - The name of the author.
+	MODULE.Contact - The author's contact.
+	MODULE.Purpose - The module's purpose.
+	MODULE.Config - This table will be accessible from the NARWHAL.Config.Modules[moduleName] table. Anything in the corresponding NARWHAL.Config table will get overwritten in the module.
+	MODULE.ConfigName - Choosing a unique name here will allow you to enable/disable this module from Narwhal's Config table, and also generate ConVars that correspond to the configurations.
+	
+The MODULE Structure:
+	Check out example.lua from the gamemode/modules folder.
+
+How it works:
+	Before the gamemode even Initializes, the gamemode/modules folder is searched and all the module paths are stored.
+	Then all the paths are loaded, and the lua files are preloaded as raw text.
+	All comment parsing is removed, and then the gamemode searches for all MODULE.Require statements, and builds dependency trees based on the findings.
+	That data is recorded, and then compiled manually using CompileString.
+	Any dependencies that fail get put in a table of failed modules, and will automatically fail any of the modules that Require them.
+	
+	
+	
+	
+	

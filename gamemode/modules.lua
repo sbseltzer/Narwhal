@@ -44,22 +44,8 @@ local function IncludeModule( Module, ref )
 	if !t then
 		error( "Inclusion of Module '"..Module.."' Failed: Not registered!\n", 2 )
 	end
-	if t.Hooks[1] then
-		for _, v in pairs( t.Hooks ) do
-			t:Hook( unpack(v), true )
-		end
-	end
-	if ref then return t end -- Return a reference of the table so we can edit it globally.
-	return table.Copy( t ) -- Return a copy of the table so we can use modules as instances.
-end
-
-local function IncludeModule( Module, ref )
-	local t = GetModule( Module ) -- Gets the module's table
-	if !t then
-		error( "Inclusion of Module '"..Module.."' Failed: Not registered!\n", 2 )
-	end
-	if t.Hooks[1] then
-		for _, v in pairs( t.Hooks ) do
+	if t.__ModuleHooks[1] then
+		for _, v in pairs( t.__ModuleHooks ) do
 			t:Hook( unpack(v), true )
 		end
 	end
@@ -77,13 +63,14 @@ local function ResetModuleTable()
 	
 	MODULE = {}
 	MODULE.Config = {}
-	MODULE.Hooks = {}
+	MODULE.__ModuleHooks = {}
 	
 	MODULE.Name = nil
 	MODULE.Title = ""
 	MODULE.Author = ""
 	MODULE.Contact = ""
 	MODULE.Purpose = ""
+	MODULE.ConfigName = ""
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
@@ -94,7 +81,7 @@ local function ResetModuleTable()
 	function MODULE:Hook( hookName, uniqueName, func, hookForReal )
 		local self = self or MODULE
 		if !hookForReal then
-			table.insert( self.Hooks, { hookName, uniqueName, func } )
+			table.insert( self.__ModuleHooks, { hookName, uniqueName, func } )
 			return
 		end
 		local isMember = false
