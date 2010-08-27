@@ -3,9 +3,8 @@ Narwhal Base is a highly optimized open-source gamemode base oriented towards th
 
 Credits:
 Grea$eMonkey
-Doug52392
+Tobba
 AndrewMcWatters
 NightExcessive
 Kamataima - Animations System
-UberMensch - MySQL Support/Interface
 

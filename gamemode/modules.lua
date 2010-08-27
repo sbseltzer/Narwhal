@@ -193,21 +193,75 @@ end
 // Reads the module's raw text and gathers information about it before including
 local function PreloadModuleData( path, state )
 	
-	if path:find(".") and !path:find(".lua") then return end -- Don't read the "." or ".." folders
+	print(path, state)
+	--if path:find(".") and !path:find(".lua") then return end -- Don't read the "." or ".." folders
 	
 	// Read/Gather info
 	local function ReadText()
+		
 		local RawText = file.Read( "../gamemodes/"..path )
 		
+		// Remove all comments before we look for variables
+		local commentPattern1 = "/%*([%w%x%c%s%p]-)%*/"
+		local commentPattern2 = "%-%-%[%[([%w%x%c%s%p]-)%]%]"
+		local commentPattern3 = "%-%-([^%c]*)[\n]-"
+		local commentPattern4 = "//([^%c]*)[\n]-"
+		
+		--[[ V1
 		local commentPattern1 = "/%*(.*)%*/"
 		local commentPattern2 = "%-%-%[%[(.*)%]%]"
 		local commentPattern3 = "%-%-(.*)[\n]-"
 		local commentPattern4 = "//(.*)[\n]-"
+		]]
 		
-		RawText:gsub( commentPattern1, "" )
-		RawText:gsub( commentPattern2, "" )
-		RawText:gsub( commentPattern3, "" )
-		RawText:gsub( commentPattern4, "" )
+		--[[ V2
+		local commentPattern1 = "/%*([.]+)%*/"
+		local commentPattern2 = "%-%-%[%[([.]+)%]%]"
+		local commentPattern3 = "%-%-([.]+[\n]?)"
+		local commentPattern4 = "//([.]+[\n]?)"
+		]]
+		
+		--[[ V3
+		local commentPattern1 = "/%*([^(/%*)(%*/)]+)%*/"
+		local commentPattern2 = "%-%-%[%[([^(%-%-%[%[)(%]%])]+)%]%]" -- "%-%-%[%[([^%c]+)%]%]" --(%-%-%[%[)(%]%])
+		local commentPattern3 = "%-%-([^%c]*)[\n]-"
+		local commentPattern4 = "//([^%c]*)[\n]-"
+		]]
+		
+		
+		local find = RawText:find( commentPattern1 )
+		if RawText:find( commentPattern1 ) then
+			repeat
+				find = RawText:find( commentPattern1, find )
+				RawText = RawText:gsub( commentPattern1, "" )
+			until( !RawText:find( commentPattern1, find ) )
+		end
+		
+		find = RawText:find( commentPattern2 )
+		if RawText:find( commentPattern2 ) then
+			repeat
+				find = RawText:find( commentPattern2, find )
+				RawText = RawText:gsub( commentPattern2, "" )
+			until( !RawText:find( commentPattern2, find ) )
+		end
+		
+		find = RawText:find( commentPattern3 )
+		if RawText:find( commentPattern3 ) then
+			repeat
+				find = RawText:find( commentPattern3, find )
+				RawText = RawText:gsub( commentPattern3, "" )
+			until( !RawText:find( commentPattern3, find ) )
+		end
+		
+		find = RawText:find( commentPattern4 )
+		if RawText:find( commentPattern4 ) then
+			repeat
+				find = RawText:find( commentPattern4, find )
+				RawText = RawText:gsub( commentPattern4, "" )
+			until( !RawText:find( commentPattern4, find ) )
+		end
+		
+		--print(RawText)
 		
 		local Name
 		local namePattern = "MODULE%.Name%s*=%s*[\"']*([%w_]+)[\"']*"
@@ -224,27 +278,36 @@ local function PreloadModuleData( path, state )
 		for reqModule in RawText:gmatch( includesPattern ) do
 			table.insert( mIncludes, reqModule )
 		end
-		ModuleFiles[Name] = { Path = path, State = state, Dependencies = mIncludes, Code = RawText }
+		
+		--ModuleFiles[Name] = { Path = path, State = state, Dependencies = mIncludes, Code = RawText }
 		MsgN( "Loaded Module '"..Name.."'." )
+		
+		return Name, mIncludes, RawText
+		
 	end
 
 	// Make sure it loads in the correct state
+	local name, inc, txt = ReadText()
 	if state == "server" then
 		if SERVER then
-			ReadText()
+			ModuleFiles[name] = { Path = path, State = state, Dependencies = inc, Code = txt }
+		end
+		if CLIENT then
+			ModuleFiles[name] = { State = state, Dependencies = inc }
 		end
 	elseif state == "client" then
 		if SERVER then
 			AddCSLuaFile( path )
+			ModuleFiles[name] = { State = state, Dependencies = inc }
 		end
 		if CLIENT then
-			ReadText()
+			ModuleFiles[name] = { Path = path, State = state, Dependencies = inc, Code = txt }
 		end
 	elseif state == "shared" then
 		if SERVER then
 			AddCSLuaFile( path )
 		end
-		ReadText()
+		ModuleFiles[name] = { Path = path, State = state, Dependencies = inc, Code = txt }
 	end
 	
 end
@@ -256,7 +319,7 @@ local function PreLoadGamemodeModules()
 		if d:find( ".lua" ) then
 			PreloadModuleData( Folder.."/gamemode/modules/"..d, "shared" )
 		elseif d == "client" or d == "server" or d == "shared" then
-			for e, f in pairs( file.FindInLua( Folder.."/gamemode/modules/"..d.."/*" ) ) do
+			for e, f in pairs( file.FindInLua( Folder.."/gamemode/modules/"..d.."/*.lua" ) ) do
 				PreloadModuleData( Folder.."/gamemode/modules/"..d.."/"..f, d )
 			end
 		end
@@ -273,7 +336,11 @@ local function LoadDependencyTree( name )
 	for _, inc in pairs( ModuleFiles[name].Dependencies ) do -- Loop through the module's dependencies
 		print("\tChecking validity for include "..inc)
 		if ModuleFiles[inc] then -- If the include exists
-			if table.HasValue( FailedModules, ModuleFiles[inc].Path ) then -- Looks like this module has been deemed as failed. Fail any modules that depended on it.
+			if ModuleFiles[inc].State != "shared" and ModuleFiles[inc].State != ModuleFiles[name].State then
+				ErrorNoHalt( "WARNING: Module '"..name.."' is in the "..ModuleFiles[name].State:upper().." Lua state, and uses dependency '"..inc.."' which exists in the "..ModuleFiles[inc].State:upper().." Lua state! You may encounter some errors.\n" )
+				return
+			end
+			if table.HasValue( FailedModules, inc ) then -- Looks like this module has been deemed as failed. Fail any modules that depended on it.
 				ErrorNoHalt( "Registration of Module '"..name.."' Failed: Module is dependent on failed module '"..inc.."'!\n" )
 				return
 			elseif !GetModule( inc ) then -- If the include is registered
@@ -286,7 +353,9 @@ local function LoadDependencyTree( name )
 		end
 	end
 	ResetModuleTable() -- Reset the Module table
-	RegisterModule( name, ModuleFiles[name].Path, ModuleFiles[name].State ) -- Include the module
+	if ModuleFiles[name].Path then
+		RegisterModule( name, ModuleFiles[name].Path, ModuleFiles[name].State ) -- Include the module
+	end
 	table.insert( IncludedModules, name ) -- This module has been successfully included.
 end
 
@@ -302,7 +371,7 @@ local function LoadModules()
 
 	// Loop through the module data and include their dependencies first
 	for k, v in pairs( ModuleFiles ) do
-		if !table.HasValue( IncludedModules, k ) and !table.HasValue( FailedModules, v.Path ) then
+		if !table.HasValue( IncludedModules, k ) and !table.HasValue( FailedModules, k ) then
 			LoadDependencyTree( k )
 		end
 	end

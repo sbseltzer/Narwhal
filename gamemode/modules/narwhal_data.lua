@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
   Auth: NightExcessive
   Name: Data Handler
-  Desc: Saves and keeps data organized.
+  Desc: Saves and keeps data organized. (aaaaa)aaasdsaf(f)ffsf
 -----------------------------------------------------------------------------]]--
 
 local tostring = tostring
@@ -12,7 +12,7 @@ local pcall = pcall
 local table = table
 local string = string
 
-MODULE.Name = "data" -- The reference name
+MODULE.Name = "narwhal_data" -- The reference name
 MODULE.Title = "Data Handler" -- The display name
 MODULE.Author = "NightExcessive" -- The author
 MODULE.Contact = "nightexcessive@gmail.com" -- The author's contact

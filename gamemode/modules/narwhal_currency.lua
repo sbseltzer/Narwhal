@@ -4,16 +4,19 @@
   Desc: Simple currency system.
 -----------------------------------------------------------------------------*/
 
-MODULE.Name = "currency" -- The reference name
+MODULE.Name = "narwhal_currency" -- The reference name
 MODULE.Title = "Narwhal Currency" -- The display name
 MODULE.Author = "Grea$eMonkey" -- The author
-MODULE.Contact = "ssjgamemaker@charter.net" -- The author's contact
+MODULE.Contact = "geekwithalife@gmail.com" -- The author's contact
 MODULE.Purpose = "Simple currency system." -- The purpose
-
-local database = MODULE.Require( "database" )
 
 local PLAYER = FindMetaTable( "Player" )
 if !PLAYER then return end
+
+local database
+if SERVER then
+	database = MODULE.Require( "narwhal_database" )
+end
 
 // Called one time after the module has loaded.
 function MODULE:Initialize()
@@ -22,11 +25,14 @@ end
 
 function MODULE:CreateCurrency( name, set, get, add, take, give )
 	
+	if !name then return end
+	
 	local networkname = name.."_currency"
 	
+	// Get can be shared. ;)
 	if get then
 		function PLAYER[get]( self )
-			return self:FetchNWFloat( networkname, 0 )
+			return self:FetchNWInt( networkname, 0 )
 		end
 	end
 	
@@ -34,23 +40,23 @@ function MODULE:CreateCurrency( name, set, get, add, take, give )
 	
 	if set then
 		function PLAYER[set]( self, amount )
-			self:SendNWFloat( networkname, amount )
+			self:SendNWInt( networkname, amount )
 		end
 	end
 	if add then
 		function PLAYER[add]( self, amount )
-			self:SendNWFloat( networkname, self:FetchNWFloat( networkname, 0 ) + amount )
+			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
 		end
 	end
 	if take then
 		function PLAYER[take]( self, amount )
-			self:SendNWFloat( networkname, self:FetchNWFloat( networkname, 0 ) - amount )
+			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
 		end
 	end
 	if give then
 		function PLAYER[give]( self, ply, amount )
-			self:SendNWFloat( networkname, self:FetchNWFloat( networkname, 0 ) - amount )
-			ply:SendNWFloat( networkname, self:FetchNWFloat( networkname, 0 ) + amount )
+			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
+			ply:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
 		end
 	end
 	

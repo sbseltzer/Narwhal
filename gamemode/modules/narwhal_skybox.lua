@@ -13,7 +13,7 @@ local pairs = pairs
 local table = table
 local Vector = Vector
 
-MODULE.Name = "skybox" -- The reference name
+MODULE.Name = "narwhal_skybox" -- The reference name
 MODULE.Title = "Skybox module" -- The display name
 MODULE.Author = "Tobba" -- The author
 MODULE.Contact = "" -- The author's contact

@@ -5,7 +5,7 @@ require( "mysqloo" )
   Desc: Store stuff with MySQL.
 -----------------------------------------------------------------------------*/
 
-MODULE.Name = "database" -- The reference name
+MODULE.Name = "narwhal_database" -- The reference name
 MODULE.Title = "Database Module" -- The display name
 MODULE.Author = "Tobba" -- The author
 MODULE.Contact = "" -- The author's contact

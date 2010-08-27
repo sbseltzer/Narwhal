@@ -10,20 +10,21 @@
 
 ---------------------------------------------------------*/
 
+NARWHAL_DERIVATIVE = NARWHAL_DERIVATIVE or "base"
 
 // Include shared files
 include( 'includes_shd.lua' )
 
-DeriveGamemode( "base" )
+--DeriveGamemode( "base" )
 --DeriveGamemode( NARWHAL.Derivative )
---DeriveGamemode( NARWHAL.Derivative )
+DeriveGamemode( NARWHAL_DERIVATIVE )
 
 GM.Name 		= "Narwhal Base"
 GM.Author 		= "Team GModCentral"
 GM.Email 		= "team@gmodcentral.com"
 GM.Website 		= "www.gmodcentral.com"
 GM.TeamBased 	= true
-GM.Teams		= {}
+GM.NarwhalTeams	= {}
 
 /*---------------------------------------------------------
   Teams are configured in a special way.
@@ -33,13 +34,18 @@ GM.Teams		= {}
   'SpawnPoints' is a table list of spawn points (or just a string for one spawn point).
 ---------------------------------------------------------*/
 
-function Add_Team( iTeamNum, strGlobal, strName, tblColor, tblSpawnPoints )
+function NARWHAL.AddTeam( iTeamNum, strGlobal, strName, tblColor, tblSpawnPoints )
 	local GM = GM or GAMEMODE
-	GM.Teams[iTeamNum] = { Global = strGlobal, Name = strName, Color = tblColor, SpawnPoints = tblSpawnPoints }
+	GM.NarwhalTeams[iTeamNum] = { Global = strGlobal, Name = strName, Color = tblColor, SpawnPoints = tblSpawnPoints }
+end
+function NARWHAL.EditTeam( iTeamNum, strGlobal, strName, tblColor, tblSpawnPoints )
+	local GM = GM or GAMEMODE
+	GM.NarwhalTeams[iTeamNum] = { Global = strGlobal, Name = strName, Color = tblColor, SpawnPoints = tblSpawnPoints }
+	GM:CreateTeams()
 end
 
-Add_Team( 1, "ONE", "Team 1 Name", Color(100,200,100), { "info_player_start" } )
-Add_Team( 2, "TWO", "Team 2 Name", Color(200,100,200), { "info_player_start" } )
+--NARWHAL.AddTeam( 1, "ONE", "Team 1 Name", Color(100,200,100), { "info_player_start" } )
+--NARWHAL.AddTeam( 2, "TWO", "Team 2 Name", Color(200,100,200), { "info_player_start" } )
 
 /*---------------------------------------------------------
    Name: gamemode:PlayerConnect( )
@@ -113,13 +119,11 @@ function GM:CreateTeams()
 	// gamemode you should override this function in your gamemode
 	if ( !GAMEMODE.TeamBased ) then return end
 	
-	if #GAMEMODE.Teams < 1 then return end
+	if !GAMEMODE.Teams or GAMEMODE.Teams[1] or #GAMEMODE.Teams < 1 then return end
 	for k, v in pairs( GAMEMODE.Teams ) do
-	
 		_G[ "TEAM_" .. string.upper( v.Global ) ] = k
 		team.SetUp( k, v.Name, v.Color )
 		team.SetSpawnPoint( k, v.SpawnPoints ) // <-- This would be info_terrorist or some entity that is in your map
-		
 	end
 	--team.CreateTeam( index, name, color, joinable, spawns )
 	team.SetSpawnPoint( TEAM_SPECTATOR, "worldspawn" ) 
