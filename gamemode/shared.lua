@@ -66,29 +66,6 @@ function GM:PlayerAuthed( ply, SteamID, UniqueID )
 end
 
 /*---------------------------------------------------------
-   Name: gamemode:SetupMove( player, movedata )
-   Desc: Allows us to change stuff before the engine 
-		  processes the movements
----------------------------------------------------------*/
-function GM:SetupMove( ply, move )
-end
-
-/*---------------------------------------------------------
-   Name: gamemode:FinishMove( player, movedata )
----------------------------------------------------------*/
-function GM:FinishMove( ply, move )
-end
-
-/*---------------------------------------------------------
-   Name: gamemode:Move
-   This basically overrides the NOCLIP, PLAYERMOVE movement stuff.
-   It's what actually performs the move. 
-   Return true to not perform any default movement actions. (completely override)
----------------------------------------------------------*/
-function GM:Move( ply, move )
-end
-
-/*---------------------------------------------------------
    Name: EntityRemoved
    Desc: Called right before an entity is removed. Note that this
    isn't going to be totally reliable on the client since the client
