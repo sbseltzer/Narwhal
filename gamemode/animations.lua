@@ -1,6 +1,33 @@
 --Hey hey hey! It's fucking NPC animations version three! This time with no Rick Dark shit.
 --Credits to Azuisleet ( Original hook ), Entoros( Holdtype thing -- Which is no more, since garry added that in :/ ), and well, me, Big Bang/F-Nox ( everything else )
 
+// TODO: Further optimize logic, and change GM methods to hooks so we can disable/enable with our config.lua file.
+
+-- Globals to locals
+local table = table
+local concommand = concommand
+local timer = timer
+local hook = hook
+local string = string
+local math = math
+local _E = _E
+local pairs = pairs
+local tonumber = tonumber
+local ValidEntity = ValidEntity
+local CurTime = CurTime
+local SERVER = SERVER
+local CLIENT = CLIENT
+local IN_ATTACK = IN_ATTACK
+local IN_ATTACK2 = IN_ATTACK2
+local IN_RUN = IN_RUN
+local ACT_LAND = ACT_LAND
+local ACT_IDLE = ACT_IDLE
+local ACT_GESTURE_RANGE_ATTACK_SMG1 = ACT_GESTURE_RANGE_ATTACK_SMG1
+local ACT_VM_PRIMARYATTACK = ACT_VM_PRIMARYATTACK
+local ACT_GESTURE_RELOAD_SMG1 = ACT_GESTURE_RELOAD_SMG1
+local ACT_INVALID = ACT_INVALID
+
+
 --Weapons that are always aimed
 local AlwaysAimed = 
 {
@@ -18,7 +45,7 @@ local NeverAimed =
 	"hands"
 }
 
-function MakeAim( ply )
+local function MakeAim( ply )
 	
 	if ValidEntity( ply:GetActiveWeapon() ) then
 		if !table.HasValue( NeverAimed, ply:GetActiveWeapon():GetClass() ) then
@@ -35,7 +62,7 @@ function MakeAim( ply )
 
 end
 
-function MakeUnAim( ply )
+local function MakeUnAim( ply )
 
 	if ValidEntity( ply:GetActiveWeapon() ) then
 		if( !ply:GetActiveWeapon():GetDTBool( 1 ) and !table.HasValue( AlwaysAimed, ply:GetActiveWeapon():GetClass()) ) then

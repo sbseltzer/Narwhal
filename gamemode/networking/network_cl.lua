@@ -50,7 +50,7 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType )
 			ErrorNoHalt( "Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed. Client must not be in the serverside filter for this variable.\n" )
 			return
 		end
-		GAMEMODE:SendNetworkedVariable( Ent, Name, Var, storageType )
+		NARWHAL:SendNetworkedVariable( Ent, Name, Var, storageType )
 		return Var
 	end
 	

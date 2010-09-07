@@ -20,6 +20,7 @@ include( 'modules.lua' )
 include( 'animations.lua' )
 include( 'player_shd.lua' )
 include( 'networking/network_shd.lua' )
+include( 'table_ext.lua' )
 
 // Putting files in the shared folder will automatically include and AddCSLuaFile the contents
 local Folder = string.Replace( GM.Folder, "gamemodes/", "" )

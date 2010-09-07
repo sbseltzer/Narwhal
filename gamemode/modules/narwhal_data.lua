@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
   Auth: NightExcessive
   Name: Data Handler
-  Desc: Saves and keeps data organized. (aaaaa)aaasdsaf(f)ffsf
+  Desc: Saves and keeps data organized.
 -----------------------------------------------------------------------------]]--
 
 local tostring = tostring
@@ -11,6 +11,7 @@ local type = type
 local pcall = pcall
 local table = table
 local string = string
+local file = file
 
 MODULE.Name = "narwhal_data" -- The reference name
 MODULE.Title = "Data Handler" -- The display name

@@ -1,4 +1,13 @@
+
+local require = require
+local type = type
+local error = error
+local ErrorNoHalt = ErrorNoHalt
+local Msg = Msg
+local table = table
+
 require( "mysqloo" )
+
 /*-----------------------------------------------------------------------------
   Auth: Tobba
   Name: Database Module
@@ -13,6 +22,8 @@ MODULE.Purpose = "Store stuff with MySQL." -- The purpose
 MODULE.Connection = nil
 MODULE.Stack = {}
 MODULE.Interp = 1
+
+if !mysqloo then error( "MySQLOO must be installed for "..MODULE.Name.." to run!" ) end
 
 function MODULE:Connect(host, user, pass, db, port)
 	host = host or "127.0.0.1"

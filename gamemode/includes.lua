@@ -21,6 +21,7 @@ resource.AddFile( "models/Skeleton/maleanimtree.mdl" )
 resource.AddFile( "models/Skeleton/femaleanimtree.mdl" )
 resource.AddFile( "models/Skeleton/metroanimtree.mdl" )
 //resource.AddFile( "models/Skeleton/playeranimtree.mdl" ) -- TODO
+//resource.AddFile( "models/Skeleton/l4danimtree.mdl" ) -- TODO
 
 // Include server files
 include( 'config.lua' )
@@ -34,13 +35,14 @@ AddCSLuaFile( "modules.lua" )
 AddCSLuaFile( "animations.lua" )
 AddCSLuaFile( "player_shd.lua" )
 AddCSLuaFile( "networking/network_shd.lua" )
+AddCSLuaFile( "table_ext.lua" )
 
 // Add client files
 AddCSLuaFile( "networking/network_cl.lua" )
 
 // Temp files for testing
-include( 'sv_testhooks.lua' )
-AddCSLuaFile( "cl_testhooks.lua" )
+--include( 'sv_testhooks.lua' )
+--AddCSLuaFile( "cl_testhooks.lua" )
 
 local function LoadFiles( state )
 	local Folder = string.Replace( GM.Folder, "gamemodes/", "" )

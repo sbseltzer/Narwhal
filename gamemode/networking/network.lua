@@ -62,13 +62,13 @@ local function CheckForConfirmation( ply, Ent, Name, storageType, storageDest, r
 		timer.Simple( retryAgain, CheckForConfirmation, ply, Ent, Name, storageType, storageDest, retries + 1, tSendData )
 	else
 		ErrorNoHalt( "Reattempting network syncronization for "..tostring(ply).."...\n" )
-		GAMEMODE:SendNetworkedVariable( unpack( tSendData ) )
+		NARWHAL:SendNetworkedVariable( unpack( tSendData ) )
 	end
 	
 end
 
 // SERVER version of SendNetworkedVariable.
-function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
+function NARWHAL:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	storageType = storageType or "var"
 	
@@ -125,7 +125,7 @@ function GM:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 end
 
 // SERVER version of FetchNetworkedVariable.
-function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
+function NARWHAL:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 	storageType = storageType or "var"
 	
@@ -144,7 +144,7 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
 		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
 		Filter = Filter or NARWHAL.__NetworkCache[storageDest][ID][Name].Filter or player.GetAll()
-		GAMEMODE:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
+		NARWHAL:SendNetworkedVariable( Ent, Name, Var, storageType, Filter )
 		return Var
 	end
 	
@@ -152,7 +152,7 @@ function GM:FetchNetworkedVariable( Ent, Name, Var, storageType, Filter )
 	
 end
 
-function GM:RemoveNetworkedVariables( Ent )
+function NARWHAL:RemoveNetworkedVariables( Ent )
 
 	umsg.Start( "NETWORK_RemoveIndex" )
 		umsg.String(Ent:GetNetworkID())

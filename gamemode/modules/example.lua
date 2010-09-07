@@ -10,15 +10,19 @@ MODULE.Title = "My Example Module" -- The display name
 MODULE.Author = "Grea$eMonkey" -- The author
 MODULE.Contact = "geekwithalife@gmail.com" -- The author's contact
 MODULE.Purpose = "Just an example module to figure out the framework design from." -- The purpose
+MODULE.AutoHook = true
+//MODULE.ConfigName = "UseExampleModule" -- Now if you do NARWHAL.Config.UseExampleModule = false, it will disable the use of this module.
 
---local somthin1 = MODULE.Require( "somemodule1" )
---local somthin2 = MODULE.Require( "somemodule2" )
+MODULE.Require( "narwhal_currency" )
 
 // Called one time after the module has loaded.
+function MODULE:Init()
+	print( self.Name.." has been loaded!" ) -- Even though this is hooked to a gamemode method, it still uses the MODULE table as 'self'!
+end
+
 function MODULE:Initialize()
-	print( self.Name.." has initialized!" )
-	--somthin1:PrintString( "Hello world", self.Name )
-	--somthin2:PrintString( "Hello world", self.Name )
+	print( self.Name.." has initialized!" ) -- Even though this is hooked to a gamemode method, it still uses the MODULE table as 'self'!
+	--self:GetDependency("narwhal_currency"):CreateCurrency( "lol", "set", "get", "add", "take", "give" )
 end
 /*
 // Here's a module hook.
@@ -34,6 +38,4 @@ MODULE:Hook( "Think", "MyThink", MODULE.MyThink )
 local function MyThink()
 end
 MODULE:Hook( "Think", "MyThink2", MyThink )
-
---NARWHAL.RegisterModule( MODULE )
 */

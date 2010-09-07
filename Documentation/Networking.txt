@@ -20,14 +20,14 @@ Supported Types:
 	Color
 	Table
 
-Gamemode Hooks:
-	GAMEMODE:SendNetworkedVariable( Ent, name, variable[, filter] )
+Narwhal Methods:
+	NARWHAL:SendNetworkedVariable( Ent, name, variable[, filter] )
 		Internal - Do not call
-	GAMEMODE:FetchNetworkedVariable( Ent, name[, variable[, filter]] )
+	NARWHAL:FetchNetworkedVariable( Ent, name[, variable[, filter]] )
 		Internal - Do not call
-	GAMEMODE:RemoveNetworkedVariables( Ent )
+	NARWHAL:RemoveNetworkedVariables( Ent )
 		Internal - Do not call
-	GAMEMODE:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
+	NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
 		sType is a reference name that acts as the storage location in the network configuration table.
 			For example, the sType for SendNetworkedString is "string". For something like Color, we've used "color", since Colors are actually tables.
 			The sType just needs to be a unique reference name.
@@ -43,10 +43,10 @@ Gamemode Hooks:
 			Use the umsg library to send it to the Client, as this function is called between the umsg.Start and umsg.End statements.
 		funcRead is the function where you manually read it on the Client.
 			This is called from a usermessage hook, so the bf_read object is passed as an argument.
-	GAMEMODE:LoadNetworkConfigurations()
+	NARWHAL:LoadNetworkConfigurations()
 		This is an empty shared hook. This is where you set up any custom data structures you want to network.
-		Here you would call GAMEMODE.AddValidNetworkType.
-	GAMEMODE:GetNetworkData()
+		Here you would call NARWHAL.AddValidNetworkType.
+	NARWHAL:GetNetworkData()
 		Returns the table of network configurations.
 		
 How it works:
@@ -63,7 +63,7 @@ How it works:
 		Filters need to be in the form of a table, and will default to all players if not specified.
 	Network Configurations:
 		Network Configurations are what defines what kinds of data can be sent using Narwhal.
-		Developers can add their own by calling GAMEMODE.AddValidNetworkType in GAMEMODE.LoadNetworkConfigurations.
+		Developers can add their own by calling NARWHAL.AddValidNetworkType in NARWHAL.LoadNetworkConfigurations.
 		This allows developers to make their own networkable data structures. A good example would be Colors.
 		Colors in GMod are actually tables, but with a specific design. Colors are only supposed to have an 'r', 'g', 'b', and 'a' member.
 		Rather than serializing a table every time, we can send them as chars, which is faster and more efficient.

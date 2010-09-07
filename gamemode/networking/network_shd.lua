@@ -44,13 +44,13 @@ NARWHAL.__NetworkCache.Tables = {} -- Stores NWTables
 NARWHAL.__NetworkCache.Vars = {} -- Stores NWVars
 
 // This is a function for getting the network configurations.
-function GM:GetNetworkData()
+function NARWHAL:GetNetworkData()
 	return NARWHAL.__NetworkData
 end
 
 // This can be used to add custom datatypes. This could be useful on a per-gamemode basis. It would allow developers to design their own ways of sending data.
 // Every time we send data, it follows a general pattern: Check to see if the data is valid within the context of the variable, Encode it somehow, Send that encoded data via usermessages, and then Retrieving that data on the client.
-function GM:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
+function NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
 	local tData = {}
 	tData["Ref"] = sRef
 	tData["Storage"] = sStore
@@ -72,14 +72,14 @@ end
 local function LoadInternalNetworkConfigurations()
 	
 	// BOOLEANS
-	GAMEMODE:AddValidNetworkType( "boolean", "Bool", "Booleans",
+	NARWHAL:AddValidNetworkType( "boolean", "Bool", "Booleans",
 		function( var ) return tobool( var ) end,
 		function( var ) umsg.Bool( var ) end,
 		function( um ) return um:ReadBool() end
 	)
 
 	// STRINGS
-	GAMEMODE:AddValidNetworkType( "string", "String", "Strings",
+	NARWHAL:AddValidNetworkType( "string", "String", "Strings",
 		function( var )
 			local vType = type( var )
 			if vType != "string" and vType != "number" then
@@ -92,7 +92,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// INTEGERS
-	GAMEMODE:AddValidNetworkType( "integer", "Int", "Integers",
+	NARWHAL:AddValidNetworkType( "integer", "Int", "Integers",
 		function( var )
 			if !tonumber( var ) then
 				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
@@ -121,7 +121,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// FLOATS
-	GAMEMODE:AddValidNetworkType( "float", "Float", "Floats",
+	NARWHAL:AddValidNetworkType( "float", "Float", "Floats",
 		function( var )
 			if !tonumber( var ) then
 				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
@@ -133,7 +133,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// ENTITIES	
-	GAMEMODE:AddValidNetworkType( "entity", "Entity", "Entities",
+	NARWHAL:AddValidNetworkType( "entity", "Entity", "Entities",
 		function( var )
 			local vType = type( var )
 			if vType != "Entity" and vType != "Player" then
@@ -174,7 +174,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// COLORS
-	GAMEMODE:AddValidNetworkType( "color", "Color", "Colors",
+	NARWHAL:AddValidNetworkType( "color", "Color", "Colors",
 		function( var )
 			if type( var ) != "table" then
 				error( "Bad argument #2 (Color table expected, got "..type( var )..")\n", 2 )
@@ -201,7 +201,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// VECTORS
-	GAMEMODE:AddValidNetworkType( "vector", "Vector", "Vectors",
+	NARWHAL:AddValidNetworkType( "vector", "Vector", "Vectors",
 		function( var )
 			if type( var ) != "vector" then
 				error( "Bad argument #2 (Vector expected, got "..type( var )..")\n", 2 )
@@ -213,7 +213,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// ANGLES
-	GAMEMODE:AddValidNetworkType( "angle", "Angle", "Angles",
+	NARWHAL:AddValidNetworkType( "angle", "Angle", "Angles",
 		function( var )
 			if type( var ) != "angle" then
 				error( "Bad argument #2 (Angle expected, got "..type( var )..")\n", 2 )
@@ -225,7 +225,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// TABLES
-	GAMEMODE:AddValidNetworkType( "table", "Table", "Tables",
+	NARWHAL:AddValidNetworkType( "table", "Table", "Tables",
 		function( var )
 			if type( var ) != "table" then
 				error( "Bad argument #2 (Table expected, got "..type( var )..")\n", 2 )
@@ -237,7 +237,7 @@ local function LoadInternalNetworkConfigurations()
 	)
 
 	// EFFECTS
-	GAMEMODE:AddValidNetworkType( "ceffectdata", "Effect", "Effects",
+	NARWHAL:AddValidNetworkType( "ceffectdata", "Effect", "Effects",
 		function( var )
 			if type( var ) != "CEffectData" then
 				error( "Bad argument #2 (CEffectData expected, got "..type( var )..")\n", 2 )
@@ -248,8 +248,8 @@ local function LoadInternalNetworkConfigurations()
 		function( um ) return glon.decode( um:ReadString() ) end
 	)
 	
-	if GAMEMODE.LoadNetworkConfigurations then
-		GAMEMODE:LoadNetworkConfigurations() -- Call the one for developers.
+	if NARWHAL.LoadNetworkConfigurations then
+		NARWHAL:LoadNetworkConfigurations() -- Call the one for developers.
 	end
 	
 	local ENTITY = FindMetaTable( "Entity" ) -- Here is the entity metatable. This lets us add methods to all entities.
@@ -294,7 +294,7 @@ local function LoadInternalNetworkConfigurations()
 					error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
-			GAMEMODE:SendNetworkedVariable( self, Name, Var, k, Filter )
+			NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter )
 		end
 		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter )
 			local entType = type( self )
@@ -318,7 +318,7 @@ local function LoadInternalNetworkConfigurations()
 					error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
-			return GAMEMODE:FetchNetworkedVariable( self, Name, Var, k, Filter )
+			return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter )
 		end
 		ENTITY["SendNW"..v.Ref] = ENTITY["SendNetworked"..v.Ref]
 		ENTITY["FetchNW"..v.Ref] = ENTITY["FetchNetworked"..v.Ref]

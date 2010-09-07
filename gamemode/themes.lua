@@ -1,235 +1,303 @@
+/*---------------------------------------------------------
 
-/*
-	UNFINISHED
-	Themes are essentially the same as modules, except they are basically like whole gamemodes.
-*/
+	Developer's Notes:
+	
+	Narwhal Themes are basically like Derma Skins, but
+	applied to the Gamemode as a whole.
+	
+---------------------------------------------------------*/
 
-local hook = hook
-local file = file
-local table = table
-local string = string
-local type = type
-local error = error
-local pcall = pcall
-local pairs = pairs
-local ErrorNoHalt = ErrorNoHalt
-local AddCSLuaFile = AddCSLuaFile
-local SERVER = SERVER
-local CLIENT = CLIENT
-
-local ThemeFiles = {}
+local Themes = {}
+local Loaded = {}
+local NotLoaded = {}
+local ThemeFolders = {}
 local themeHook = hook
 
-NARWHAL.__Themes = {}
-NARWHAL.__CurrentTheme = "Default"
+// Gets the theme data
+local function GetTheme( themeName )
+	if !Themes[themeName] then
+		return
+	end
+	return Themes[themeName]
+end
+
+// Gets the themes table
+local function GetThemes()
+	return Themes
+end
 
 // Gets the current gamemode theme
-function GM:GetCurrentTheme()
+local function CurrentTheme()
 	return NARWHAL.__CurrentTheme
 end
 
-// Gets the theme data from the global table
-function GM:GetThemeData( themeName )
-	if !NARWHAL.__Themes[themeName] then
-		return false
-	end
-	return NARWHAL.__Themes[themeName]
-end
-
 // Sets the gamemode theme
-function GM:SetTheme( themeName )
-	local oldtheme, newtheme = GAMEMODE:GetThemeData( NARWHAL.__CurrentTheme ), GAMEMODE:GetThemeData( themeName )
-	if oldtheme.OnThemeChanged then
-		oldtheme:OnThemeChanged( themeName )
+local function SetTheme( themeName )
+	if !themeName then return end
+	local currentTheme, newTheme = GetTheme( CurrentTheme() ), GetTheme( themeName )
+	if !newTheme then return end
+	if currentTheme then
+		if !NARWHAL:ThemeChanged( CurrentTheme(), themeName ) then
+			return
+		end
+		if currentTheme.OnThemeChanged then
+			currentTheme:OnThemeChanged( themeName )
+		end
+		if currentTheme.Hooks then
+			currentTheme:UnHookAll()
+		end
 	end
-	for k, v in pairs( oldtheme.Hooks ) do
-		hook.Remove( v[1], v[2] )
-	end
-	for k, v in pairs( newtheme.Hooks ) do
-		hook.Add( unpack( v ) )
+	if newTheme.Hooks then
+		currentTheme:HookAll()
 	end
 	NARWHAL.__CurrentTheme = themeName
-	THEME = newtheme
+end
+
+NARWHAL.GetTheme = GetTheme
+NARWHAL.GetThemes = GetThemes
+function NARWHAL:CurrentTheme()
+	return CurrentTheme()
+end
+function NARWHAL:SetTheme( theme )
+	SetTheme( theme )
 end
 
 // Resets the Theme table
 // Here we define a set of members and functions that are available in all themes.
-local function ResetThemeTable()
+local function CreateThemeTable( name )
 	
 	THEME = {}
-	THEME.Hooks = {}
+	THEME.__ThemeHooks = {}
+	THEME.__HookName = name
+	THEME.__Functions = {}
+	THEME.__Protected = {}
 	
-	THEME.Name = nil
-	THEME.Title = ""
+	THEME.Name = ""
 	THEME.Author = ""
 	THEME.Contact = ""
+	THEME.Description = ""
 	
-	THEME.Derive = "" -- I'm thinking of making it so modules can derive from one another.
+	function THEME:__Call( funcName, ... )
+		if table.HasValue( self.__Protected, funcName ) then
+			ErrorNoHalt( "Attempted to call function "..funcName.." which is on the Protected list. These functions are not supposed to be called via THEME.__Call!\n" )
+			return
+		end
+		local f = self[funcName] and self.__Functions[funcName]
+		if f then
+			local t = { pcall( self.__Functions[funcName], ... ) }
+			if t[1] then
+				table.remove( t, 1 )
+				return unpack(t)
+			else
+				ErrorNoHalt( "Narwhal Theme Error in "..self.Name..": "..t[2].."\n" )
+			end
+		else
+			ErrorNoHalt( "Narwhal Theme Error for "..self.Name..": Attempt to call THEME."..funcName.." (function expected, got nil)\n" )
+		end
+	end
+	
+	function THEME:__GenerateFunctionCalls()
+		print(self.Name)
+		PrintTable(self.__Protected)
+		for m, f in pairs( self ) do
+			if type( f ) == "function" and !table.HasValue( self.__Protected, m ) then
+				print( m, f )
+				self.__Functions[m] = f
+				self[m] = function( ... )
+					return self:__Call( m, ... )
+				end
+			end
+		end
+	end
 	
 	// Adds a hook for the specified theme.
-	function THEME:Hook( hookName, uniqueName, func )
+	function THEME:Hook( hookName, uniqueName, func, hookForReal )
 		local self = self or THEME
+		if !self.__ThemeHooks then
+			self.__ThemeHooks = {}
+		end
+		table.insert( self.__ThemeHooks, { hookName, uniqueName, func } )
+		if !hookForReal then
+			return
+		end
 		local isMember = false
 		for k, v in pairs( self ) do
-			if v == func then
-				isMember = true
-				break
+			if type(v) == "function" then
+				if v == func then
+					isMember = true
+					table.insert( self.__Protected, k )
+					break
+				end
 			end
 		end
 		if isMember then
-			table.insert( self.Hooks, { hookName, "THEMES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end } )
+			themeHook.Add( hookName, "Themes."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
 		else
-			table.insert( self.Hooks, { hookName, "THEMES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end } )
+			themeHook.Add( hookName, "Themes."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
+		end
+	end
+	
+	// Removes a hook for the specified theme.
+	function THEME:UnHook( hookName, uniqueName, unhookForReal )
+		local self = self or THEME
+		if unhookForReal then
+			for k, v in pairs( self.__ThemeHooks ) do
+				if v[1] == hookName and v[2] == uniqueName then
+					themeHook.Remove( v[1], v[2] )
+					break
+				end
+			end
 		end
 	end
 	
 	// Generates autohooks.
-	function THEME:GenerateHooks()
+	function THEME:__GenerateHooks()
 		local hooks = themeHook.GetTable()
 		for k, v in pairs( self ) do
-			if type( v ) == "function" and hooks[k] then
-				table.insert( self.Hooks, { hookName, "THEMES."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end } )
+			if type(v) == "function" and hooks[k] then
+				print("Autogenerating function hook on "..k.." for theme "..self.Name)
+				self:Hook( k, "BaseFunction_"..k, v, self.AutoHook )
 			end
 		end
 	end
 	
-end
-
-// Registers a specific theme file
-local function RegisterTheme( name, path, state )
-	
-	if !path:find(".lua") then return end -- Don't try to include the "." or ".." folders.
-	THEME.Name = name
-	
-	// Does the actuall including
-	local function FinalInclude()
-		
-		local bLoaded, strError = pcall( CompileString( ThemeFiles[name].Code, path ) )
-		
-		if !bLoaded then
-			ErrorNoHalt( "Registration of Theme '",name,"' Failed: "..strError.."\n" )
-			table.insert( FailedThemes, path )
+	// Adds a hook for the specified theme.
+	function THEME:HookAll()
+		local self = self or THEME
+		if !self.__ThemeHooks then
 			return
 		end
-		
+		for k, v in pairs( self.__ThemeHooks ) do
+			self:Hook( unpack( v ), true )
+		end
+	end
+	
+	// Removes a hook for the specified theme.
+	function THEME:UnHookAll()
+		local self = self or THEME
+		if !self.__ThemeHooks then
+			return
+		end
+		for k, v in pairs( self.__ThemeHooks ) do
+			self:UnHook( v[1], v[2], true )
+		end
+	end
+	
+	for k, v in pairs( THEME ) do
+		if type( v ) == "function" then
+			table.insert( THEME.__Protected, k )
+		end
+	end
+	
+	return THEME
+	
+end
+
+local function SearchThemesFolder()
+	local Folder = GM.Folder:sub( 11 )
+	for c, d in pairs( file.FindInLua( Folder.."/gamemode/themes/*" ) ) do
+		if !d:find( "%." ) then
+			table.insert( ThemeFolders, d )
+		end
+	end
+	MsgN("Themes")
+	PrintTable( ThemeFolders )
+end
+
+local function HandleUnhandled()
+
+	for k, v in pairs( NotLoaded ) do
+		Msg( "Theme: " .. v.Name .. " was not loaded because not all dependencies could be found!\n" )
+	end
+	
+	for k, v in pairs( Loaded ) do
+		if v.Base and Loaded[v.Base] then
+			v = table.Inherit( v, Loaded[v.Base] )
+			if v.Base and !v.BaseClass then
+				v.BaseClass = Loaded[v.Base]
+			end
+		else
+			local GM = GM or GAMEMODE or gmod.GetGamemode()
+			v.BaseClass = GM.BaseClass
+		end
+		Themes[v.Name] = v
+	end
+	
+	Loaded = nil
+	NotLoaded = nil
+	
+end
+
+local function HandleTheme( THEME )
+	
+	if !THEME then return end
+	
+	if THEME.Base then
+		for _, theme in pairs( Loaded ) do
+			if THEME.Base == theme.Name then
+				THEME.BaseClass = theme
+			end
+		end
+	end
+	
+	table.insert( Loaded, THEME )
+	
+end
+
+local function LoadThemes( PathList ) -- PathList is a list of theme paths
+
+	local GM = GM or GAMEMODE
+	for k, v in pairs( PathList ) do
+	
+		THEME = CreateThemeTable( v )
+		include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/shared.lua" )
+		if SERVER then
+			include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/init.lua" )
+		else
+			include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/cl_init.lua" )
+		end
 		if !THEME then
-			ErrorNoHalt( "Registration of Theme '",name,"' Failed: THEME table is nil! Conflicting scripts?\n" )
-			table.insert( FailedThemes, path )
-			return
+			ErrorNoHalt( "\nNarwhal Theme Error in "..v..": The 'THEME' table is nil! Are there errors in the file?\n" )
+		else
+			Msg("\nHandling Base for "..THEME.Name.."\n\n")
+			HandleTheme( THEME )
 		end
 		
-		if !THEME.Name then
-			table.insert( FailedThemes, ThemeFiles[name].Path )
-			ErrorNoHalt( "Registration of theme file '"..ThemeFiles[name].Path.."' Failed: THEME.Name is invalid! Parsing error?\n" )
-			return
-		end
-		
-		NARWHAL.__Themes[name] = THEME
-		
-		MsgN( "Successfully registered Theme '",name,"'!\n" )
-		
 	end
 	
-	if state == "client" then
-		if SERVER then
-			AddCSLuaFile( path )
-		end
-		if CLIENT then
-			FinalInclude()
-		end
-	elseif state == "server" then
-		if SERVER then
-			FinalInclude()
-		end
-	elseif state == "shared" then
-		if SERVER then
-			AddCSLuaFile( path )
-		end
-		FinalInclude()
-	end
+	HandleUnhandled()
 	
 end
 
-// Reads the theme's raw text and gathers information about it before including
-local function PreloadThemeData( name, path, state )
+hook.Add( "Initialize", "NARWHAL_SetDefaultTheme", function()
+	if !GetTheme( NARWHAL:ForceTheme() ) then return end
+	SetTheme( NARWHAL:ForceTheme() )
+end )
+
+hook = nil
+SearchThemesFolder()
+if SERVER then
+	for k, v in pairs( ThemeFolders ) do
+		local GM = GM or GAMEMODE
+		local Folder = GM.Folder:sub(11).."/gamemode/themes/"..v
+		AddCSLuaFile( Folder.."/shared.lua" )
+		AddCSLuaFile( Folder.."/cl_init.lua" )
+	end
+end
+LoadThemes( ThemeFolders )
+THEME = nil
+hook = themeHook
+
+for k, v in pairs( Themes ) do
 	
-	if path:find(".") and !path:find(".lua") then return end -- Don't read the "." or ".." folders
-	
-	// Read/Gather info
-	local function ReadText()
-		ThemeFiles[name] = { Path = path, State = state, Code = file.Read( "../gamemodes/"..path ) }
+	if v.Init then
+		v:Init()
 	end
-
-	// Make sure it loads in the correct state
-	if state == "server" then
-		if SERVER then
-			ReadText()
-		end
-	elseif state == "client" then
-		if SERVER then
-			AddCSLuaFile( path )
-		end
-		if CLIENT then
-			ReadText()
-		end
-	elseif state == "shared" then
-		if SERVER then
-			AddCSLuaFile( path )
-		end
-		ReadText()
+	if v.AutoHook then
+		v:__GenerateHooks()
 	end
+	v:__GenerateFunctionCalls()
 	
 end
-
-// Preload Theme Data
-local function PreLoadGamemodeThemes()
-	local Folder = string.Replace( GM.Folder, "gamemodes/", "" );
-	for c, d in pairs( file.FindInLua( Folder.."/gamemode/themes/*") ) do
-		if !d:find( "." ) then
-			for e, f in pairs( file.FindInLua( Folder.."/gamemode/themes/"..d.."/*" ) ) do
-				local state
-				if f == "init.lua" then
-					state = "server"
-				elseif f == "cl_init.lua" then
-					state = "client"
-				elseif f == "shared.lua" then
-					state = "shared"
-				end
-				PreloadThemeData( d, Folder.."/gamemode/themes/"..d.."/"..f, state )
-			end
-		end
-	end
-end
-
-MsgN( "Preloading Themes..." )
-PreLoadGamemodeThemes() -- Preload themes
-
-hook = nil -- We don't want your nasty hooks
-
-MsgN( "Registering Themes..." )
-// Loop through the theme data and include their dependencies first
-for k, v in pairs( ThemeFiles ) do
-	if !ThemeFiles[k] then -- This theme doesnt exist.
-		ErrorNoHalt( "Registration of theme '"..name.."' Failed: Theme is invalid!\n" )
-		return
-	end
-	ResetThemeTable() -- Reset the Theme table
-	MsgN( "Registering Theme "..k )
-	RegisterTheme( k, ThemeFiles[k].Path, ThemeFiles[k].State ) -- Include the theme
-end
-MsgN( "Finished Registering Themes..." )
-
-hook = themeHook -- Okay you can come out now. :)
-THEME = nil -- Remove the THEME table.
-
-// Generate our hooks
-for k, v in pairs( NARWHAL.__Themes ) do
-	v:GenerateHooks()
-end
-
-
-
-
-
 
 

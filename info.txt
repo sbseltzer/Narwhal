@@ -8,6 +8,6 @@
 	"author_url"	"http://www.gmodcentral.com/"
 	
 	"icon"		""
-	"info"		""
+	"info"		"Designed for the creation of large networked community gamemodes. Narwhal is lightweight enough to be for any kind of gamemode, however."
 	"hide"		"1"
 }

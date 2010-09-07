@@ -25,7 +25,7 @@ end
 
 function MODULE:CreateCurrency( name, set, get, add, take, give )
 	
-	if !name then return end
+	if !name then error( self.Name..".CreateCurrency argument #1 failed! Currency name is nil!\n" ) end
 	
 	local networkname = name.."_currency"
 	
@@ -36,29 +36,32 @@ function MODULE:CreateCurrency( name, set, get, add, take, give )
 		end
 	end
 	
-	if CLIENT then return end -- We don't want the client to be able to change money stuff.
+	if SERVER then -- We don't want the client to be able to change money stuff.
+		if set then
+			PLAYER[set] = function( self, amount )
+				self:SendNWInt( networkname, amount )
+			end
+		end
+		if add then
+			PLAYER[add] = function( self, amount )
+				self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
+			end
+		end
+		if take then
+			PLAYER[take] = function( self, amount )
+				self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
+			end
+		end
+		if give then
+			PLAYER[give] = function( self, ply, amount )
+				self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
+				ply:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
+			end
+		end
+	end
 	
-	if set then
-		PLAYER[set] = function( self, amount )
-			self:SendNWInt( networkname, amount )
-		end
-	end
-	if add then
-		PLAYER[add] = function( self, amount )
-			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
-		end
-	end
-	if take then
-		PLAYER[take] = function( self, amount )
-			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
-		end
-	end
-	if give then
-		PLAYER[give] = function( self, ply, amount )
-			self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
-			ply:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
-		end
-	end
+	print("Generated currency:", name)
+	return "lolz", 1, true, false, {1, 2, 3}
 	
 end
 
