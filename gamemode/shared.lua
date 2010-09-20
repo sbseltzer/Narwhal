@@ -7,27 +7,29 @@
 	
 ---------------------------------------------------------*/
 
-// This is experimental.
-NARWHAL_DERIVATIVE = NARWHAL_DERIVATIVE or "base"
-
-print( "loaded narwhal", NARWHAL_DERIVATIVE )
+NARWHAL = {}
+NARWHAL_FOLDER = GM.Folder:sub(11)
 
 // Include shared files
 include( 'includes_shd.lua' )
 
-DeriveGamemode( NARWHAL_DERIVATIVE )
+DeriveGamemode( NARWHAL_DERIVATIVE or "base" )
 
-// DO NOT EDIT THIS!!!!
-if NARWHAL_DERIVATIVE and NARWHAL_DERIVATIVE:lower() != "base" and NARWHAL_DERIVATIVE:lower() != "narwhal" then
-	gamemode.Register( GM, "Narwhal", NARWHAL_DERIVATIVE )
-	GM = gamemode.Get( "Narwhal" )
+// We're gonna cheat and re-register the gamemode ;D
+if NARWHAL_DERIVATIVE and NARWHAL_DERIVATIVE:lower() != "base" and NARWHAL_DERIVATIVE:lower() != NARWHAL_FOLDER then
+	Msg( "Re-registering gamemode '"..NARWHAL_FOLDER.."' derived from '"..NARWHAL_DERIVATIVE.."'\n" )
+	gamemode.Register( GM, NARWHAL_FOLDER, NARWHAL_DERIVATIVE )
+	GM = gamemode.Get( NARWHAL_FOLDER )
 end
 
-GM.Name 		= "Narwhal Base"
+IncludeNarwhalModules()
+IncludeNarwhalThemes()
+
+GM.Name 		= "Narwhal"
 GM.Author 		= "Team GModCentral"
 GM.Email 		= "team@gmodcentral.com"
 GM.Website 		= "www.gmodcentral.com"
-GM.TeamBased 	= true
+GM.TeamBased 	= false
 
 /*---------------------------------------------------------
    Name: LoadModules

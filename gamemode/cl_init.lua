@@ -6,8 +6,6 @@
 ---------------------------------------------------------*/
 
 
-NARWHAL = {}
-
 // Include shared files
 include( 'shared.lua' )
 
@@ -19,7 +17,6 @@ include( 'includes_cl.lua' )
    Desc: Called immediately after starting the gamemode 
 ---------------------------------------------------------*/
 function GM:Initialize( )
-
 end
 
 

@@ -6,8 +6,6 @@
 ---------------------------------------------------------*/
 
 
-NARWHAL = {}
-
 // Include shared files
 include( 'shared.lua' )
 
@@ -22,6 +20,7 @@ AddCSLuaFile( "includes_shd.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "includes_cl.lua" )
 
+
 /*---------------------------------------------------------
    Name: gamemode:Initialize( )
    Desc: Called immediately after starting the gamemode 
@@ -29,6 +28,7 @@ AddCSLuaFile( "includes_cl.lua" )
 function GM:Initialize( )
 
 end
+
 
 /*---------------------------------------------------------
    Name: gamemode:InitPostEntity( )

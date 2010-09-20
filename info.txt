@@ -1,13 +1,13 @@
 "Gamemode"
 {
-	"name"		"Narwhal Base"
-	"version"	"1.0"
+	"name"		"Narwhal"
+	"version"	"0.1"
 
 	"author_name"	"TEAM GMODCENTRAL"
 	"author_email"	"team@gmodcentral.com"
 	"author_url"	"http://www.gmodcentral.com/"
 	
 	"icon"		""
-	"info"		"Designed for the creation of large networked community gamemodes. Narwhal is lightweight enough to be for any kind of gamemode, however."
+	"info"		"Narwhal is a lightweight gamemode base designed for the creation of large networked gamemodes."
 	"hide"		"1"
 }

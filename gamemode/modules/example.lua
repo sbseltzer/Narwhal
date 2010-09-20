@@ -6,14 +6,14 @@
 -----------------------------------------------------------------------------*/
 
 MODULE.Name = "myexamplemodule" -- The reference name
-MODULE.Title = "My Example Module" -- The display name
+MODULE.Title = "Example Module" -- The display name
 MODULE.Author = "Grea$eMonkey" -- The author
 MODULE.Contact = "geekwithalife@gmail.com" -- The author's contact
 MODULE.Purpose = "Just an example module to figure out the framework design from." -- The purpose
 MODULE.AutoHook = true
 //MODULE.ConfigName = "UseExampleModule" -- Now if you do NARWHAL.Config.UseExampleModule = false, it will disable the use of this module.
 
-MODULE.Require( "narwhal_currency" )
+--MODULE.Require( "narwhal_currency" )
 
 // Called one time after the module has loaded.
 function MODULE:Init()

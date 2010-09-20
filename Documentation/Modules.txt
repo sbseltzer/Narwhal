@@ -7,11 +7,13 @@ General Info:
 	Modules are encapsulated, and any errors produced by them will get intercepted by a protected call before they can harm your gamemode.
 	You can add hooks to your modules, but not with hook.Add. You need to use MODULE:Hook( hook, uniquename, func ).
 
+Things to know:
+	1. Do not attempt to override MODULE functions (even those you made yourself) after it has loaded.
+	   When modules are loaded, any functions that are direct members to the MODULE table are edited specifically for module encapsulation and protection.
+	   The original function is stored in a table for later reference. The function is then overridden to call MODULE:__Call( funcName, ... ) which uses pcall on the original function.
+	   This allows the module to protect all functions. You can stop this from happening by setting MODULE.Protect to false.
+	
 Narwhal Functions:
-	NARWHAL.IncludeModule( moduleName, bRef )
-		Use this to get access to a module's table.
-		When bRef is true, it will return a reference of the module table, but this is not recommended.
-		Otherwise, it will pass a copy of the table, which allows you to use modules as instances of themselves. This is a much safer way of accessing modules.
 	NARWHAL.GetModule( moduleName )
 		This returns a reference of a module's table.
 	NARWHAL.GetModules()
@@ -53,6 +55,7 @@ MODULE Values:
 	MODULE.Config - This table will be accessible from the NARWHAL.Config.Modules[moduleName] table. Anything in the corresponding NARWHAL.Config table will get overwritten in the module.
 	MODULE.ConfigName - Choosing a unique name here will allow you to enable/disable this module from Narwhal's Config table, and also generate ConVars that correspond to the configurations.
 	MODULE.AutoHook - Making this false will keep this module from automatically hooking MODULE methods that have the same name as gamemode hooks (Think, Initialize, etc).
+	MODULE.Protect - Making this false will stop functions from being protected with the MODULE.__Call function.
 	MODULE.Dependency - This table contains the dependency tables of all the module's dependencies indexed by name. These tables can also be accessed via MODULE:GetDependency( moduleName ).
 	
 The MODULE Structure:

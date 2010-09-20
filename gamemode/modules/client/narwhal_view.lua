@@ -8,7 +8,7 @@
 MODULE.Name = "narwhal_view" -- The reference name
 MODULE.Title = "Narwhal View" -- The display name
 MODULE.Author = "Grea$eMonkey" -- The author
-MODULE.Contact = "ssjgamemaker@charter.net" -- The author's contact
+MODULE.Contact = "geekwithalife@gmail.com" -- The author's contact
 MODULE.Purpose = "" -- The purpose
 
 local viewpresets = {}

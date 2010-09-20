@@ -16,9 +16,6 @@
 // Include client files
 include( 'networking/network_cl.lua' )
 
-// Temp files for testing
---include( 'cl_testhooks.lua' )
-
 // Putting files in the client folder will automatically include the contents.
 local Folder = string.Replace( GM.Folder, "gamemodes/", "" )
 for c, d in pairs( file.FindInLua( Folder.."/gamemode/client/*") ) do

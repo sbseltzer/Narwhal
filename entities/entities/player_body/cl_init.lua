@@ -1,6 +1,5 @@
 include('shared.lua')
 
-
 function ENT:Draw()
 	
 	if GetViewEntity() == LocalPlayer() then

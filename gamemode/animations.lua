@@ -68,9 +68,9 @@ local function MakeUnAim( ply )
 		if( !ply:GetActiveWeapon():GetDTBool( 1 ) and !table.HasValue( AlwaysAimed, ply:GetActiveWeapon():GetClass()) ) then
 			ply:SetNWBool( "aiming", false )
 			--ply:GetActiveWeapon():SendWeaponAnim( ACT_VM_HOLSTER )
-				if SERVER then
-					ply:DrawViewModel( false )
-				end
+			if SERVER then
+				ply:DrawViewModel( false )
+			end
 			if( ply:GetActiveWeapon():IsValid() ) then
 				ply:GetActiveWeapon():SetNWBool( "NPCAimed", false );
 			end
@@ -88,15 +88,11 @@ local function HolsterToggle( ply )
 	end
 
 	if( !ply:GetNWBool( "aiming", false ) ) then
-	
 		MakeAim( ply );
 		ply:SetNWBool( "forceaim", true )
-		
 	else
-		
 		MakeUnAim( ply );
 		ply:SetNWBool( "forceaim", false )
-		
 	end
 
 end
@@ -125,7 +121,7 @@ local function NPCWeaponHook( ply, key )
 						end
 					end
 				end
-			end)
+			end )
 		end
 	end
 	
@@ -628,7 +624,7 @@ end
 local function getgender( ply )
 
 	local model = string.lower( ply:GetModel() )
-	if table.HasValue( Anims.Female[ "models" ], string.lower( model ) ) or ply:GetNWString( "gender", "Male" ) == "Female" then
+	if table.HasValue( Anims.Female[ "models" ], model ) or ply:GetNWString( "gender", "Male" ) == "Female" then
 		return "Female"
 	end
 	
@@ -746,7 +742,7 @@ function GM:HandlePlayerJumping( ply )
 				timer.Simple( 0.3, function()
 					ply.m_bLanding = false
 					ply.m_bJumping = false
-					ply:Freeze( false )
+					ply:Freeze( false ) -- WTF?!?!?!!!1101!29!0!41
 					/*
 					ply.CalcSeqOverride = -1
 					ply:AnimRestartMainSequence()*/
@@ -952,3 +948,45 @@ function GM:DoAnimationEvent( ply, event, data )
 	
 end
 
+function _R.Player:ResetSkeletalAnim()
+	self.CalcIdeal = ACT_IDLE
+end
+function _R.Player:SetSkeletalAnim( act )
+	self.CalcIdeal = act
+end
+function _R.Player:GetSkeletalAnim()
+	return self.CalcIdeal
+end
+function _R.Player:SetSkeletalAnim_Calculated( holdtype, anim, state )
+	if state then
+		self.CalcIdeal = HandleSequence( self, Anims[ getgender( self ) ][ holdtype ][ state ][ anim ] )
+	else
+		self.CalcIdeal = HandleSequence( self, Anims[ getgender( self ) ][ holdtype ][ anim ] )
+	end
+end
+function _R.Player:GetBodyEntity()
+	return self:GetNWEntity( "player_body" )
+end
+function _R.Player:CreateBodyEntity( mdl )
+	if IsValid( self:GetBodyEntity() ) then
+		self:GetBodyEntity():SetModel( mdl or self:GetModel() or "models/Kleiner.mdl" )
+		return
+	end
+	local body = ents.Create( "player_body" )
+	body:SetPos( self:GetPos() )
+	body:SetAngles( self:GetAngles() )
+	body:SetModel( mdl or "models/player/Kleiner.mdl" )
+	body:SetParent( self )
+	body:Spawn()
+	self:SetNWEntity( "player_body", body )
+end
+
+hook.Add( "PlayerSpawn", "NARWHAL.PlayerSpawn.CreatePlayerBody", function( ply )
+	ply:SetModel( "models/player/barney.mdl" )
+	ply:CreateBodyEntity()
+end )
+
+hook.Add( "PlayerDeath", "NARWHAL.PlayerDeath.HandlePlayerBody", function( ply )
+	ply:GetRagdollEntity():SetModel( ply:GetNWEntity("player_body"):GetModel() )
+	ply:GetNWEntity("player_body"):Remove()
+end )

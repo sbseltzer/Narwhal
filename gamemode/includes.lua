@@ -25,7 +25,6 @@ resource.AddFile( "models/Skeleton/metroanimtree.mdl" )
 
 // Include server files
 include( 'config.lua' )
-include( 'player.lua' )
 include( 'networking/network.lua' )
 
 // Add shared files
@@ -33,16 +32,10 @@ AddCSLuaFile( "config.lua" )
 AddCSLuaFile( "themes.lua" )
 AddCSLuaFile( "modules.lua" )
 AddCSLuaFile( "animations.lua" )
-AddCSLuaFile( "player_shd.lua" )
 AddCSLuaFile( "networking/network_shd.lua" )
-AddCSLuaFile( "table_ext.lua" )
 
 // Add client files
 AddCSLuaFile( "networking/network_cl.lua" )
-
-// Temp files for testing
---include( 'sv_testhooks.lua' )
---AddCSLuaFile( "cl_testhooks.lua" )
 
 local function LoadFiles( state )
 	local Folder = string.Replace( GM.Folder, "gamemodes/", "" )

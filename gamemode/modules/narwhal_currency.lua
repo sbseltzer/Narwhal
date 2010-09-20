@@ -9,6 +9,7 @@ MODULE.Title = "Narwhal Currency" -- The display name
 MODULE.Author = "Grea$eMonkey" -- The author
 MODULE.Contact = "geekwithalife@gmail.com" -- The author's contact
 MODULE.Purpose = "Simple currency system." -- The purpose
+MODULE.ConfigName = "UseCurrency"
 
 local PLAYER = FindMetaTable( "Player" )
 if !PLAYER then return end
@@ -30,38 +31,35 @@ function MODULE:CreateCurrency( name, set, get, add, take, give )
 	local networkname = name.."_currency"
 	
 	// Get can be shared. ;)
-	if get then
+	if get and !PLAYER[get] then
 		PLAYER[get] = function( self )
 			return self:FetchNWInt( networkname, 0 )
 		end
 	end
 	
 	if SERVER then -- We don't want the client to be able to change money stuff.
-		if set then
+		if set and !PLAYER[set] then
 			PLAYER[set] = function( self, amount )
 				self:SendNWInt( networkname, amount )
 			end
 		end
-		if add then
+		if add and !PLAYER[add] then
 			PLAYER[add] = function( self, amount )
 				self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
 			end
 		end
-		if take then
+		if take and !PLAYER[take] then
 			PLAYER[take] = function( self, amount )
 				self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
 			end
 		end
-		if give then
+		if give and !PLAYER[give] then
 			PLAYER[give] = function( self, ply, amount )
 				self:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) - amount )
 				ply:SendNWInt( networkname, self:FetchNWInt( networkname, 0 ) + amount )
 			end
 		end
 	end
-	
-	print("Generated currency:", name)
-	return "lolz", 1, true, false, {1, 2, 3}
 	
 end
 

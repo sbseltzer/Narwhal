@@ -19,11 +19,12 @@ MODULE.Title = "Database Module" -- The display name
 MODULE.Author = "Tobba" -- The author
 MODULE.Contact = "" -- The author's contact
 MODULE.Purpose = "Store stuff with MySQL." -- The purpose
+MODULE.ConfigName = "UseMySQL"
 MODULE.Connection = nil
 MODULE.Stack = {}
 MODULE.Interp = 1
 
-if !mysqloo then error( "MySQLOO must be installed for "..MODULE.Name.." to run!" ) end
+if !mysqloo then ErrorNoHalt( "MySQLOO must be installed for "..MODULE.Name.." to run!\n" ) return end
 
 function MODULE:Connect(host, user, pass, db, port)
 	host = host or "127.0.0.1"

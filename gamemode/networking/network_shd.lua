@@ -27,9 +27,19 @@ local NullEntity = NullEntity
 local SERVER = SERVER
 local CLIENT = CLIENT
 
-NARWHAL.__NetworkData = {}
-NARWHAL.__NetworkTypeID = {}
-NARWHAL.__NetworkTypeID2 = {}
+// Network enums
+_E["NARWHAL_NW_ALL"] = 0
+_E["NARWHAL_NW_SELF"] = 1
+_E["NARWHAL_NW_TEAM"] = 2
+_E["NARWHAL_NW_MYTEAM"] = 3
+_E["NARWHAL_NW_OPTEAM"] = 4
+
+// Network tables
+NARWHAL.__NetworkSubscriptions = {} -- Stores subcribed vars for individual players
+NARWHAL.__NetworkData = {} -- Stores network configurations
+NARWHAL.__NetworkTypeID = {} -- Used for receiving of network types in the form of chars
+NARWHAL.__NetworkTypeID2 = {} -- Used for sending of network types in the form of chars
+NARWHAL.__NetworkedEntIDs = {} -- Stores network IDs for individual entities
 NARWHAL.__NetworkCache = {} -- Set up the shared Network Cache table
 NARWHAL.__NetworkCache.Booleans = {} -- Stores NWBools
 NARWHAL.__NetworkCache.Strings = {} -- Stores NWStrings
@@ -49,7 +59,8 @@ function NARWHAL:GetNetworkData()
 end
 
 // This can be used to add custom datatypes. This could be useful on a per-gamemode basis. It would allow developers to design their own ways of sending data.
-// Every time we send data, it follows a general pattern: Check to see if the data is valid within the context of the variable, Encode it somehow, Send that encoded data via usermessages, and then Retrieving that data on the client.
+// Every time we send data, it follows a general pattern:
+// Check to see if the data is valid within the context of the variable, Encode it somehow, Send that encoded data via usermessages, and then Retrieving that data on the client.
 function NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
 	local tData = {}
 	tData["Ref"] = sRef
@@ -69,7 +80,9 @@ function NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, 
 end
 
 // Here's our internal configuration loading. Devs can load their own in the other function.
-local function LoadInternalNetworkConfigurations()
+hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function()
+	
+	// CONFIGURE OUR DEFAULT DATATYPES
 	
 	// BOOLEANS
 	NARWHAL:AddValidNetworkType( "boolean", "Bool", "Booleans",
@@ -248,83 +261,97 @@ local function LoadInternalNetworkConfigurations()
 		function( um ) return glon.decode( um:ReadString() ) end
 	)
 	
+	// Call the developer function if applicable
 	if NARWHAL.LoadNetworkConfigurations then
-		NARWHAL:LoadNetworkConfigurations() -- Call the one for developers.
+		NARWHAL:LoadNetworkConfigurations()
 	end
 	
 	local ENTITY = FindMetaTable( "Entity" ) -- Here is the entity metatable. This lets us add methods to all entities.
-	if !ENTITY then return end
+	if !ENTITY then return end -- No entity metatable? That's not good...
 	
 	// A handy function for getting network ID's. This is no longer networkable
 	local NextID = 0
 	ENTITY.GetNetworkID = function( self )
+		if !self or !IsValid( self ) or self == NULL then
+			return "nil"
+		end
+		if !self.GetNetworkID then return end
+		local id
 		if self:IsPlayer() then
-			return "ply"..self:UserID()
+			id = "ply"..self:UserID()
 		elseif self.NetworkID then
-			return "ent"..self.NetworkID
+			id = "ent"..self.NetworkID
 		else
 			NextID = NextID + 1
-			return "ent"..NextID
+			self.NetworkID = NextID
+			id = "ent"..NextID
 		end
+		NARWHAL.__NetworkedEntIDs[id] = self
+		return id
+	end
+	
+	// Handy util.
+	ents.GetByNetworkID = function( id )
+		return NARWHAL.__NetworkedEntIDs[id]
 	end
 	
 	// Now we loop through our network data and generate our player/entity methods for networking.
 	for k, v in pairs( NARWHAL.__NetworkData ) do
-		ENTITY["SendNetworked"..v.Ref] = function( self, Name, Var, Filter )
+		ENTITY["SendNetworked"..v.Ref] = function( self, Name, Var, Filter, ... )
 			local entType = type( self )
 			if !SERVER then Filter = nil end
 			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
-				error( "Entity.SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
 			elseif !Name then
-				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
 			elseif !Var then
-				error( entType..".SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
-			elseif Filter and type( Filter ) != "player" and type( Filter ) != "table" then
-				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Player or Table of Players expected, got "..type( Filter )..")\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
+			elseif Filter and type( Filter ):lower() != "player" and type( Filter ) != "table" and ( type( Filter ) == "number" and ( Filter < 0 or Filter > 4 ) ) and type( Filter ) != "function" then
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #3 (Function, Enum, Player, or Table of Players expected, got "..type( Filter )..")\n", 2 )
 			elseif Filter and type( Filter ) == "table" then
 				for k, v in pairs( Filter ) do
-					if !ValidEntity( v ) or type( v ) != "player" then
+					if !ValidEntity( v ) or type( v ):lower() != "player" then
 						table.remove( Filter, k )
-						ErrorNoHalt( entType..".FetchNetworked"..v.Ref..": Problem with argument #3 (Filter Table contains invalid member "..tostring( v )..")\n" )
+						ErrorNoHalt( "SendNetworked"..v.Ref..": Problem with argument #3 (Filter Table contains invalid member "..tostring( v )..")\n" )
 					end
 				end
 				if !IsTableOfEntitiesValid( Filter ) then
-					error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
+					error( "SendNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
-			NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter )
+			NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter, ... )
 		end
-		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter )
+		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter, ... )
 			local entType = type( self )
 			if !SERVER then Filter = nil end
 			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
-				error( "Entity.FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
+				error( "FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
 			elseif !Name then
-				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
-			elseif Filter and type( Filter ) != "player" and type( Filter ) != "table" then
-				error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Player or Table of Players expected, got "..type( Filter )..")\n", 2 )
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+			elseif Filter and type( Filter ):lower() != "player" and type( Filter ) != "table" and ( type( Filter ) == "number" and ( Filter < 0 or Filter > 4 ) ) and type( Filter ) != "function" then
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Function, Enum, Player, or Table of Players expected, got "..type( Filter )..")\n", 2 )
 			elseif Filter and type( Filter ) == "table" then
 				for k, v in pairs( Filter ) do
-					if !ValidEntity( v ) or type( v ) != "player" then
+					if !ValidEntity( v ) or type( v ):lower() != "player" then
 						table.remove( Filter, k )
-						ErrorNoHalt( entType..".FetchNetworked"..v.Ref..": Problem with argument #3 (Filter Table contains invalid member "..tostring( v )..")\n" )
+						ErrorNoHalt( "FetchNetworked"..v.Ref..": Problem with argument #3 (Filter Table contains invalid member "..tostring( v )..")\n" )
 					end
 				end
 				if !IsTableOfEntitiesValid( Filter ) then
-					error( entType..".FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
+					error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
-			return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter )
+			return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter, ... )
 		end
 		ENTITY["SendNW"..v.Ref] = ENTITY["SendNetworked"..v.Ref]
 		ENTITY["FetchNW"..v.Ref] = ENTITY["FetchNetworked"..v.Ref]
 	end
 	
-end
-hook.Add( "Initialize", "NARWHAL_LoadNetworkConfigurations", LoadInternalNetworkConfigurations )
+end )
+
 
 

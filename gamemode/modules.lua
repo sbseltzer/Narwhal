@@ -35,43 +35,25 @@
 ---------------------------------------------------------*/
 
 
-local Modules = {}
-local Loaded = {}
-local NotLoaded = {}
-local ClientSideModulePaths = {}
-local ServerSideModulePaths = {}
+NARWHAL.__ModuleList = {}
+
+local Loaded, NotLoaded, ClientSideModulePaths, ServerSideModulePaths
 local moduleHook = hook -- We don't want devs using the hook library. Instead, they should use the module methods we provided.
 
 // Gets the module table
-local function GetModules()
-	return Modules
+function NARWHAL.GetModules()
+	return NARWHAL.__ModuleList
 end
 
 // Gets the module data from the module table
-local function GetModule( moduleName )
-	if !Modules[moduleName] then
-		Modules[moduleName] = {}
+function NARWHAL.GetModule( moduleName )
+	if !NARWHAL.__ModuleList[moduleName] then
+		error( "NARWHAL.GetModule Failed: Module "..moduleName.." does not exist!\n", 2 )
+	elseif NARWHAL.__ModuleList[moduleName].__Disabled then
+		error( "NARWHAL.GetModule Failed: Module "..moduleName.." is disabled!\n", 2 )
 	end
-	return Modules[moduleName]
+	return NARWHAL.__ModuleList[moduleName]
 end
-
-// Includes a module
-local function IncludeModule( Module, ref )
-	local t = GetModule( Module ) -- Gets the module's table
-	if !t then
-		ErrorNoHalt( "Narwhal Module Error: Inclusion of Module '"..Module.."' Failed: Not registered!\n" )
-		return
-	end
-	if t.__ModuleHooks and t.__ModuleHooks[1] then
-		t:HookAll()
-	end
-	if ref then return t end -- Return a reference of the table so we can edit it globally.
-	return table.Copy( t ) -- Return a copy of the table so we can use modules as instances.
-end
-
-NARWHAL.GetModule = GetModule
-NARWHAL.GetModules = GetModules
-NARWHAL.IncludeModule = IncludeModule
 
 local function CreateModuleTable()
 	
@@ -82,7 +64,7 @@ local function CreateModuleTable()
 	MODULE.__ModuleHooks = nil
 	MODULE.__Dependencies = nil
 	MODULE.__Functions = {}
-	MODULE.__Protected = {}
+	MODULE.__Protected = { "Init", "Require", "GetDependency", "Hook", "UnHook", "HookAll", "UnHookAll", "__Call", "__GenerateFunctionCalls", "__GenerateHooks" }
 	
 	MODULE.Name = nil
 	MODULE.Title = ""
@@ -90,15 +72,15 @@ local function CreateModuleTable()
 	MODULE.Contact = ""
 	MODULE.Purpose = ""
 	MODULE.ConfigName = ""
+	MODULE.Protect = true
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
 		if !MODULE.__Dependencies then
 			MODULE.__Dependencies = {}
 		end
-		table.insert( MODULE.Dependency, moduleName )
-		table.insert( MODULE.__Dependencies, moduleName )
-		--return function() return Modules[moduleName] end
+		table.insert( MODULE.Dependency, moduleName ) -- Table of metatables
+		table.insert( MODULE.__Dependencies, moduleName ) -- Table of names
 	end
 	
 	function MODULE:GetDependency( moduleName )
@@ -113,13 +95,14 @@ local function CreateModuleTable()
 		return self.Dependency[moduleName]
 	end
 	
-	function MODULE:Init()
-		-- This would be filled in by the user.
-	end
-	
+	// All functions that are direct members of the MODULE table are internally protected.
 	function MODULE:__Call( funcName, ... )
+		if !NARWHAL.Config.UseModules then
+			print( "Attempted to call "..funcName.." on "..self.Name.." while UseModules is false." )
+			return
+		end
 		if table.HasValue( self.__Protected, funcName ) then
-			ErrorNoHalt( "Attempted to call function "..funcName.." which is on the Protected list. These functions are not supposed to be called via MODULE.__Call!\n" )
+			ErrorNoHalt( "Attempted to call function "..funcName.." on "..self.Name.." which is on the Protected list. These functions are not supposed to be called internally with MODULE.__Call!\n" )
 			return
 		end
 		local f = self[funcName] and self.__Functions[funcName]
@@ -137,11 +120,8 @@ local function CreateModuleTable()
 	end
 	
 	function MODULE:__GenerateFunctionCalls()
-		print(self.Name)
-		PrintTable(self.__Protected)
 		for m, f in pairs( self ) do
 			if type( f ) == "function" and !table.HasValue( self.__Protected, m ) then
-				print( m, f )
 				self.__Functions[m] = f
 				self[m] = function( ... )
 					return self:__Call( m, ... )
@@ -156,8 +136,8 @@ local function CreateModuleTable()
 		if !self.__ModuleHooks then
 			self.__ModuleHooks = {}
 		end
-		table.insert( self.__ModuleHooks, { hookName, uniqueName, func } )
 		if !hookForReal then
+			table.insert( self.__ModuleHooks, { hookName, uniqueName, func } )
 			return
 		end
 		local isMember = false
@@ -171,9 +151,9 @@ local function CreateModuleTable()
 			end
 		end
 		if isMember then
-			moduleHook.Add( hookName, "Modules."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
+			moduleHook.Add( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
 		else
-			moduleHook.Add( hookName, "Modules."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
+			moduleHook.Add( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
 		end
 	end
 	
@@ -188,7 +168,7 @@ local function CreateModuleTable()
 				end
 			end
 		end
-		moduleHook.Remove( hookName, "Modules."..self.Name..".HOOK."..uniqueName )
+		moduleHook.Remove( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName )
 	end
 	
 	// Generates autohooks.
@@ -196,7 +176,6 @@ local function CreateModuleTable()
 		local hooks = moduleHook.GetTable()
 		for k, v in pairs( self ) do
 			if type(v) == "function" and hooks[k] then
-				print("Autogenerating function hook on "..k.." for module "..self.Name)
 				self:Hook( k, "BaseFunction_"..k, v, self.AutoHook )
 			end
 		end
@@ -234,8 +213,7 @@ local function CreateModuleTable()
 	
 end
 
-local function SearchModulesFolder()
-	local Folder = GM.Folder:sub( 11 )
+local function SearchModulesFolder( Folder )
 	for c, d in pairs( file.FindInLua( Folder.."/gamemode/modules/*" ) ) do
 		if d:find( ".lua" ) then
 			if SERVER then
@@ -257,35 +235,33 @@ local function SearchModulesFolder()
 			end
 		end
 	end
-	MsgN("Server")
-	PrintTable( ServerSideModulePaths )
-	MsgN("Client")
-	PrintTable( ClientSideModulePaths )
 end
 
 local function HandleUnhandled()
 
 	for k, v in pairs( NotLoaded ) do
-		Msg( "Module: " .. v.Name .. " was not loaded because not all dependencies could be found!\n" )
+		print( "Narwhal Module: " .. v.Name .. " was not loaded because not all dependencies could be found!" )
 	end
 	
 	for k, v in pairs( Loaded ) do
-		Modules[v.Name] = v
-		if v.Dependency[1] then
-			local meta = {}
-			meta.__index = function(table, key) return Modules[key] end
-			setmetatable(v.Dependency, meta)
+		if ( v.ConfigName and NARWHAL.Config[v.ConfigName] == false ) or ( NARWHAL.Config.Modules[v.Name] and NARWHAL.Config.Modules[v.Name].Enabled == false ) then
+			print( "Narwhal Module "..v.Name.." is disabled." )
+			NARWHAL.__ModuleList[v.Name] = {__Disabled = true}
+		else
+			NARWHAL.__ModuleList[v.Name] = v
+			if v.Dependency[1] then
+				local meta = {}
+				meta.__index = function(table, key) return NARWHAL.__ModuleList[key] end
+				setmetatable(v.Dependency, meta)
+			end
 		end
 	end
-	
-	Loaded = nil
-	NotLoaded = nil
 	
 end
 
 local function HandleDependencies( MODULE, nloaded )
 	
-	if !MODULE then return end
+	if !MODULE then print("invalid module table?") return end
 	
 	if MODULE.__Dependencies and MODULE.__Dependencies[1] then
 		for _, mod in pairs( Loaded ) do
@@ -322,16 +298,28 @@ local function LoadModules( PathList ) -- PathList is a list of module paths
 		include( v )
 		
 		if !MODULE then
-			ErrorNoHalt( "\nNarwhal Module Error in "..v..": The 'MODULE' table is nil! Are there errors in the file?\n" )
+			ErrorNoHalt( "Narwhal Module Error: "..v..": The 'MODULE' table is nil! Are there errors in the file?\n" )
 		elseif !MODULE.Name then
-			ErrorNoHalt( "\nNarwhal Module Error in "..v..": The 'MODULE.Name' member is nil! Are there errors in the file?\n" )
+			ErrorNoHalt( "Narwhal Module Error: "..v..": The 'MODULE.Name' member is nil! Are there errors in the file?\n" )
 		elseif MODULE.Name:len() == 0 then
-			ErrorNoHalt( "\nNarwhal Module Error in "..v..": The 'MODULE.Name' member is an empty string! The module name must be more than 0 characters!\n" )
+			ErrorNoHalt( "Narwhal Module Error: "..v..": The 'MODULE.Name' member is an empty string! The module name must be more than 0 characters!\n" )
 		elseif MODULE.Name:find( "[^%w_]" ) then
-			ErrorNoHalt( "\nNarwhal Module Error in "..v..": The 'MODULE.Name' member contains unsafe characters! The module name may only contain alphanumeric characters and underscores!\n" )
+			ErrorNoHalt( "Narwhal Module Error: "..v..": The 'MODULE.Name' member contains unsafe characters! The module name may only contain alphanumeric characters and underscores!\n" )
+		elseif table.HasValue( Loaded, MODULE ) or NARWHAL.__ModuleList[MODULE.Name] then
+			ErrorNoHalt( "Narwhal Module Error: "..v..": Another module named "..MODULE.Name.." has already been loaded! Copy-paste mistake?\n" )
 		else
-			Msg("\nHandling dependencies for "..MODULE.Name.."\n\n")
-			HandleDependencies( MODULE, false )
+			local exists = false
+			for _, m in pairs( Loaded ) do
+				if m.Name == MODULE.Name then
+					print( "Narwhal Module: "..v..": Module "..MODULE.Name.." already exists. Module author '"..MODULE.Author.."' may be trying to override it in a derivative, so the original module will not be loaded." )
+					exists = true
+					break
+				end
+			end
+			if !exists then
+				Msg("Handling dependencies for Module "..MODULE.Name.."\n")
+				HandleDependencies( MODULE, false )
+			end
 		end
 		
 	end
@@ -340,31 +328,69 @@ local function LoadModules( PathList ) -- PathList is a list of module paths
 	
 end
 
-SearchModulesFolder()
-hook = nil
-if SERVER then
-	for k, v in pairs( ClientSideModulePaths ) do
-		AddCSLuaFile( v )
-	end
-	LoadModules( ServerSideModulePaths )
-else
-	LoadModules( ClientSideModulePaths )
-end
---LoadModules( table.Merge( ServerSideModulePaths, ClientSideModulePaths ), "shared" )
-hook = moduleHook
-MODULE = nil
-
-for k, v in pairs( Modules ) do
+function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 	
-	if v.Init then
-		v:Init()
+	local function InitWrapper()
+		
+		if !NARWHAL.Config.UseModules then print("Narwhal Modules are disabled.") return end
+		
+		hook = nil
+		Loaded = {}
+		NotLoaded = {}
+		ClientSideModulePaths = {}
+		ServerSideModulePaths = {}
+		
+		local function findBases( t, der )
+			if der then -- This is our derived gamemode, so we will want to add its modules too.
+				SearchModulesFolder( t.Folder:sub(11) ) -- Add modules from the derivatives's folder.
+			end
+			if t.BaseClass and t.Folder:sub(11) != "narwhal" then -- If our base isn't narwhal yet, then we need to search deeper.
+				SearchModulesFolder( t.BaseClass.Folder:sub(11) ) -- Add modules from the base's folder.
+				findBases( t.BaseClass, false ) -- Seach our base's base for modules.
+			end
+		end
+		
+		findBases( GM or GAMEMODE or gmod.GetGamemode(), true )
+		
+		if SERVER then
+			for k, v in pairs( ClientSideModulePaths ) do
+				AddCSLuaFile( v )
+			end
+			LoadModules( ServerSideModulePaths )
+		else
+			LoadModules( ClientSideModulePaths )
+		end
+
+		for k, v in pairs( NARWHAL.__ModuleList ) do
+		
+			if v.Config and NARWHAL.Config.Modules[k] then
+				NARWHAL.__ModuleList[k].Config = NARWHAL.Config.Modules[k]
+			end
+			if v.Init then
+				v:Init()
+			end
+			if v.Initialize then
+				v:Initialize()
+			end
+			if v.AutoHook then
+				v:__GenerateHooks()
+			end
+			if v.Protect then
+				v:__GenerateFunctionCalls()
+			end
+			
+		end
+		
+		MODULE = nil
+		Loaded = nil
+		NotLoaded = nil
+		ClientSideModulePaths = nil
+		ServerSideModulePaths = nil
+		hook = moduleHook
+		
 	end
-	if v.AutoHook then
-		v:__GenerateHooks()
-	end
-	v:__GenerateFunctionCalls()
+	
+	InitWrapper()
 	
 end
-
-
 

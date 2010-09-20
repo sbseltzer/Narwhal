@@ -7,37 +7,36 @@
 	
 ---------------------------------------------------------*/
 
-local Themes = {}
-local Loaded = {}
-local NotLoaded = {}
-local ThemeFolders = {}
+
+NARWHAL.__ThemeList = {}
+local Loaded, NotLoaded, ThemeFolders
 local themeHook = hook
 
 // Gets the theme data
-local function GetTheme( themeName )
-	if !Themes[themeName] then
+function NARWHAL:GetTheme( themeName )
+	if !NARWHAL.__ThemeList[themeName] then
 		return
 	end
-	return Themes[themeName]
+	return NARWHAL.__ThemeList[themeName]
 end
 
-// Gets the themes table
-local function GetThemes()
-	return Themes
+// Returns the themes table
+function NARWHAL.GetThemes()
+	return NARWHAL.__ThemeList
 end
 
-// Gets the current gamemode theme
-local function CurrentTheme()
+// Returns the name of the current gamemode theme
+function NARWHAL:CurrentTheme()
 	return NARWHAL.__CurrentTheme
 end
 
 // Sets the gamemode theme
-local function SetTheme( themeName )
+function NARWHAL:SetTheme( themeName )
 	if !themeName then return end
-	local currentTheme, newTheme = GetTheme( CurrentTheme() ), GetTheme( themeName )
+	local currentTheme, newTheme = NARWHAL:GetTheme( NARWHAL:CurrentTheme() ), NARWHAL:GetTheme( themeName )
 	if !newTheme then return end
 	if currentTheme then
-		if !NARWHAL:ThemeChanged( CurrentTheme(), themeName ) then
+		if !NARWHAL:ThemeChanged( NARWHAL:CurrentTheme(), themeName ) then
 			return
 		end
 		if currentTheme.OnThemeChanged then
@@ -53,20 +52,12 @@ local function SetTheme( themeName )
 	NARWHAL.__CurrentTheme = themeName
 end
 
-NARWHAL.GetTheme = GetTheme
-NARWHAL.GetThemes = GetThemes
-function NARWHAL:CurrentTheme()
-	return CurrentTheme()
-end
-function NARWHAL:SetTheme( theme )
-	SetTheme( theme )
-end
-
 // Resets the Theme table
 // Here we define a set of members and functions that are available in all themes.
 local function CreateThemeTable( name )
 	
 	THEME = {}
+	THEME.Config = {}
 	THEME.__ThemeHooks = {}
 	THEME.__HookName = name
 	THEME.__Functions = {}
@@ -76,6 +67,7 @@ local function CreateThemeTable( name )
 	THEME.Author = ""
 	THEME.Contact = ""
 	THEME.Description = ""
+	THEME.Protect = true
 	
 	function THEME:__Call( funcName, ... )
 		if table.HasValue( self.__Protected, funcName ) then
@@ -97,8 +89,6 @@ local function CreateThemeTable( name )
 	end
 	
 	function THEME:__GenerateFunctionCalls()
-		print(self.Name)
-		PrintTable(self.__Protected)
 		for m, f in pairs( self ) do
 			if type( f ) == "function" and !table.HasValue( self.__Protected, m ) then
 				print( m, f )
@@ -131,9 +121,9 @@ local function CreateThemeTable( name )
 			end
 		end
 		if isMember then
-			themeHook.Add( hookName, "Themes."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
+			themeHook.Add( hookName, "NARWHAL.__ThemeList."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
 		else
-			themeHook.Add( hookName, "Themes."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
+			themeHook.Add( hookName, "NARWHAL.__ThemeList."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
 		end
 	end
 	
@@ -155,7 +145,6 @@ local function CreateThemeTable( name )
 		local hooks = themeHook.GetTable()
 		for k, v in pairs( self ) do
 			if type(v) == "function" and hooks[k] then
-				print("Autogenerating function hook on "..k.." for theme "..self.Name)
 				self:Hook( k, "BaseFunction_"..k, v, self.AutoHook )
 			end
 		end
@@ -193,21 +182,18 @@ local function CreateThemeTable( name )
 	
 end
 
-local function SearchThemesFolder()
-	local Folder = GM.Folder:sub( 11 )
+local function SearchThemesFolder( Folder )
 	for c, d in pairs( file.FindInLua( Folder.."/gamemode/themes/*" ) ) do
 		if !d:find( "%." ) then
 			table.insert( ThemeFolders, d )
 		end
 	end
-	MsgN("Themes")
-	PrintTable( ThemeFolders )
 end
 
 local function HandleUnhandled()
 
 	for k, v in pairs( NotLoaded ) do
-		Msg( "Theme: " .. v.Name .. " was not loaded because not all dependencies could be found!\n" )
+		print( "Theme: " .. v.Name .. " was not loaded because not all bases could be found!\n" )
 	end
 	
 	for k, v in pairs( Loaded ) do
@@ -220,7 +206,7 @@ local function HandleUnhandled()
 			local GM = GM or GAMEMODE or gmod.GetGamemode()
 			v.BaseClass = GM.BaseClass
 		end
-		Themes[v.Name] = v
+		NARWHAL.__ThemeList[v.Name] = v
 	end
 	
 	Loaded = nil
@@ -238,6 +224,10 @@ local function HandleTheme( THEME )
 				THEME.BaseClass = theme
 			end
 		end
+		if !THEME.BaseClass then
+			table.insert( NotLoaded, THEME )
+			return
+		end
 	end
 	
 	table.insert( Loaded, THEME )
@@ -250,16 +240,30 @@ local function LoadThemes( PathList ) -- PathList is a list of theme paths
 	for k, v in pairs( PathList ) do
 	
 		THEME = CreateThemeTable( v )
-		include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/shared.lua" )
+		--if file.Exists( "../gamemodes/"..Folder.."/shared.lua" ) then
+			include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/shared.lua" )
+		--end
 		if SERVER then
-			include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/init.lua" )
+			--if file.Exists( "../gamemodes/"..Folder.."/init.lua" ) then
+				include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/init.lua" )
+			--end
 		else
-			include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/cl_init.lua" )
+			--if file.Exists( "../gamemodes/"..Folder.."/cl_init.lua" ) then
+				include( GM.Folder:sub(11).."/gamemode/themes/"..v.."/cl_init.lua" )
+			--end
 		end
 		if !THEME then
 			ErrorNoHalt( "\nNarwhal Theme Error in "..v..": The 'THEME' table is nil! Are there errors in the file?\n" )
+		/*elseif !THEME.Name then
+			ErrorNoHalt( "Narwhal Theme Error: "..v..": The 'THEME.Name' member is nil! Are there errors in the file?\n" )
+		elseif THEME.Name:len() == 0 then
+			ErrorNoHalt( "Narwhal Theme Error: "..v..": The 'THEME.Name' member is an empty string! The theme name must be more than 0 characters!\n" )
+		elseif THEME.Name:find( "[^%w_]" ) then
+			ErrorNoHalt( "Narwhal Theme Error: "..v..": The 'THEME.Name' member contains unsafe characters! The theme name may only contain alphanumeric characters and underscores!\n" )
+		elseif table.HasValue( Loaded, THEME ) or NARWHAL.__ModuleList[THEME.Name] then
+			ErrorNoHalt( "Narwhal Theme Error: "..v..": Another theme named "..THEME.Name.." has already been loaded! Copy-paste mistake?\n" )*/
 		else
-			Msg("\nHandling Base for "..THEME.Name.."\n\n")
+			Msg("Handling Bases for Theme "..v.."\n")
 			HandleTheme( THEME )
 		end
 		
@@ -269,35 +273,70 @@ local function LoadThemes( PathList ) -- PathList is a list of theme paths
 	
 end
 
-hook.Add( "Initialize", "NARWHAL_SetDefaultTheme", function()
-	if !GetTheme( NARWHAL:ForceTheme() ) then return end
-	SetTheme( NARWHAL:ForceTheme() )
+hook.Add( "Initialize", "NARWHAL.Initialize.SetDefaultTheme", function()
+	if !NARWHAL:GetTheme( NARWHAL:ForceTheme() ) then return end
+	NARWHAL:SetTheme( NARWHAL:ForceTheme() )
 end )
 
-hook = nil
-SearchThemesFolder()
-if SERVER then
-	for k, v in pairs( ThemeFolders ) do
-		local GM = GM or GAMEMODE
-		local Folder = GM.Folder:sub(11).."/gamemode/themes/"..v
-		AddCSLuaFile( Folder.."/shared.lua" )
-		AddCSLuaFile( Folder.."/cl_init.lua" )
-	end
-end
-LoadThemes( ThemeFolders )
-THEME = nil
-hook = themeHook
+function IncludeNarwhalThemes()
 
-for k, v in pairs( Themes ) do
+	local function InitWrapper()
+		
+		if !NARWHAL.Config.UseThemes then print("Narwhal Themes are disabled.") return end
+		
+		hook = nil
+		Loaded = {}
+		NotLoaded = {}
+		ThemeFolders = {}
+		
+		local function findBases( t, der )
+			if der then -- This is our derived gamemode, so we will want to add its themes too.
+				SearchThemesFolder( t.Folder:sub(11) ) -- Add themes from the derivatives's folder.
+			end
+			if t.BaseClass and t.Folder:sub(11) != "narwhal" then -- If our base isn't narwhal yet, then we need to search deeper.
+				SearchThemesFolder( t.BaseClass.Folder:sub(11) ) -- Add themes from the base's folder.
+				findBases( t.BaseClass, false ) -- Seach our base's base for themes.
+			end
+		end
+		
+		findBases( GM or GAMEMODE or gmod.GetGamemode(), true )
+		
+		if SERVER then
+			for k, v in pairs( ThemeFolders ) do
+				local GM = GM or GAMEMODE
+				local Folder = GM.Folder:sub(11).."/gamemode/themes/"..v
+				--if file.Exists( "../gamemodes/"..Folder.."/shared.lua" ) then
+					AddCSLuaFile( Folder.."/shared.lua" )
+				--end
+				--if file.Exists( "../gamemodes/"..Folder.."/cl_init.lua" ) then
+					AddCSLuaFile( Folder.."/cl_init.lua" )
+				--end
+			end
+		end
+		
+		LoadThemes( ThemeFolders )
+
+		for k, v in pairs( NARWHAL.__ThemeList ) do
+			
+			if v.Init then
+				v:Init()
+			end
+			if v.AutoHook then
+				v:__GenerateHooks()
+			end
+			v:__GenerateFunctionCalls()
+			
+		end
+		
+		THEME = nil
+		Loaded = nil
+		NotLoaded = nil
+		ThemeFolders = nil
+		hook = themeHook
+		
+	end
 	
-	if v.Init then
-		v:Init()
-	end
-	if v.AutoHook then
-		v:__GenerateHooks()
-	end
-	v:__GenerateFunctionCalls()
+	InitWrapper()
 	
 end
-
 
