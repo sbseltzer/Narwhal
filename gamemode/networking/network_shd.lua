@@ -24,15 +24,15 @@ local ValidEntity = ValidEntity
 local ErrorNoHalt = ErrorNoHalt
 local Entity = Entity
 local NullEntity = NullEntity
-local SERVER = SERVER
-local CLIENT = CLIENT
 
-// Network enums
-_E["NARWHAL_NW_ALL"] = 0
-_E["NARWHAL_NW_SELF"] = 1
-_E["NARWHAL_NW_TEAM"] = 2
-_E["NARWHAL_NW_MYTEAM"] = 3
-_E["NARWHAL_NW_OPTEAM"] = 4
+if SERVER then
+	// Network enums
+	_E["NARWHAL_NW_ALL"] = 0
+	_E["NARWHAL_NW_SELF"] = 1
+	_E["NARWHAL_NW_TEAM"] = 2
+	_E["NARWHAL_NW_MYTEAM"] = 3
+	_E["NARWHAL_NW_OPTEAM"] = 4
+end
 
 // Network tables
 NARWHAL.__NetworkSubscriptions = {} -- Stores subcribed vars for individual players
@@ -373,7 +373,8 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 			local t = { pcall( function() NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter, unpack(fArgs) ) end ) }
 			local b, e = unpack(t)
 			if !b then
-				error( e:sub( e:find("Sending"), e:len() ), 2 )
+				local exp = string.Explode( ":", string.Explode( "\n", debug.traceback() )[3] )
+				ErrorNoHalt( "[@"..exp[1]:gsub( "%c", "" )..":"..exp[2].."] "..e:sub( e:find("Sending"), e:len() ) )
 			end
 		end
 		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter, ... )
@@ -398,11 +399,13 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 					error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
+
 			local fArgs = {...}
 			local t = { pcall( function() return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter, unpack(fArgs) ) end ) }
 			local b, e = unpack(t)
 			if !b then
-				error( e:sub( e:find("Fetching"), e:len() ), 2 )
+				local exp = string.Explode( ":", string.Explode( "\n", debug.traceback() )[3] )
+				ErrorNoHalt( "[@"..exp[1]:gsub( "%c", "" )..":"..exp[2].."] "..e:sub( e:find("Fetching"), e:len() ) )
 			else
 				table.remove( t, 1 )
 				return unpack(t)
