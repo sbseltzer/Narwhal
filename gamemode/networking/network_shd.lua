@@ -148,9 +148,9 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	// ENTITIES	
 	NARWHAL:AddValidNetworkType( "entity", "Entity", "Entities",
 		function( var )
-			local vType = type( var )
-			if vType != "Entity" and vType != "Player" then
-				error( "Bad argument #2 (Player or Entity expected, got "..vType..")\n", 2 )
+			local vType = type( var ):lower()
+			if vType != "entity" and vType != "player" and vType != "weapon" and vType != "vehicle" then
+				error( "Bad argument #2 (Entity expected, got "..vType..")\n", 2 )
 			end
 			return var
 		end,
@@ -261,6 +261,54 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 		function( um ) return glon.decode( um:ReadString() ) end
 	)
 	
+	local CTakeDamageInfoTranslation = {
+		a = "AmmoType",
+		t = "Attacker",
+		b = "BaseDamage",
+		d = "Damage",
+		f = "DamageForce",
+		p = "DamagePosition",
+		y = "DamageType",
+		i = "Inflictor",
+		m = "MaxDamage",
+		r = "ReportedPosition",
+		s = "IsBulletDamage",
+		e = "IsExplosionDamage",
+		l = "IsFallDamage"
+	}
+	// DAMAGE
+	NARWHAL:AddValidNetworkType( "ctakedamageinfo", "DamageInfo", "DamageInfo",
+		function( var )
+			if type( var ) != "CTakeDamageInfo" then
+				error( "Bad argument #2 (CTakeDamageInfo expected, got "..type( var )..")\n", 2 )
+			end
+			local t = {}
+			for k, v in pairs( CTakeDamageInfoTranslation ) do
+				if v:sub(1,2) == "Is" then
+					t[k] = var[v]( var )
+				else
+					t[k] = var["Get"..v]( var )
+				end
+			end
+			return glon.encode( t )
+		end,
+		function( var )
+			umsg.String( var )
+		end,
+		function( um )
+			local t = glon.decode( um:ReadString() )
+			local d = DamageInfo()
+			for k, v in pairs(t) do
+				if k:sub(1,2) == "Is" then
+					d[CTakeDamageInfoTranslation[k]](d, v)
+				else
+					d["Set"..CTakeDamageInfoTranslation[k]](d, v)
+				end
+			end
+			return d
+		end
+	)
+
 	// Call the developer function if applicable
 	if NARWHAL.LoadNetworkConfigurations then
 		NARWHAL:LoadNetworkConfigurations()
@@ -298,15 +346,15 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	// Now we loop through our network data and generate our player/entity methods for networking.
 	for k, v in pairs( NARWHAL.__NetworkData ) do
 		ENTITY["SendNetworked"..v.Ref] = function( self, Name, Var, Filter, ... )
-			local entType = type( self )
+			local entType = type( self ):lower()
 			if !SERVER then Filter = nil end
-			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
-				error( "SendNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
+			if !self or !ValidEntity( self ) or ( entType != "entity" and entType != "player" and entType != "weapon" and entType != "vehicle"  ) then
+				error( "SendNetworked"..v.Ref.." Failed: Entity expected, got "..entType.."\n", 2 )
 			elseif !Name then
 				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
-			elseif !Var then
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Name contains invalid characters!)\n", 2 )
+			elseif Var == nil then
 				error( "SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
 			elseif Filter and type( Filter ):lower() != "player" and type( Filter ) != "table" and ( type( Filter ) == "number" and ( Filter < 0 or Filter > 4 ) ) and type( Filter ) != "function" then
 				error( "SendNetworked"..v.Ref.." Failed: Bad argument #3 (Function, Enum, Player, or Table of Players expected, got "..type( Filter )..")\n", 2 )
@@ -321,17 +369,22 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 					error( "SendNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
-			NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter, ... )
+			local fArgs = {...}
+			local t = { pcall( function() NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter, unpack(fArgs) ) end ) }
+			local b, e = unpack(t)
+			if !b then
+				error( e:sub( e:find("Sending"), e:len() ), 2 )
+			end
 		end
 		ENTITY["FetchNetworked"..v.Ref] = function( self, Name, Var, Filter, ... )
-			local entType = type( self )
+			local entType = type( self ):lower()
 			if !SERVER then Filter = nil end
-			if !self or !ValidEntity( self ) or ( entType:lower() != "entity" and entType:lower() != "player" ) then
-				error( "FetchNetworked"..v.Ref.." Failed: Entity or Player expected, got "..entType.."\n", 2 )
+			if !self or !ValidEntity( self ) or ( entType != "entity" and entType != "player" and entType != "weapon" and entType != "vehicle"  ) then
+				error( "FetchNetworked"..v.Ref.." Failed: Entity expected, got "..entType.."\n", 2 )
 			elseif !Name then
 				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
 			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Names may only contain alphanumeric characters and underscores!)\n", 2 )
+				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Name contains invalid characters!)\n", 2 )
 			elseif Filter and type( Filter ):lower() != "player" and type( Filter ) != "table" and ( type( Filter ) == "number" and ( Filter < 0 or Filter > 4 ) ) and type( Filter ) != "function" then
 				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Function, Enum, Player, or Table of Players expected, got "..type( Filter )..")\n", 2 )
 			elseif Filter and type( Filter ) == "table" then
@@ -345,7 +398,15 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 					error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Filter Table does not contain any valid players!)\n", 2 )
 				end
 			end
-			return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter, ... )
+			local fArgs = {...}
+			local t = { pcall( function() return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter, unpack(fArgs) ) end ) }
+			local b, e = unpack(t)
+			if !b then
+				error( e:sub( e:find("Fetching"), e:len() ), 2 )
+			else
+				table.remove( t, 1 )
+				return unpack(t)
+			end
 		end
 		ENTITY["SendNW"..v.Ref] = ENTITY["SendNetworked"..v.Ref]
 		ENTITY["FetchNW"..v.Ref] = ENTITY["FetchNetworked"..v.Ref]

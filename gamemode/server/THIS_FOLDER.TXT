@@ -1,0 +1,3 @@
+This is where you can put your serverside gamemode files.
+They will be included automatically.
+If you need to include them in a specific order, you may want to do it manually and not put them here.

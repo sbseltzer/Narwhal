@@ -19,7 +19,7 @@ NARWHAL.Config["UseCurrency"]				= false	-- Toggle the money system.
 NARWHAL.Config["UseStore"]					= false	-- Toggle the gobal store platform.
 NARWHAL.Config["UseAchievements"] 			= false	-- Toggle the achievements system.
 
-NARWHAL.Config["Commands"]			= { ["sv_alltalk"] = 1 }	-- These are called and set with game.ConsoleCommand in gamemode Initialize.
+NARWHAL.Config["Commands"]			= { ["somecommand"] = 1 }	-- These are called and set with game.ConsoleCommand in gamemode Initialize.
 NARWHAL.Config["Modules"]			= {} 						-- If any of your modules use a custom configuration, you can change it here. MODULE.Config["member"] becomes NARWHAL.Config[moduleName]["member"]
 NARWHAL.Config["unstable_settings"]	= {} 						-- Settings from here that admins will be unable to change while the game is running.
 

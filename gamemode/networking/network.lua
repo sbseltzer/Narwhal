@@ -229,7 +229,7 @@ function NARWHAL:SendNetworkedVariable( Ent, Name, Var, storageType, Filter, ...
 	local Filter_Table = FilterToTable( Ent, Filter )
 	
 	local Var_Encoded = Config.Func_Check( Var ) -- Check the validity of our var according to our network configurations.
-	if !Var_Encoded then return end -- Nil var? Lets stop here.
+	if Var_Encoded == nil then return end -- Nil var? Lets stop here.
 	
 	// We want to see if we have a waiting list of players already, and if we do, we will want to remove those players from our filter.
 	if NARWHAL.__NetworkCache[storageDest][ID][Name].Waiting then -- See if we have a waiting list

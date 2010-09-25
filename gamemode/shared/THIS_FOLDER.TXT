@@ -1,0 +1,3 @@
+This is where you can put your shared gamemode files.
+They will be included and AddCSLuaFile'd automatically.
+If you need to include them in a specific order, you may want to do it manually and not put them here.

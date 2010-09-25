@@ -12,7 +12,8 @@ Ryaga - Helped design the Module Loading system.
 
 Bug-Hunters:
 Chewgum
-Antid
+Antid2
+Llamalord
 
 Check out the wiki page for documentation and more: http://wiki.garrysmod.com/?title=Narwhal
 

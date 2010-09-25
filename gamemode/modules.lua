@@ -35,10 +35,27 @@
 ---------------------------------------------------------*/
 
 
+// I'm a fan of micro-optimization. I don't care what respectable programmer periodicals say.
+// In Lua, calling and running a local function is performed 30% faster than calling and running a global function of the same contents.
+// Therfore, declaring our globals as locals will mean those functions will run 30% faster than normal.
+// The difference can be negligable based on the circumstance, but whatever.
+local table = table
+local file = file
+local setmetatable = setmetatable
+local unpack = unpack
+local error = error
+local print = print
+local pairs = pairs
+local pcall = pcall
+local type = type
+local ErrorNoHalt = ErrorNoHalt
+local Msg = Msg
+
 NARWHAL.__ModuleList = {}
 
 local Loaded, NotLoaded, ClientSideModulePaths, ServerSideModulePaths
 local moduleHook = hook -- We don't want devs using the hook library. Instead, they should use the module methods we provided.
+local moduleRequire = require -- We may need to prevent workarounds, like bypassing module hooks by doing require("hook") 
 
 // Gets the module table
 function NARWHAL.GetModules()
@@ -46,25 +63,30 @@ function NARWHAL.GetModules()
 end
 
 // Gets the module data from the module table
-function NARWHAL.GetModule( moduleName )
+function NARWHAL.GetModule( moduleName, opRef )
 	if !NARWHAL.__ModuleList[moduleName] then
 		error( "NARWHAL.GetModule Failed: Module "..moduleName.." does not exist!\n", 2 )
 	elseif NARWHAL.__ModuleList[moduleName].__Disabled then
 		error( "NARWHAL.GetModule Failed: Module "..moduleName.." is disabled!\n", 2 )
 	end
-	return NARWHAL.__ModuleList[moduleName]
+	if opRef then
+		return NARWHAL.__ModuleList[moduleName]
+	else
+		return table.Copy( NARWHAL.__ModuleList[moduleName] )
+	end
 end
 
 local function CreateModuleTable()
 	
 	local MODULE = {}
 	MODULE.Config = {}
-	MODULE.AutoHook = true
 	MODULE.Dependency = {}
+	MODULE.AutoHook = true
+	MODULE.Protect = true
 	MODULE.__ModuleHooks = nil
 	MODULE.__Dependencies = nil
 	MODULE.__Functions = {}
-	MODULE.__Protected = { "Init", "Require", "GetDependency", "Hook", "UnHook", "HookAll", "UnHookAll", "__Call", "__GenerateFunctionCalls", "__GenerateHooks" }
+	MODULE.__Protected = { "Require", "GetDependency", "Hook", "UnHook", "HookAll", "UnHookAll", "__Call", "__GenerateFunctionCalls", "__GenerateHooks" }
 	
 	MODULE.Name = nil
 	MODULE.Title = ""
@@ -72,7 +94,6 @@ local function CreateModuleTable()
 	MODULE.Contact = ""
 	MODULE.Purpose = ""
 	MODULE.ConfigName = ""
-	MODULE.Protect = true
 	
 	// Includes a module inside a module. Returns the child module.
 	function MODULE.Require( moduleName )
@@ -132,7 +153,8 @@ local function CreateModuleTable()
 	
 	// Adds a hook for the specified module.
 	function MODULE:Hook( hookName, uniqueName, func, hookForReal )
-		local self = self or MODULE
+		self = self or MODULE
+		if !self or type(self) != "table" then print( "Failed to do MODULE:Hook(...). Are you sure you didn't do MODULE.Hook(...)?" ) return end
 		if !self.__ModuleHooks then
 			self.__ModuleHooks = {}
 		end
@@ -204,7 +226,7 @@ local function CreateModuleTable()
 	end
 	
 	for k, v in pairs( MODULE ) do
-		if type( v ) == "function" then
+		if type( v ) == "function" and !table.HasValue( MODULE.__Protected, k ) then
 			table.insert( MODULE.__Protected, k )
 		end
 	end
@@ -245,7 +267,7 @@ local function HandleUnhandled()
 	
 	for k, v in pairs( Loaded ) do
 		if ( v.ConfigName and NARWHAL.Config[v.ConfigName] == false ) or ( NARWHAL.Config.Modules[v.Name] and NARWHAL.Config.Modules[v.Name].Enabled == false ) then
-			print( "Narwhal Module "..v.Name.." is disabled." )
+			print( "Narwhal Module: "..v.Name.." is disabled." )
 			NARWHAL.__ModuleList[v.Name] = {__Disabled = true}
 		else
 			NARWHAL.__ModuleList[v.Name] = v
@@ -335,16 +357,25 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 		if !NARWHAL.Config.UseModules then print("Narwhal Modules are disabled.") return end
 		
 		hook = nil
+		function require( modName )
+			if modName == "hook" then
+				print( "Trying to bypass module hooks are you? You naughty little bastard. Too bad we're smarter than you. ;D" )
+				return
+			end
+			moduleRequire( modName )
+		end
 		Loaded = {}
 		NotLoaded = {}
 		ClientSideModulePaths = {}
 		ServerSideModulePaths = {}
 		
+		// This recursively searches your derived gamemodes until we hit a non-narwhal base.
+		// That way we can be sure to add all modules from any narwhal-based gamemodes.
 		local function findBases( t, der )
 			if der then -- This is our derived gamemode, so we will want to add its modules too.
 				SearchModulesFolder( t.Folder:sub(11) ) -- Add modules from the derivatives's folder.
 			end
-			if t.BaseClass and t.Folder:sub(11) != "narwhal" then -- If our base isn't narwhal yet, then we need to search deeper.
+			if t.BaseClass and t.Folder:sub(11):lower() != NARWHAL_FOLDER:lower() then -- If our base isn't narwhal yet, then we need to search deeper.
 				SearchModulesFolder( t.BaseClass.Folder:sub(11) ) -- Add modules from the base's folder.
 				findBases( t.BaseClass, false ) -- Seach our base's base for modules.
 			end
@@ -369,9 +400,6 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 			if v.Init then
 				v:Init()
 			end
-			if v.Initialize then
-				v:Initialize()
-			end
 			if v.AutoHook then
 				v:__GenerateHooks()
 			end
@@ -387,10 +415,96 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 		ClientSideModulePaths = nil
 		ServerSideModulePaths = nil
 		hook = moduleHook
+		require = moduleRequire
 		
 	end
 	
 	InitWrapper()
 	
 end
+
+// GetModuleInfo - Grabs the module info and converts it to a string.
+local function GetModuleInfo( modName, member )
+	local mod = NARWHAL.GetModule( modName, true )
+	if !mod then
+		print( "Module "..modName.." is invalid! It may be disabled." )
+		return
+	end
+	local function searchTable( t, tabs, str )
+		tabs = tabs or 0
+		str = str or ""
+		local tabString = ""
+		if tabs > 1 then
+			for i = 1, tabs do
+				tabString = tabString.."\t"
+			end
+		end
+		for k, v in pairs( t ) do
+			if type(v) == "table" then
+				str = str..tabString..k..":\n"..searchTable( t, tabs+1 ).."\n"
+			else
+				str = str..tabString..k.."\t=\t"..tostring(v).."\n"
+			end
+		end
+		return str
+	end
+	local outInfo = modName..":\n\t"
+	local name, author, contact, purpose, configname, protect, autohook = mod.Title, mod.Author, mod.Contact, mod.Purpose, mod.ConfigName, mod.Protect, mod.AutoHook
+	if member then
+		if !mod[member] then
+			print( "Module "..modName.." does not have a table member by the name of '"..member.."'!" )
+			return
+		end
+		local mstring = ""
+		if type(mod[member]) == "table" then
+			mstring = searchTable( mod[member] )
+		else
+			mstring = tostring( mod[member] )
+		end
+		print( modName.."["..member.."]:\t"..mstring )
+	end
+	outInfo = outInfo.."\tModule Name:\t"..name.."\n"
+	if author and author != "" then
+		outInfo = outInfo.."\tAuthor Name:\t"..author.."\n"
+	end
+	if contact and contact != "" then
+		outInfo = outInfo.."\tAuthor Contact:\t"..contact.."\n"
+	end
+	if purpose and purpose != "" then
+		outInfo = outInfo.."\tModule Purpose:\t"..purpose.."\n"
+	end
+	if configname and configname != "" then
+		outInfo = outInfo.."\tModule Configuration Name:\t"..configname.."\n"
+	end
+	if protect != nil then
+		outInfo = outInfo.."\tProtection Status:\t"..( ( protect and "Protected" ) or "Unprotected" ).."\n"
+	end
+	if autohook != nil then
+		outInfo = outInfo.."\tAutoHook Status:\t"..( ( autohook and "Enabled" ) or "Disabled" ).."\n"
+	end
+	if mod.Config and table.Count( mod.Config ) >= 1 then
+		outInfo = outInfo.."\tModule Configurations:\n"..searchTable( mod.Config, 2 ).."\n"
+	end
+	if mod.Dependency and table.Count( mod.Dependency ) >= 1 then
+		outInfo = outInfo.."\tModule Dependencies:\n"..searchTable( mod.Dependency, 2 ).."\n"
+	end
+	return outInfo
+end
+
+// ConCommand "narwhal_module": Prints a list of registered modules and their info in console when there are no args.
+// If you specify a module name as the first arg, it will only print that module's info.
+// If you specify a table member as the second arg, it will only print the data from that member of the specified module in console.
+local function ListModules( ply, cmd, args )
+	if args[1] and NARWHAL.GetModule( args[1], true ) then
+		print( GetModuleInfo( args[1], args[2] ) )
+	else
+		local str = "Listing Narwhal Modules:\n"
+		for k, v in pairs( NARWHAL.GetModules() ) do
+			str = str..GetModuleInfo( k ).."\n"
+		end
+		print(str)
+	end
+end
+concommand.Add( "narwhal_module", ListModules )
+
 

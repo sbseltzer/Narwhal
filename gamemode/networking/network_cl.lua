@@ -47,16 +47,13 @@ function NARWHAL:FetchNetworkedVariable( Ent, Name, Var, storageType )
 	
 	if !NARWHAL.__NetworkCache[storageDest] then
 		NARWHAL.__NetworkCache[storageDest] = {}
+	end
+	if !NARWHAL.__NetworkCache[storageDest][ID] then
 		NARWHAL.__NetworkCache[storageDest][ID] = {}
-		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
-	elseif !NARWHAL.__NetworkCache[storageDest][ID] then
-		NARWHAL.__NetworkCache[storageDest][ID] = {}
-		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
-	elseif !NARWHAL.__NetworkCache[storageDest][ID][Name] then
-		NARWHAL.__NetworkCache[storageDest][ID][Name] = {}
-		if !Var then
-			ErrorNoHalt( "Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed. Client must not be in the serverside filter for this variable.\n" )
-			return
+	end
+	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
+		if Var == nil then
+			error( "Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed. Are they in the network filter for this variable?\n" )
 		end
 		NARWHAL:SendNetworkedVariable( Ent, Name, Var, storageType )
 		return Var

@@ -1,0 +1,2 @@
+This is where you put your clientside-only modules.
+They will be included and AddCSLuaFile'd automatically.

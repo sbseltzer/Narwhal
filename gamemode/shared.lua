@@ -15,7 +15,8 @@ include( 'includes_shd.lua' )
 
 DeriveGamemode( NARWHAL_DERIVATIVE or "base" )
 
-// We're gonna cheat and re-register the gamemode ;D
+// We're gonna cheat and re-register the gamemode with your base of choice ;D
+// What this means is you can port just about any gamemode to narwhal by changing just a few lines.
 if NARWHAL_DERIVATIVE and NARWHAL_DERIVATIVE:lower() != "base" and NARWHAL_DERIVATIVE:lower() != NARWHAL_FOLDER then
 	Msg( "Re-registering gamemode '"..NARWHAL_FOLDER.."' derived from '"..NARWHAL_DERIVATIVE.."'\n" )
 	gamemode.Register( GM, NARWHAL_FOLDER, NARWHAL_DERIVATIVE )
@@ -30,6 +31,11 @@ GM.Author 		= "Team GModCentral"
 GM.Email 		= "team@gmodcentral.com"
 GM.Website 		= "www.gmodcentral.com"
 GM.TeamBased 	= false
+GM.__IsNarwhalGamemode = true
+
+function GM:IsNarwhalGamemode()
+	return GAMEMODE.__IsNarwhalGamemode
+end
 
 /*---------------------------------------------------------
    Name: LoadModules
