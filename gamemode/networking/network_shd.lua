@@ -4,11 +4,24 @@
 	
 	This file has our shared networking tables and entity methods.
 	
-	Note: This may need some cleaning up.
+	SUPPORTED DATATYPES:
+		Ints
+		Floats
+		Strings
+		Booleans
+		Vectors
+		Angles
+		Colors
+		Entities
+		CEffectData
+		CTakeDamageInfo
+		Tables
+	You can define your own datatypes too.
+	
+	Special thanks to Tobba for helping optimize this.
 
 ---------------------------------------------------------*/
 
-// Declare frequently used globals as locals to enhance performance
 local string = string
 local table = table
 local math = math
@@ -26,7 +39,7 @@ local Entity = Entity
 local NullEntity = NullEntity
 
 if SERVER then
-	// Network enums
+	// Network enums. They're really just for the server.
 	_E["NARWHAL_NW_ALL"] = 0
 	_E["NARWHAL_NW_SELF"] = 1
 	_E["NARWHAL_NW_TEAM"] = 2
@@ -58,18 +71,19 @@ function NARWHAL:GetNetworkData()
 	return NARWHAL.__NetworkData
 end
 
-// This can be used to add custom datatypes. This could be useful on a per-gamemode basis. It would allow developers to design their own ways of sending data.
+// This can be used to add custom datatypes. This can be useful on a per-gamemode basis.
+// It allows developers to design their own ways of sending data. Think of them as glorified usermessages with their own sending and fetching utils.
 // Every time we send data, it follows a general pattern:
-// Check to see if the data is valid within the context of the variable, Encode it somehow, Send that encoded data via usermessages, and then Retrieving that data on the client.
+// Check to see if the data is valid, encode/send the data via usermessages, and then recieve/decode the data on the client.
 function NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
 	local tData = {}
-	tData["Ref"] = sRef
-	tData["Storage"] = sStore
+	tData["Ref"] = sRef -- The reference name. Used for creating the Send/Fetch utils and used in networking error messages.
+	tData["Storage"] = sStore -- The unique name of the storage location within the NetworkCache table.
 	if SERVER then
-		tData["Func_Check"] = funcCheck
-		tData["Func_Send"] = funcSend
+		tData["Func_Check"] = funcCheck -- Used for checking the validity of the var before sending it.
+		tData["Func_Send"] = funcSend -- Used for sending the var.
 	elseif CLIENT then
-		tData["Func_Read"] = funcRead
+		tData["Func_Read"] = funcRead -- Used for reading the var.
 	end
 	NARWHAL.__NetworkData[sType] = tData
 	NARWHAL.__NetworkTypeID[#NARWHAL.__NetworkTypeID + 1] = sType
@@ -78,6 +92,11 @@ function NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, 
 		NARWHAL.__NetworkCache[sStore] = {}
 	end
 end
+
+// This removes all vars that belong to deleted entities.
+hook.Add( "EntityRemoved", "NARWHAL.EntityRemoved.RemoveNWVars", function( ent )
+	NARWHAL:RemoveNetworkedVariables( ent )
+end )
 
 // Here's our internal configuration loading. Devs can load their own in the other function.
 hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function()
@@ -95,7 +114,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	NARWHAL:AddValidNetworkType( "string", "String", "Strings",
 		function( var )
 			local vType = type( var )
-			if vType != "string" and vType != "number" then
+			if vType != "string" and vType != "number" and !tostring( var ) then
 				error( "Bad argument #2 (String expected, got "..vType..")\n", 2 )
 			end
 			return tostring( var )
@@ -155,11 +174,11 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 			return var
 		end,
 		function( var )
-			local vType = type( var )
-			if vType == "Entity" then
+			local vType = type( var ):lower()
+			if vType == "entity" or vType == "weapon" or vType == "vehicle" then
 				umsg.Char(0)
 				umsg.Short(var:EntIndex())
-			elseif vType == "Player" then
+			elseif vType == "player" then
 				umsg.Char(1)
 				umsg.Short(var:UserID()-32770)
 			end
@@ -167,7 +186,6 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 		function( um )
 			local entType = um:ReadChar()
 			local entID = 0
-
 			if entType == 0 then
 				return Entity( um:ReadShort() )
 			elseif entType == 1 then
@@ -180,7 +198,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 					end
 				end
 			else
-				error("Fatal error receiving entity(invalid type)")
+				error( "Fatal error receiving entity (invalid type)\n", 2 )
 			end
 			return NullEntity()
 		end
@@ -287,7 +305,10 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 				if v:sub(1,2) == "Is" then
 					t[k] = var[v]( var )
 				else
-					t[k] = var["Get"..v]( var )
+					local val = var["Get"..v]( var )
+					if val then
+						t[k] = var["Get"..v]( var )
+					end
 				end
 			end
 			return glon.encode( t )
@@ -309,10 +330,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 		end
 	)
 
-	// Call the developer function if applicable
-	if NARWHAL.LoadNetworkConfigurations then
-		NARWHAL:LoadNetworkConfigurations()
-	end
+	gamemode.Call( "LoadNetworkConfigurations" ) -- Call the developer function
 	
 	local ENTITY = FindMetaTable( "Entity" ) -- Here is the entity metatable. This lets us add methods to all entities.
 	if !ENTITY then return end -- No entity metatable? That's not good...

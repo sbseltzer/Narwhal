@@ -4,6 +4,7 @@
 	
 	Narwhal Themes are basically like Derma Skins, but
 	applied to the Gamemode as a whole.
+	They're loaded pretty much the same way as modules.
 	
 ---------------------------------------------------------*/
 
@@ -13,7 +14,7 @@ local Loaded, NotLoaded, ThemeFolders
 local themeHook = hook
 
 // Gets the theme data
-function NARWHAL:GetTheme( themeName )
+function NARWHAL.GetTheme( themeName )
 	if !NARWHAL.__ThemeList[themeName] then
 		return
 	end
@@ -33,10 +34,10 @@ end
 // Sets the gamemode theme
 function NARWHAL:SetTheme( themeName )
 	if !themeName then return end
-	local currentTheme, newTheme = NARWHAL:GetTheme( NARWHAL:CurrentTheme() ), NARWHAL:GetTheme( themeName )
+	local currentTheme, newTheme = NARWHAL.GetTheme( NARWHAL.__CurrentTheme ), NARWHAL.GetTheme( themeName )
 	if !newTheme then return end
 	if currentTheme then
-		if !NARWHAL:ThemeChanged( NARWHAL:CurrentTheme(), themeName ) then
+		if !gamemode.Call( "ThemeChanged", NARWHAL.__CurrentTheme, themeName ) then
 			return
 		end
 		if currentTheme.OnThemeChanged then
@@ -273,9 +274,11 @@ local function LoadThemes( PathList ) -- PathList is a list of theme paths
 	
 end
 
+// Set the theme on Initialize
 hook.Add( "Initialize", "NARWHAL.Initialize.SetDefaultTheme", function()
-	if !NARWHAL:GetTheme( NARWHAL:ForceTheme() ) then return end
-	NARWHAL:SetTheme( NARWHAL:ForceTheme() )
+	if !NARWHAL.Config.UseThemes then print("Narwhal Themes are disabled.") return end
+	if !NARWHAL:GetTheme( gamemode.Call( "ForceTheme" ) ) then return end
+	NARWHAL:SetTheme( gamemode.Call( "ForceTheme" ) )
 end )
 
 function IncludeNarwhalThemes()

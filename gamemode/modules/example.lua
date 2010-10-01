@@ -29,9 +29,11 @@ MODULE.Author = "Grea$eMonkey" -- Author's name.
 MODULE.Contact = "geekwithalife@gmail.com" -- Author's contact.
 MODULE.Purpose = "Whatever you want." -- Short description of the module's purpose.
 --MODULE.ConfigName = "UseExampleModule" -- If you add this, you can disable the module from being loaded on startup by changing NARWHAL.Config["UseExampleModule"] to false. This must be unique!
--- The next two variables are predefined, and true by default. Do not change them unless you need to.
---MODULE.Protect = false -- Change to false if you don't want module functions pcall'd. It is recommended to leave this true. See Part 4 to see how module methods work.
---MODULE.AutoHook = false -- Change to false if you don't want your module methods with gamemode hook names to be autohooked. See Part 5 to learn about how module hooks work.
+
+-- The next three variables are predefined. Do not change them unless you need to.
+--MODULE.Protect = false -- Change to false if you don't want module functions pcall'd. It is recommended to not touch this. See Part 4 to see how module methods work.
+--MODULE.AutoHook = false -- Change to false if you don't want your module methods with gamemode hook names to be hooked. See Part 5 to learn about how module hooks work.
+--MODULE.ManualHook = true -- Change to true if you don't want your module hooks to be automatically hooked on load. See Part 5 to learn about how module hooks work.
 
 -- Part 2: Adding dependencies
 
@@ -87,7 +89,7 @@ function MODULE:AddNumbers( num1, num2 )
 	-- In this function we have num1 and num2, and we're going to find their sum. Simple, eh?
 	-- Let's make sure we're dealing with valid numbers before adding. If one of the arguments isn't a number, we'll throw an error.
 	if !tonumber(num1) or !tonumber(num2) then
-		error( "MODULE.AddNumbers failed: Invalid arguments!\n" )
+		error( "MODULE.AddNumbers failed: Invalid arguments!\n", 2 )
 	end
 	return num1 + num2
 end
@@ -117,8 +119,9 @@ local function SomeThinkHook()
 		print( "Module example_module is thinking!" )
 	end
 end
--- You're not allowed to use hook.Add in modules! How else can we encapsulate it for you?
--- The hook library is nil while modules are loading.
+-- You're not allowed to use hook.Add in modules! How else can we encapsulate it for you? The hook library is nil while modules are loading.
+-- IMPORTANT: When you call MODULE.Hook, it doesn't ACTUALLY hook it, it just adds it to a list of hooks.
+-- When modules are finished loading, the list of hooks will be hooked for real unless MODULE.ManualHook is true.
 -- Note: Narwhal module hooks take the unique name and combine it with the module name and a few other things to ensure uniqueness. Don't be afraid to have simple hook names.
 MODULE:Hook( "Think", "ModuleThinkHook", SomeThinkHook )
 

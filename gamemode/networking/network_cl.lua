@@ -7,7 +7,8 @@
 
 ---------------------------------------------------------*/
 
-// Declare frequently used globals as locals to enhance performance
+include( "network_shd.lua" )
+
 local timer = timer
 local string = string
 local usermessage = usermessage
@@ -61,6 +62,15 @@ function NARWHAL:FetchNetworkedVariable( Ent, Name, Var, storageType )
 	
 	return NARWHAL.__NetworkCache[storageDest][ID][Name]
 	
+end
+
+// Removes network cache for the ent
+function NARWHAL:RemoveNetworkedVariables( Ent )
+	for k, v in pairs( NARWHAL.__NetworkData ) do
+		if NARWHAL.__NetworkCache[v.Storage][Ent:GetNetworkID()] then
+			NARWHAL.__NetworkCache[v.Storage][Ent:GetNetworkID()] = nil
+		end
+	end
 end
 
 // Usermessage Hooks

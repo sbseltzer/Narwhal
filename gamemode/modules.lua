@@ -3,42 +3,38 @@
 
 	Developer's Notes:
 	
-	We had a serious problem before. Since Clientside files
-	are added to a cache and then deleted from the client's
-	temp folder, there was no way for us to read their
-	plain text for dependency detection.
+	We had a serious problem before. We wanted to pcall file
+	inclusion, but pcall doesn't work on include. The only 
+	function we could find was CompileString, but that 
+	required having the plaintext of the file.
+	Since Clientside files are added to a cache and then
+	cleared from the client's temp folder, there was no way
+	for us to effectively read their plain text for protected
+	compilation.
 	
 	We had 3 solutions:
 		1. Copy them into text files and send those to the
-		   client for later reading. Any files that are included
+		   client for reading. Any files that are included
 		   and AddCSLuaFile'd to those client files would be read
 		   and manually inserted into the code string for compiling.
 		2. Send the code directly to the client via datastream
 		   for compiling.
 		3. Host the files online and use http.Get for compiling.
+	None of which were ideal.
 	
-	We chose none-of-the-above for the time being. For now
-	we will just be including and AddCSLuaFile'ing since
-	it currently poses no significant threat to the script.
+	We decided to leave it be and just do normal including and
+	AddCSLuaFile'ing since it currently poses no significant
+	threat to the script.
 	
-	Instead we just load the files and detect the dependencies
-	through tables and then load in the appropriate order.
+	Special thanks to Ryaga for helping design this system.
 	
-	1. We search the modules folder for clientside, serverside, and shared modules
-	2. We add their paths to the respective tables, adding shared ones to both client and server path tables.
-	3. We load the modules in the clientside and serverside paths table on gamemode load by reading the serverside code directly from the lua files.
-	4. Any files that don't have all their dependencies loaded get added to a table for later handling, and then loading as soon as all their dependencies exist.
-	5. This is repeated until all valid files are loaded.
-	
-	Thank you Ryaga for helping with this system.
-
 ---------------------------------------------------------*/
 
 
 // I'm a fan of micro-optimization. I don't care what respectable programmer periodicals say.
-// In Lua, calling and running a local function is performed 30% faster than calling and running a global function of the same contents.
+// In Lua, calling a local function is performed 30% faster than calling an identical global function.
 // Therfore, declaring our globals as locals will mean those functions will run 30% faster than normal.
-// The difference can be negligable based on the circumstance, but whatever.
+// The difference can be negligable based on how frequently it's called, but whatever.
 local table = table
 local file = file
 local setmetatable = setmetatable
@@ -64,10 +60,12 @@ end
 
 // Gets the module data from the module table
 function NARWHAL.GetModule( moduleName, opRef )
+	if !moduleName then return end
 	if !NARWHAL.__ModuleList[moduleName] then
 		error( "NARWHAL.GetModule Failed: Module "..moduleName.." does not exist!\n", 2 )
 	elseif NARWHAL.__ModuleList[moduleName].__Disabled then
-		error( "NARWHAL.GetModule Failed: Module "..moduleName.." is disabled!\n", 2 )
+		Msg( "NARWHAL.GetModule Failed: Module "..moduleName.." is disabled!\n" )
+		return
 	end
 	if opRef then
 		return NARWHAL.__ModuleList[moduleName]
@@ -82,6 +80,7 @@ local function CreateModuleTable()
 	MODULE.Config = {}
 	MODULE.Dependency = {}
 	MODULE.AutoHook = true
+	MODULE.ManualHook = false
 	MODULE.Protect = true
 	MODULE.__ModuleHooks = nil
 	MODULE.__Dependencies = nil
@@ -198,7 +197,7 @@ local function CreateModuleTable()
 		local hooks = moduleHook.GetTable()
 		for k, v in pairs( self ) do
 			if type(v) == "function" and hooks[k] then
-				self:Hook( k, "BaseFunction_"..k, v, self.AutoHook )
+				self:Hook( k, "BaseFunction_"..k, v )
 			end
 		end
 	end
@@ -400,6 +399,9 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 			if v.Init then
 				v:Init()
 			end
+			if !v.ManualHook then
+				v:HookAll()
+			end
 			if v.AutoHook then
 				v:__GenerateHooks()
 			end
@@ -425,10 +427,10 @@ end
 
 // GetModuleInfo - Grabs the module info and converts it to a string.
 local function GetModuleInfo( modName, member )
-	local mod = NARWHAL.GetModule( modName, true )
-	if !mod then
+	local mod = NARWHAL.__ModuleList[modName]
+	if !mod or mod.__Disabled then
 		print( "Module "..modName.." is invalid! It may be disabled." )
-		return
+		return 
 	end
 	local function searchTable( t, tabs, str )
 		tabs = tabs or 0
@@ -448,8 +450,8 @@ local function GetModuleInfo( modName, member )
 		end
 		return str
 	end
-	local outInfo = modName..":\n\t"
-	local name, author, contact, purpose, configname, protect, autohook = mod.Title, mod.Author, mod.Contact, mod.Purpose, mod.ConfigName, mod.Protect, mod.AutoHook
+	local outInfo = modName..":\n"
+	local name, author, contact, purpose, configname, protect, autohook, manhook = mod.Title, mod.Author, mod.Contact, mod.Purpose, mod.ConfigName, mod.Protect, mod.AutoHook, mod.ManualHook
 	if member then
 		if !mod[member] then
 			print( "Module "..modName.." does not have a table member by the name of '"..member.."'!" )
@@ -463,18 +465,18 @@ local function GetModuleInfo( modName, member )
 		end
 		print( modName.."["..member.."]:\t"..mstring )
 	end
-	outInfo = outInfo.."\tModule Name:\t"..name.."\n"
+	outInfo = outInfo.."\tModule Name:\t\t"..name.."\n"
 	if author and author != "" then
-		outInfo = outInfo.."\tAuthor Name:\t"..author.."\n"
+		outInfo = outInfo.."\tAuthor Name:\t\t"..author.."\n"
 	end
 	if contact and contact != "" then
-		outInfo = outInfo.."\tAuthor Contact:\t"..contact.."\n"
+		outInfo = outInfo.."\tAuthor Contact:\t\t"..contact.."\n"
 	end
 	if purpose and purpose != "" then
-		outInfo = outInfo.."\tModule Purpose:\t"..purpose.."\n"
+		outInfo = outInfo.."\tModule Purpose:\t\t"..purpose.."\n"
 	end
 	if configname and configname != "" then
-		outInfo = outInfo.."\tModule Configuration Name:\t"..configname.."\n"
+		outInfo = outInfo.."\tModule Config Name:\t"..configname.."\n"
 	end
 	if protect != nil then
 		outInfo = outInfo.."\tProtection Status:\t"..( ( protect and "Protected" ) or "Unprotected" ).."\n"
@@ -482,8 +484,11 @@ local function GetModuleInfo( modName, member )
 	if autohook != nil then
 		outInfo = outInfo.."\tAutoHook Status:\t"..( ( autohook and "Enabled" ) or "Disabled" ).."\n"
 	end
+	if manhook != nil then
+		outInfo = outInfo.."\tManualHook Status:\t"..( ( manhook and "Enabled" ) or "Disabled" ).."\n"
+	end
 	if mod.Config and table.Count( mod.Config ) >= 1 then
-		outInfo = outInfo.."\tModule Configurations:\n"..searchTable( mod.Config, 2 ).."\n"
+		outInfo = outInfo.."\tModule Config:\n"..searchTable( mod.Config, 2 ).."\n"
 	end
 	if mod.Dependency and table.Count( mod.Dependency ) >= 1 then
 		outInfo = outInfo.."\tModule Dependencies:\n"..searchTable( mod.Dependency, 2 ).."\n"
@@ -499,8 +504,12 @@ local function ListModules( ply, cmd, args )
 		print( GetModuleInfo( args[1], args[2] ) )
 	else
 		local str = "Listing Narwhal Modules:\n"
+		local info
 		for k, v in pairs( NARWHAL.GetModules() ) do
-			str = str..GetModuleInfo( k ).."\n"
+			info = GetModuleInfo( k )
+			if info then
+				str = str..info.."\n"
+			end
 		end
 		print(str)
 	end

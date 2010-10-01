@@ -5,21 +5,12 @@
 	Serverside Networking.
 	This sends and synchronizes info to the client.
 	
-	SUPPORTED DATATYPES:
-		Numbers (Ints and Floats)
-		Strings
-		Booleans
-		Vectors
-		Angles
-		Colors
-		Entities
-		CEffectData
-		Tables
-	TODO:
-		
 ---------------------------------------------------------*/
 
-// Declare frequently used globals as locals to enhance performance
+include( "network_shd.lua" )
+AddCSLuaFile( "network_shd.lua" )
+AddCSLuaFile( "network_cl.lua" )
+
 local team = team
 local umsg = umsg
 local table = table
@@ -353,4 +344,5 @@ end )
 hook.Add( "PlayerDisconnected", "NARWHAL.PlayerDisconnected.RemoveNWVars", function( player )
 	NARWHAL:RemoveNetworkedVariables( player )
 end )
+
 
