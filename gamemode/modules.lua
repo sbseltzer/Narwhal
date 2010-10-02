@@ -152,14 +152,9 @@ local function CreateModuleTable()
 	
 	// Adds a hook for the specified module.
 	function MODULE:Hook( hookName, uniqueName, func, hookForReal )
-		self = self or MODULE
 		if !self or type(self) != "table" then print( "Failed to do MODULE:Hook(...). Are you sure you didn't do MODULE.Hook(...)?" ) return end
 		if !self.__ModuleHooks then
 			self.__ModuleHooks = {}
-		end
-		if !hookForReal then
-			table.insert( self.__ModuleHooks, { hookName, uniqueName, func } )
-			return
 		end
 		local isMember = false
 		for k, v in pairs( self ) do
@@ -172,15 +167,20 @@ local function CreateModuleTable()
 			end
 		end
 		if isMember then
-			moduleHook.Add( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName, function( ... ) return func( self, ... ) end )
+			func = function( ... ) return func( self, ... ) end
 		else
-			moduleHook.Add( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName, function( ... ) return func( ... ) end )
+			func = function( ... ) return func( ... ) end
 		end
+		if !hookForReal then
+			table.insert( self.__ModuleHooks, { hookName, uniqueName, func } )
+			return
+		end
+		moduleHook.Add( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName, func )
 	end
 	
 	// Removes a hook for the specified module.
 	function MODULE:UnHook( hookName, uniqueName, unhookForReal )
-		local self = self or MODULE
+		if !self or type(self) != "table" then print( "Failed to do MODULE:UnHook(...). Are you sure you didn't do MODULE.UnHook(...)?" ) return end
 		if unhookForReal then
 			for k, v in pairs( self.__ModuleHooks ) do
 				if v[1] == hookName and v[2] == uniqueName then
@@ -204,18 +204,16 @@ local function CreateModuleTable()
 	
 	// Adds a hook for the specified module.
 	function MODULE:HookAll()
-		local self = self or MODULE
 		if !self.__ModuleHooks then
 			return
 		end
 		for k, v in pairs( self.__ModuleHooks ) do
-			self:Hook( unpack( v ), true )
+			moduleHook.Add( v[1], v[2], v[3] )
 		end
 	end
 	
 	// Removes a hook for the specified module.
 	function MODULE:UnHookAll()
-		local self = self or MODULE
 		if !self.__ModuleHooks then
 			return
 		end
@@ -393,19 +391,19 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 
 		for k, v in pairs( NARWHAL.__ModuleList ) do
 		
-			if v.Config and NARWHAL.Config.Modules[k] then
+			if v.Config != nil and NARWHAL.Config.Modules[k] then
 				NARWHAL.__ModuleList[k].Config = NARWHAL.Config.Modules[k]
 			end
-			if v.Init then
+			if v.Init != nil then
 				v:Init()
 			end
-			if !v.ManualHook then
+			if v.ManualHook == false then
 				v:HookAll()
 			end
-			if v.AutoHook then
+			if v.AutoHook == true then
 				v:__GenerateHooks()
 			end
-			if v.Protect then
+			if v.Protect == true then
 				v:__GenerateFunctionCalls()
 			end
 			

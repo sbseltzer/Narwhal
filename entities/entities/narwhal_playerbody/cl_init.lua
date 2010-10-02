@@ -2,7 +2,7 @@ include('shared.lua')
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-local PLAYER, bIndex, bIndex2, matrix, matrix2
+local PLAYER --[[, bIndex, bIndex2 , matrix, matrix2
 local BONES = {
 	"ValveBiped.Bip01_Head1",
 	"ValveBiped.Bip01_Head2",
@@ -23,7 +23,7 @@ local BONES = {
 	"ValveBiped.Bip01_R_Shoulder",
 	"ValveBiped.Bip01_L_Elbow",
 	"ValveBiped.Bip01_R_Elbow"
-}
+}]]
 function ENT:Draw()
 	
 	PLAYER = self.Entity:GetParent()

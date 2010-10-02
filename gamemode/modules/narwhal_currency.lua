@@ -21,6 +21,7 @@ end
 
 // Called one time after the module has loaded.
 function MODULE:Initialize()
+	print( self.Name, "WWOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" )
 	self:CreateCurrency( "narwhal", "Narwhal_SetCurrency", "Narwhal_GetCurrency", "Narwhal_AddCurrency", "Narwhal_TakeCurrency", "Narwhal_GiveCurrency" )
 end
 
