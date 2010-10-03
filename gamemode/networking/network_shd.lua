@@ -422,7 +422,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 			local fArgs = {...}
 			local t = { pcall( function() return NARWHAL:FetchNetworkedVariable( self, Name, Var, k, Filter, unpack(fArgs) ) end ) }
 			local b, e = unpack(t)
-			if !b then
+			if !b and e:find("Fetching") then
 				local exp = string.Explode( ":", string.Explode( "\n", debug.traceback() )[3] )
 				ErrorNoHalt( "[@"..exp[1]:gsub( "%c", "" )..":"..exp[2].."] "..e:sub( e:find("Fetching"), e:len() ) )
 			else
