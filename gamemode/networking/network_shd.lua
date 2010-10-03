@@ -75,10 +75,11 @@ end
 // It allows developers to design their own ways of sending data. Think of them as glorified usermessages with their own sending and fetching utils.
 // Every time we send data, it follows a general pattern:
 // Check to see if the data is valid, encode/send the data via usermessages, and then recieve/decode the data on the client.
-function NARWHAL:AddValidNetworkType( sType, sRef, sStore, funcCheck, funcSend, funcRead )
+function NARWHAL:AddValidNetworkType( sType, sRef, sStore, vDefault, funcCheck, funcSend, funcRead )
 	local tData = {}
 	tData["Ref"] = sRef -- The reference name. Used for creating the Send/Fetch utils and used in networking error messages.
 	tData["Storage"] = sStore -- The unique name of the storage location within the NetworkCache table.
+	tData["DefaultValue"] = vDefault -- When Var is nil, return default
 	if SERVER then
 		tData["Func_Check"] = funcCheck -- Used for checking the validity of the var before sending it.
 		tData["Func_Send"] = funcSend -- Used for sending the var.
@@ -104,14 +105,14 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	// CONFIGURE OUR DEFAULT DATATYPES
 	
 	// BOOLEANS
-	NARWHAL:AddValidNetworkType( "boolean", "Bool", "Booleans",
+	NARWHAL:AddValidNetworkType( "boolean", "Bool", "Booleans", false,
 		function( var ) return tobool( var ) end,
 		function( var ) umsg.Bool( var ) end,
 		function( um ) return um:ReadBool() end
 	)
 
 	// STRINGS
-	NARWHAL:AddValidNetworkType( "string", "String", "Strings",
+	NARWHAL:AddValidNetworkType( "string", "String", "Strings", "",
 		function( var )
 			local vType = type( var )
 			if vType != "string" and vType != "number" and !tostring( var ) then
@@ -124,7 +125,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// INTEGERS
-	NARWHAL:AddValidNetworkType( "integer", "Int", "Integers",
+	NARWHAL:AddValidNetworkType( "integer", "Int", "Integers", 0,
 		function( var )
 			if !tonumber( var ) then
 				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
@@ -153,7 +154,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// FLOATS
-	NARWHAL:AddValidNetworkType( "float", "Float", "Floats",
+	NARWHAL:AddValidNetworkType( "float", "Float", "Floats", 0,
 		function( var )
 			if !tonumber( var ) then
 				error( "Bad argument #2 (Number expected, got "..type( var )..")\n", 2 )
@@ -165,7 +166,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// ENTITIES	
-	NARWHAL:AddValidNetworkType( "entity", "Entity", "Entities",
+	NARWHAL:AddValidNetworkType( "entity", "Entity", "Entities", NullEntity(),
 		function( var )
 			local vType = type( var ):lower()
 			if vType != "entity" and vType != "player" and vType != "weapon" and vType != "vehicle" then
@@ -205,7 +206,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// COLORS
-	NARWHAL:AddValidNetworkType( "color", "Color", "Colors",
+	NARWHAL:AddValidNetworkType( "color", "Color", "Colors", color_white,
 		function( var )
 			if type( var ) != "table" then
 				error( "Bad argument #2 (Color table expected, got "..type( var )..")\n", 2 )
@@ -232,7 +233,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// VECTORS
-	NARWHAL:AddValidNetworkType( "vector", "Vector", "Vectors",
+	NARWHAL:AddValidNetworkType( "vector", "Vector", "Vectors", vector_origin,
 		function( var )
 			if type( var ) != "vector" then
 				error( "Bad argument #2 (Vector expected, got "..type( var )..")\n", 2 )
@@ -244,7 +245,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// ANGLES
-	NARWHAL:AddValidNetworkType( "angle", "Angle", "Angles",
+	NARWHAL:AddValidNetworkType( "angle", "Angle", "Angles", angle_zero,
 		function( var )
 			if type( var ) != "angle" then
 				error( "Bad argument #2 (Angle expected, got "..type( var )..")\n", 2 )
@@ -256,7 +257,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// TABLES
-	NARWHAL:AddValidNetworkType( "table", "Table", "Tables",
+	NARWHAL:AddValidNetworkType( "table", "Table", "Tables", {},
 		function( var )
 			if type( var ) != "table" then
 				error( "Bad argument #2 (Table expected, got "..type( var )..")\n", 2 )
@@ -268,7 +269,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// EFFECTS
-	NARWHAL:AddValidNetworkType( "ceffectdata", "Effect", "Effects",
+	NARWHAL:AddValidNetworkType( "ceffectdata", "Effect", "Effects", EffectData(),
 		function( var )
 			if type( var ) != "CEffectData" then
 				error( "Bad argument #2 (CEffectData expected, got "..type( var )..")\n", 2 )
@@ -295,7 +296,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 		l = "IsFallDamage"
 	}
 	// DAMAGE
-	NARWHAL:AddValidNetworkType( "ctakedamageinfo", "DamageInfo", "DamageInfo",
+	NARWHAL:AddValidNetworkType( "ctakedamageinfo", "DamageInfo", "DamageInfo", DamageInfo(),
 		function( var )
 			if type( var ) != "CTakeDamageInfo" then
 				error( "Bad argument #2 (CTakeDamageInfo expected, got "..type( var )..")\n", 2 )
@@ -370,7 +371,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 				error( "SendNetworked"..v.Ref.." Failed: Entity expected, got "..entType.."\n", 2 )
 			elseif !Name then
 				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
-			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
+			elseif Name:find("[%?\"'<>|%c]") or Name:find(" ") then
 				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Name contains invalid characters!)\n", 2 )
 			elseif Var == nil then
 				error( "SendNetworked"..v.Ref.." Failed: Bad argument #2 (Attempted to use nil variable!)\n", 2 )
@@ -390,7 +391,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 			local fArgs = {...}
 			local t = { pcall( function() NARWHAL:SendNetworkedVariable( self, Name, Var, k, Filter, unpack(fArgs) ) end ) }
 			local b, e = unpack(t)
-			if !b then
+			if !b and e:find("Sending") then
 				local exp = string.Explode( ":", string.Explode( "\n", debug.traceback() )[3] )
 				ErrorNoHalt( "[@"..exp[1]:gsub( "%c", "" )..":"..exp[2].."] "..e:sub( e:find("Sending"), e:len() ) )
 			end
@@ -402,8 +403,8 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 				error( "FetchNetworked"..v.Ref.." Failed: Entity expected, got "..entType.."\n", 2 )
 			elseif !Name then
 				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (String or Number expected, got "..type( Name )..")\n", 2 )
-			elseif Name:find('[\\/:%*%?"<>|]') or Name:find(" ") then
-				error( "SendNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Name contains invalid characters!)\n", 2 )
+			elseif Name:find("[%?\"'<>|%c]") or Name:find(" ") then
+				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #1 (Variable Name contains invalid characters!)\n", 2 )
 			elseif Filter and type( Filter ):lower() != "player" and type( Filter ) != "table" and ( type( Filter ) == "number" and ( Filter < 0 or Filter > 4 ) ) and type( Filter ) != "function" then
 				error( "FetchNetworked"..v.Ref.." Failed: Bad argument #3 (Function, Enum, Player, or Table of Players expected, got "..type( Filter )..")\n", 2 )
 			elseif Filter and type( Filter ) == "table" then

@@ -77,6 +77,7 @@ end
 local function CreateModuleTable()
 	
 	local MODULE = {}
+	
 	MODULE.Config = {}
 	MODULE.Dependency = {}
 	MODULE.AutoHook = true
@@ -84,6 +85,7 @@ local function CreateModuleTable()
 	MODULE.Protect = true
 	MODULE.__ModuleHooks = nil
 	MODULE.__Dependencies = nil
+	MODULE.__Disabled = false
 	MODULE.__Functions = {}
 	MODULE.__Protected = { "Require", "GetDependency", "Hook", "UnHook", "HookAll", "UnHookAll", "__Call", "__GenerateFunctionCalls", "__GenerateHooks" }
 	
@@ -151,45 +153,56 @@ local function CreateModuleTable()
 	end
 	
 	// Adds a hook for the specified module.
-	function MODULE:Hook( hookName, uniqueName, func, hookForReal )
-		if !self or type(self) != "table" then print( "Failed to do MODULE:Hook(...). Are you sure you didn't do MODULE.Hook(...)?" ) return end
-		if !self.__ModuleHooks then
-			self.__ModuleHooks = {}
-		end
-		local isMember = false
+	function MODULE:Hook( hookName, uniqueName, func )
+		
+		if self == nil or type(self) != "table" then print( "Failed to do MODULE:Hook(...). Are you sure you didn't do MODULE.Hook(...)?" ) return end
+		if self.Name == nil or self.Name == "" then print( "Failed to do MODULE:Hook( \""..hookName.."\", \""..uniqueName.."\", "..tostring(func).." ). MODULE.Name is nil." ) return end
+		
+		if self.__ModuleHooks == nil then self.__ModuleHooks = {} end -- Give it a hooks table if there isn't one.
+		if self.__ModuleHooks[hookName] == nil then self.__ModuleHooks[hookName] = {} end
+		
+		func = function( ... ) return func( ... ) end -- Our default function value.
+		
+		// This next part searches the table to see if the function is a member of it.
+		// This will allow us to determine whether we should pass self as a value.
 		for k, v in pairs( self ) do
 			if type(v) == "function" then
-				if v == func then
-					isMember = true
+				if v == func then -- This could be a problem...
+					func = function( ... ) return func( self, ... ) end
 					table.insert( self.__Protected, k )
 					break
 				end
 			end
 		end
-		if isMember then
-			func = function( ... ) return func( self, ... ) end
-		else
-			func = function( ... ) return func( ... ) end
+		
+		// This checks if we already added it to the table.
+		// If it's already in the hooks table, we should overwrite it.
+		local isAdded = false
+		for k, v in pairs( self.__ModuleHooks[hookName] ) do
+			if v[1] == "NARWHAL.Module."..self.Name..".HOOK."..uniqueName then
+				isAdded = true
+				self.__ModuleHooks[hookName][k] = { "NARWHAL.Module."..self.Name..".HOOK."..uniqueName, func }
+				break
+			end
 		end
-		if !hookForReal then
-			table.insert( self.__ModuleHooks, { hookName, uniqueName, func } )
-			return
+		if !isAdded then
+			table.insert( self.__ModuleHooks[hookName], { "NARWHAL.Module."..self.Name..".HOOK."..uniqueName, func } )
 		end
-		moduleHook.Add( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName, func )
+		
 	end
 	
 	// Removes a hook for the specified module.
 	function MODULE:UnHook( hookName, uniqueName, unhookForReal )
 		if !self or type(self) != "table" then print( "Failed to do MODULE:UnHook(...). Are you sure you didn't do MODULE.UnHook(...)?" ) return end
 		if unhookForReal then
-			for k, v in pairs( self.__ModuleHooks ) do
-				if v[1] == hookName and v[2] == uniqueName then
-					table.remove( self.__ModuleHooks, k )
+			for k, v in pairs( self.__ModuleHooks[hookName] ) do
+				if v[1] == uniqueName then
+					table.remove( self.__ModuleHooks[hookName], k )
 					break
 				end
 			end
 		end
-		moduleHook.Remove( hookName, "NARWHAL.__ModuleList."..self.Name..".HOOK."..uniqueName )
+		moduleHook.Remove( hookName, "NARWHAL.Module."..self.Name..".HOOK."..uniqueName )
 	end
 	
 	// Generates autohooks.
@@ -204,11 +217,14 @@ local function CreateModuleTable()
 	
 	// Adds a hook for the specified module.
 	function MODULE:HookAll()
-		if !self.__ModuleHooks then
-			return
-		end
-		for k, v in pairs( self.__ModuleHooks ) do
-			moduleHook.Add( v[1], v[2], v[3] )
+		if MODULE and self.Name == MODULE.Name then return end -- We don't want to be adding hooks until the module has finished loading successfully.
+		if self.__ModuleHooks == nil then return end
+		for _, v in pairs( self.__ModuleHooks ) do
+			for hookName, data in pairs( v ) do
+				if data then
+					moduleHook.Add( hookName, unpack( data ) )
+				end
+			end
 		end
 	end
 	
@@ -217,8 +233,12 @@ local function CreateModuleTable()
 		if !self.__ModuleHooks then
 			return
 		end
-		for k, v in pairs( self.__ModuleHooks ) do
-			self:UnHook( unpack( v ), true )
+		for _, v in pairs( self.__ModuleHooks ) do
+			for hookName, data in pairs( v ) do
+				if data then
+					moduleHook.Remove( hookName, unpack( data ) )
+				end
+			end
 		end
 	end
 	
@@ -262,10 +282,17 @@ local function HandleUnhandled()
 		print( "Narwhal Module: " .. v.Name .. " was not loaded because not all dependencies could be found!" )
 	end
 	
+	local Info = { "Name", "Title", "Author", "Contact", "Purpose", "ConfigName", "Config", "Dependency", "AutoHook", "ManualHook", "Protect" }
 	for k, v in pairs( Loaded ) do
 		if ( v.ConfigName and NARWHAL.Config[v.ConfigName] == false ) or ( NARWHAL.Config.Modules[v.Name] and NARWHAL.Config.Modules[v.Name].Enabled == false ) then
 			print( "Narwhal Module: "..v.Name.." is disabled." )
-			NARWHAL.__ModuleList[v.Name] = {__Disabled = true}
+			v.__Disabled = true
+			NARWHAL.__ModuleList[v.Name] = v
+			/*for f, _ in pairs( v ) do
+				if !table.HasValue( Info, f ) then
+					NARWHAL.__ModuleList[v.Name][f] = nil
+				end
+			end*/
 		else
 			NARWHAL.__ModuleList[v.Name] = v
 			if v.Dependency[1] then
@@ -310,11 +337,11 @@ local function HandleDependencies( MODULE, nloaded )
 end
 
 local function LoadModules( PathList ) -- PathList is a list of module paths
-
+	
 	for k, v in pairs( PathList ) do
 	
-		MODULE = CreateModuleTable()
-		include( v )
+		MODULE = CreateModuleTable() -- Create the module table
+		include( v ) -- Include the file to overwrite values
 		
 		if !MODULE then
 			ErrorNoHalt( "Narwhal Module Error: "..v..": The 'MODULE' table is nil! Are there errors in the file?\n" )
@@ -325,18 +352,18 @@ local function LoadModules( PathList ) -- PathList is a list of module paths
 		elseif MODULE.Name:find( "[^%w_]" ) then
 			ErrorNoHalt( "Narwhal Module Error: "..v..": The 'MODULE.Name' member contains unsafe characters! The module name may only contain alphanumeric characters and underscores!\n" )
 		elseif table.HasValue( Loaded, MODULE ) or NARWHAL.__ModuleList[MODULE.Name] then
-			ErrorNoHalt( "Narwhal Module Error: "..v..": Another module named "..MODULE.Name.." has already been loaded! Copy-paste mistake?\n" )
+			Msg( "Narwhal Module: "..v..": Another module named "..MODULE.Name.." has already been loaded! Copy-paste mistake?\n" )
 		else
 			local exists = false
 			for _, m in pairs( Loaded ) do
 				if m.Name == MODULE.Name then
-					print( "Narwhal Module: "..v..": Module "..MODULE.Name.." already exists. Module author '"..MODULE.Author.."' may be trying to override it in a derivative, so the original module will not be loaded." )
+					Msg( "Narwhal Module: "..v..": Module "..MODULE.Name.." already exists. Module author '"..(m.Author or "[[Unknown Author]]").."' may be trying to override it in a derivative, so the original module will not be loaded.\n" )
 					exists = true
 					break
 				end
 			end
 			if !exists then
-				Msg("Handling dependencies for Module "..MODULE.Name.."\n")
+				Msg("Handling dependencies for Module "..MODULE.Name.." in "..(name or "nil").."\n")
 				HandleDependencies( MODULE, false )
 			end
 		end
@@ -347,11 +374,13 @@ local function LoadModules( PathList ) -- PathList is a list of module paths
 	
 end
 
-function IncludeNarwhalModules() -- Global function. Add to shared.lua.
-	
+function IncludeNarwhalModules( name, reload ) -- Global function. Add to shared.lua.
+
 	local function InitWrapper()
 		
-		if !NARWHAL.Config.UseModules then print("Narwhal Modules are disabled.") return end
+		if !NARWHAL.Config.UseModules then print("Narwhal Modules are disabled for "..(name or "nil")..".") return end
+		
+		print( "Loading Modules for "..(name or "nil")..":" )
 		
 		hook = nil
 		function require( modName )
@@ -360,6 +389,10 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 				return
 			end
 			moduleRequire( modName )
+		end
+		
+		if reload then
+			NARWHAL.__ModuleList = {}
 		end
 		Loaded = {}
 		NotLoaded = {}
@@ -389,22 +422,30 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 			LoadModules( ClientSideModulePaths )
 		end
 
-		for k, v in pairs( NARWHAL.__ModuleList ) do
+		for k, v in pairs( NARWHAL.GetModules() ) do
 		
 			if v.Config != nil and NARWHAL.Config.Modules[k] then
-				NARWHAL.__ModuleList[k].Config = NARWHAL.Config.Modules[k]
+				v.Config = NARWHAL.Config.Modules[k]
 			end
-			if v.Init != nil then
-				v:Init()
-			end
-			if v.ManualHook == false then
-				v:HookAll()
-			end
-			if v.AutoHook == true then
-				v:__GenerateHooks()
-			end
-			if v.Protect == true then
-				v:__GenerateFunctionCalls()
+			
+			if v.__Disabled == false then
+				
+				if v.Init then
+					v:Init() -- Call Init.
+				end
+				
+				if v.AutoHook == true then
+					v:__GenerateHooks() -- Generate hooks
+				end
+				
+				if v.__ModuleHooks != nil and v.ManualHook == false then
+					v:HookAll() -- Hook all hooks for real.
+				end
+				
+				if v.Protect == true then
+					v:__GenerateFunctionCalls() -- Generate protetected function calls.
+				end
+				
 			end
 			
 		end
@@ -423,10 +464,14 @@ function IncludeNarwhalModules() -- Global function. Add to shared.lua.
 	
 end
 
+//
+// The following stuff is for a concommand
+//
+
 // GetModuleInfo - Grabs the module info and converts it to a string.
 local function GetModuleInfo( modName, member )
 	local mod = NARWHAL.__ModuleList[modName]
-	if !mod or mod.__Disabled then
+	if !mod --[[or mod.__Disabled]] then
 		print( "Module "..modName.." is invalid! It may be disabled." )
 		return 
 	end

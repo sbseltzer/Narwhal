@@ -68,6 +68,14 @@ end
 // Converts our filter enums, functions, or players to tables.
 local function FilterToTable( Ent, Filter, ... )
 	// Now we actually make the filter into a table in case it's not.
+	if !Ent then
+		print( "Networking Error: Invalid Entity! Using player.GetAll()." )
+		return player.GetAll()
+	end
+	if !Filter then
+		print( "Networking Error: Invalid Filter! Using player.GetAll()." )
+		return player.GetAll()
+	end
 	if type( Filter ) == "table" then
 		return Filter
 	elseif type( Filter ) == "number" then
@@ -77,7 +85,8 @@ local function FilterToTable( Ent, Filter, ... )
 	elseif type(Filter):lower() == "player" then
 		return {Filter}
 	else
-		print( "Networking Error: Invalid Filter!" )
+		print(debug.traceback())
+		print( "Networking Error: There was a problem converting the filter to a table!" )
 	end
 end
 

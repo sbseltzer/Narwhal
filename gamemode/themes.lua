@@ -276,18 +276,25 @@ end
 
 // Set the theme on Initialize
 hook.Add( "Initialize", "NARWHAL.Initialize.SetDefaultTheme", function()
-	if !NARWHAL.Config.UseThemes then print("Narwhal Themes are disabled.") return end
-	if !NARWHAL:GetTheme( gamemode.Call( "ForceTheme" ) ) then return end
-	NARWHAL:SetTheme( gamemode.Call( "ForceTheme" ) )
+	if NARWHAL.Config.UseThemes == false then --[[print("Narwhal Themes are disabled for "..GAMEMODE.Name..".")]] return end
+	local force = gamemode.Call( "ForceTheme" )
+	if NARWHAL:GetTheme( force ) == nil then return end
+	NARWHAL:SetTheme( force )
+	print("Forcing Narwhal Theme to "..force..".") 
 end )
 
-function IncludeNarwhalThemes()
+function IncludeNarwhalThemes( name, reload )
 
 	local function InitWrapper()
 		
-		if !NARWHAL.Config.UseThemes then print("Narwhal Themes are disabled.") return end
+		if !NARWHAL.Config.UseThemes then Msg("Narwhal Themes are disabled for "..(name or "nil")..".") return end
+		
+		Msg( "Loading Themes for "..(name or "nil")..":" )
 		
 		hook = nil
+		if reload then
+			NARWHAL.__ThemeList = {}
+		end
 		Loaded = {}
 		NotLoaded = {}
 		ThemeFolders = {}

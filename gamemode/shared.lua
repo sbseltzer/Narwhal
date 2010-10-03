@@ -38,15 +38,33 @@ GM.Website 		= "www.gmodcentral.com" -- Website.
 GM.TeamBased 	= false -- It's a base gamemode. We don't need teams.
 GM.__Narwhal = GM.__Narwhal or {} -- DO NOT TOUCH!
 
+// Table inheritence without invoking metamethods
+local function RawInherit( t, base )
+	for k, v in pairs( base ) do 
+		if rawget( t, k ) == nil then rawset(t, k, v ) end
+	end
+	rawset( t, "BaseClass", base )
+	return t
+end
+
 // We're gonna cheat and register the gamemode with your base of choice. ;D
 // What this means is you can port just about any gamemode to narwhal by changing just a few lines.
 local oldReg = gamemode.Register
 function gamemode.Register( t, name, derived )
+
+	// If we're deriving from narwhal, and the narwhal derivative is valid, and the derivative isn't base, and the derivative isn't narwhal, and the derivative's gamemode table is valid, then...
 	if name == NARWHAL_FOLDER and NARWHAL_DERIVATIVE and NARWHAL_DERIVATIVE:lower() != "base" and NARWHAL_DERIVATIVE:lower() != NARWHAL_FOLDER and gamemode.Get( NARWHAL_DERIVATIVE ) != nil then
-		oldReg( t, name, NARWHAL_DERIVATIVE )
+		oldReg( t, name, NARWHAL_DERIVATIVE ) -- Derive from the derivative.
 	else
 		oldReg( t, name, derived )
 	end
+	
+	if t.IsNarwhalGamemode and t:IsNarwhalGamemode() and name:lower() != "narwhal" then
+		// Add modules and themes. You don't need to call these in your gamemodes. It automatically loads modules and themes from any derivatives.
+		IncludeNarwhalModules( name, true ) -- Adds modules.
+		IncludeNarwhalThemes( name, true ) -- Adds themes.
+	end
+	
 end
 
 
@@ -63,7 +81,6 @@ local meta = {}
 meta.__index = function( table, key ) -- Whenever NARWHAL can't find something, it will look in the GM.__Narwhal table.
 	local t = gm_accessor()
 	if !t then
-		print( "fail:", t, t.__Narwhal, NARWHAL )
 		error( "NARWHAL METATABLE FAILURE: Getting of key '"..key.."' failed!\n", 2 )
 	end
 	if !t.__Narwhal then
@@ -74,7 +91,6 @@ end
 meta.__newindex = function( table, key, value ) -- Whenever NARWHAL wants to store something, it will put it in the GM.__Narwhal table.
 	local t = gm_accessor()
 	if !t then
-		print( "fail:", t, t.__Narwhal, NARWHAL )
 		error( "NARWHAL METATABLE FAILURE: Setting of key '"..key.."' to value ("..tostring(value)..") failed!\n", 2 )
 	end
 	if !t.__Narwhal then
@@ -100,10 +116,6 @@ setmetatable( GM.__Narwhal, meta2 )
 include( 'includes_shd.lua' ) -- Include shared files.
 
 DeriveGamemode( NARWHAL_DERIVATIVE )
-
-// Add modules and themes. You don't need to call these in your gamemodes. It automatically loads modules and themes from any derivatives.
-IncludeNarwhalModules() -- Adds modules.
-IncludeNarwhalThemes() -- Adds themes.
 
 /*---------------------------------------------------------
    Name: IsNarwhalGamemode

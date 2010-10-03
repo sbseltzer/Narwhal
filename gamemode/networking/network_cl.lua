@@ -54,7 +54,9 @@ function NARWHAL:FetchNetworkedVariable( Ent, Name, Var, storageType )
 	end
 	if !NARWHAL.__NetworkCache[storageDest][ID][Name] then
 		if Var == nil then
-			error( "Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed. Are they in the network filter for this variable?\n" )
+			--error( "Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed. Are they in the network filter for this variable?\n" )
+			--print( "WARNING: Fetching of networked "..storageType.." '"..Name.."' for "..tostring(Ent).." failed! Setting to default value..." )
+			Var = NARWHAL.__NetworkData[storageType].DefaultValue
 		end
 		NARWHAL:SendNetworkedVariable( Ent, Name, Var, storageType )
 		return Var
