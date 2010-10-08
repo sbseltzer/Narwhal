@@ -59,7 +59,7 @@ function NARWHAL.GetModules()
 end
 
 // Gets the module data from the module table
-function NARWHAL.GetModule( moduleName, opRef )
+function NARWHAL.GetModule( moduleName, opCopy )
 	if !moduleName then return end
 	if !NARWHAL.__ModuleList[moduleName] then
 		error( "NARWHAL.GetModule Failed: Module "..moduleName.." does not exist!\n", 2 )
@@ -67,7 +67,7 @@ function NARWHAL.GetModule( moduleName, opRef )
 		Msg( "NARWHAL.GetModule Failed: Module "..moduleName.." is disabled!\n" )
 		return
 	end
-	if opRef then
+	if !opCopy then
 		return NARWHAL.__ModuleList[moduleName]
 	else
 		return table.Copy( NARWHAL.__ModuleList[moduleName] )

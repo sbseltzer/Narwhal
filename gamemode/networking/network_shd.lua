@@ -62,7 +62,8 @@ NARWHAL.__NetworkCache.Entities = {} -- Stores NWEntities
 NARWHAL.__NetworkCache.Colors = {} -- Stores NWColors
 NARWHAL.__NetworkCache.Vectors = {} -- Stores NWVectors
 NARWHAL.__NetworkCache.Angles = {} -- Stores NWAngles
-NARWHAL.__NetworkCache.Effects = {} -- Stores NWEffects
+NARWHAL.__NetworkCache.EffectData = {} -- Stores NWEffects
+NARWHAL.__NetworkCache.DamageInfo = {} -- Stores NWEffects
 NARWHAL.__NetworkCache.Tables = {} -- Stores NWTables
 NARWHAL.__NetworkCache.Vars = {} -- Stores NWVars
 
@@ -269,7 +270,7 @@ hook.Add( "Initialize", "NARWHAL.Initialize.LoadNetworkConfigurations", function
 	)
 
 	// EFFECTS
-	NARWHAL:AddValidNetworkType( "ceffectdata", "Effect", "Effects", EffectData(),
+	NARWHAL:AddValidNetworkType( "ceffectdata", "EffectData", "EffectData", EffectData(),
 		function( var )
 			if type( var ) != "CEffectData" then
 				error( "Bad argument #2 (CEffectData expected, got "..type( var )..")\n", 2 )

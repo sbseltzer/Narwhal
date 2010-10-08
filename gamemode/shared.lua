@@ -38,15 +38,6 @@ GM.Website 		= "www.gmodcentral.com" -- Website.
 GM.TeamBased 	= false -- It's a base gamemode. We don't need teams.
 GM.__Narwhal = GM.__Narwhal or {} -- DO NOT TOUCH!
 
-// Table inheritence without invoking metamethods
-local function RawInherit( t, base )
-	for k, v in pairs( base ) do 
-		if rawget( t, k ) == nil then rawset(t, k, v ) end
-	end
-	rawset( t, "BaseClass", base )
-	return t
-end
-
 // We're gonna cheat and register the gamemode with your base of choice. ;D
 // What this means is you can port just about any gamemode to narwhal by changing just a few lines.
 local oldReg = gamemode.Register
@@ -119,10 +110,10 @@ DeriveGamemode( NARWHAL_DERIVATIVE )
 
 /*---------------------------------------------------------
    Name: IsNarwhalGamemode
-   Desc: I'm not sure if this will even get used, but whatever.
+   Desc: I'm not sure if this will even get used, but what the hell.
 ---------------------------------------------------------*/
 function GM:IsNarwhalGamemode()
-	return true
+	return true -- :3
 end
 
 /*---------------------------------------------------------
